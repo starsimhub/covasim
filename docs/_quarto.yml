@@ -55,20 +55,22 @@ website:
         text: FAQ
       - href: api/index.qmd
         text: API reference
-      - href: papers.md
-        text: Publications
-      - href: parameters.md
-        text: Parameters
-      - href: data.md
-        text: Data scrapers
-      - href: glossary.md
-        text: Glossary
-      - href: code_of_conduct.md
-        text: Code of conduct
-      - href: contributing.md
-        text: Contributing to Covasim
-      - href: style.md
-        text: Style guide
+      - text: More
+        menu:
+          - href: papers.md
+            text: Publications
+          - href: parameters.md
+            text: Parameters
+          - href: data.md
+            text: Data scrapers
+          - href: glossary.md
+            text: Glossary
+          - href: code_of_conduct.md
+            text: Code of conduct
+          - href: contributing.md
+            text: Contributing to Covasim
+          - href: style.md
+            text: Style guide
 
   sidebar:
     - id: main
