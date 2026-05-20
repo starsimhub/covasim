@@ -14,7 +14,7 @@ website:
   image: /assets/covasim-logo.png
   favicon: /assets/favicon.ico
 
-  repo-url: https://github.com/institutefordiseasemodeling/covasim
+  repo-url: https://github.com/starsimhub/covasim
   repo-actions: [issue]
   page-navigation: true
   search:
@@ -24,7 +24,7 @@ website:
     center: "Docs built for Covasim v{{< var version >}} ({{< var versiondate >}}).<br>© 2020–2026, Bill & Melinda Gates Foundation. All rights reserved."
     right:
       - icon: github
-        href: https://github.com/institutefordiseasemodeling/covasim
+        href: https://github.com/starsimhub/covasim
         aria-label: GitHub
       - icon: envelope-at-fill
         href: mailto:info@covasim.org
@@ -38,7 +38,7 @@ website:
 
     tools:
       - icon: github
-        href: https://github.com/institutefordiseasemodeling/covasim
+        href: https://github.com/starsimhub/covasim
       - icon: envelope-at-fill
         href: mailto:info@covasim.org
       - icon: globe
