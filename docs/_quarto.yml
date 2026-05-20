@@ -201,6 +201,7 @@ interlinks:
     covasim: [cv]
 
 execute:
+  enabled: true  # required for .ipynb; Quarto does not execute notebooks by default
   freeze: auto
   cache: true
   error: false
