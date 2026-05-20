@@ -1,7 +1,0 @@
-include LICENSE
-global-include requirements*.txt
-global-include *.rst
-recursive-include covasim *.py
-recursive-include covasim *.json
-recursive-include covasim *.ttf
-global-exclude *.py[cod] __pycache__

@@ -1,7 +1,0 @@
-numpy
-numba
-pandas
-scipy<1.16.0
-statsmodels
-matplotlib
-sciris>=2.0.4

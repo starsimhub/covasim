@@ -1,0 +1,6079 @@
+{
+  "project": "covasim",
+  "version": "0.0.9999",
+  "count": 391,
+  "items": [
+    {
+      "name": "covasim.analysis.Analyzer.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Analyzer.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Analyzer.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Analyzer.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Analyzer.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Analyzer",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.calibrate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.calibrate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.make_study",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.make_study",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.parse_study",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.parse_study",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.plot_all",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_all",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.plot_best",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_best",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.plot_sims",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_sims",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.plot_stride",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_stride",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.plot_trend",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_trend",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.remove_db",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.remove_db",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.run_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.run_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.run_trial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.run_trial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.run_workers",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.run_workers",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration.worker",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.worker",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Calibration",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.compute",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.compute_diffs",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_diffs",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.compute_gofs",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_gofs",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.compute_losses",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_losses",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.compute_mismatch",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_mismatch",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.reconcile_inputs",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.reconcile_inputs",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.Fit",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.animate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.animate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.count_targets",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.count_targets",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.count_transmissions",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.count_transmissions",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.day",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.day",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.make_detailed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.make_detailed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.plot_histograms",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.plot_histograms",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree.r0",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.r0",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.TransTree",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.age_histogram.compute_windows",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.compute_windows",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.age_histogram.from_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.from_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.age_histogram.get",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.get",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.age_histogram.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.age_histogram",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_age_stats.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_age_stats.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_age_stats.to_total_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats.to_total_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_age_stats",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_stats.intersect",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.intersect",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_stats.make_report",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.make_report",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_stats.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_stats.report",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.report",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_stats.transpose",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.transpose",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.daily_stats",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.nab_histogram.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.nab_histogram.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.nab_histogram",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.nab_histogram",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.snapshot.get",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.snapshot.get",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis.snapshot",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.snapshot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.analysis",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.add_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.add_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.count",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.count",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.count_by_variant",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.count_by_variant",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.count_not",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.count_not",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.date_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.date_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.defined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.defined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.dur_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.dur_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.false",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.false",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.from_list",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.from_list",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.get",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.get",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.indices",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.indices",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.init_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.init_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.layer_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.layer_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.lock",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.lock",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.make_edgelist",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.make_edgelist",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.person",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.person",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.person_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.person_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.remove_duplicates",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.remove_duplicates",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.set",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.set",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.set_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.set_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.state_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.state_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.to_arr",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_arr",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.to_graph",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_graph",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.to_list",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_list",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.true",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.true",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.undefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.undefined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.unlock",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.unlock",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople.validate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.validate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BasePeople",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.copy",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.copy",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.date",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.date",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.datevec",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.datevec",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.day",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.day",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.export_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.export_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.export_results",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.export_results",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.get_analyzer",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_analyzer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.get_analyzers",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_analyzers",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.get_intervention",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_intervention",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.get_interventions",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_interventions",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.n",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.n",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.npts",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.npts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.result_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.result_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.scaled_pop_size",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.scaled_pop_size",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.set_metadata",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.set_metadata",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.set_seed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.set_seed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.to_excel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.to_excel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.tvec",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.tvec",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim.update_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.update_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.BaseSim",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Contacts.add_layer",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts.add_layer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Contacts.pop_layer",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts.pop_layer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Contacts.to_graph",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts.to_graph",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Contacts",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.FlexDict",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.FlexDict",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.append",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.append",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.find_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.find_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.from_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.from_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.members",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.members",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.meta_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.meta_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.pop_inds",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.pop_inds",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.to_graph",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.to_graph",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.update",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.update",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer.validate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.validate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Layer",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.ParsObj.update_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.ParsObj.update_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.ParsObj",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.ParsObj",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Person",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Person",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base.Result",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.base",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.data.loaders.get_age_distribution",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/data.loaders.html#covasim.data.loaders.get_age_distribution",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.data.loaders.get_country_aliases",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/data.loaders.html#covasim.data.loaders.get_country_aliases",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.data.loaders.get_household_size",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/data.loaders.html#covasim.data.loaders.get_household_size",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.data.loaders.map_entries",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/data.loaders.html#covasim.data.loaders.map_entries",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.data.loaders.show_locations",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/data.loaders.html#covasim.data.loaders.show_locations",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.data.loaders",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/data.loaders.html#covasim.data.loaders",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.defaults.get_default_colors",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/defaults.html#covasim.defaults.get_default_colors",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.defaults.get_default_plots",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/defaults.html#covasim.defaults.get_default_plots",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.defaults",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/defaults.html#covasim.defaults",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.immunity.variant.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.immunity.variant.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.immunity.variant.parse",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant.parse",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.immunity.variant",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.immunity",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.BaseVaccination.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.BaseVaccination.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.BaseVaccination.select_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.select_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.BaseVaccination.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.BaseVaccination.vaccinate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.vaccinate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.BaseVaccination",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention.plot_intervention",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.plot_intervention",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.Intervention",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.InterventionDict",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.InterventionDict",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.change_beta.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.change_beta.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.change_beta",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.change_beta",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.clip_edges.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.clip_edges.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.clip_edges",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.clip_edges",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.contact_tracing.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.contact_tracing.identify_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.identify_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.contact_tracing.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.contact_tracing.notify_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.notify_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.contact_tracing.select_cases",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.select_cases",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.contact_tracing",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.dynamic_pars.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.dynamic_pars.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.dynamic_pars",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.dynamic_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.historical_vaccinate_prob.estimate_prob",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_vaccinate_prob.estimate_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.historical_vaccinate_prob.process_days",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_vaccinate_prob.process_days",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.historical_vaccinate_prob",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_vaccinate_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.historical_wave",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_wave",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.prior_immunity",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.prior_immunity",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.sequence.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.sequence.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.sequence.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.sequence.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.sequence",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.sequence",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.simple_vaccine.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.simple_vaccine.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.simple_vaccine.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.simple_vaccine.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.simple_vaccine",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.simple_vaccine",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.test_num.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_num.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.test_num.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_num.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.test_num",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_num",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.test_prob.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.test_prob.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.test_prob.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.test_prob",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.vaccinate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.vaccinate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.vaccinate_num",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.vaccinate_num",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions.vaccinate_prob",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.vaccinate_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.interventions",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.check_save_version",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.check_save_version",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.check_version",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.check_version",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.compute_gof",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.compute_gof",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.get_doubling_time",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.get_doubling_time",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.get_png_metadata",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.get_png_metadata",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.get_version_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.get_version_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.git_info",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.git_info",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.help",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.help",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.load_data",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.load_data",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.migrate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.migrate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc.savefig",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.savefig",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.misc",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.get_cross_immunity",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_cross_immunity",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.get_prognoses",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_prognoses",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.get_vaccine_choices",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_vaccine_choices",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.get_vaccine_dose_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_vaccine_dose_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.get_vaccine_variant_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_vaccine_variant_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.get_variant_choices",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_variant_choices",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.get_variant_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_variant_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.make_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.make_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters.reset_layer_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.reset_layer_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parameters",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_critical",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_critical",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_death",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_death",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_diagnosed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_diagnosed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_exit_iso",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_exit_iso",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_inds",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_inds",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_infectious",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_infectious",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_quar",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_quar",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_recovery",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_recovery",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_severe",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_severe",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.check_symptomatic",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_symptomatic",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.infect",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.infect",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.init_flows",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.init_flows",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.make_naive",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.make_naive",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.make_nonnaive",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.make_nonnaive",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.schedule_quarantine",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.schedule_quarantine",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.set_prognoses",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.set_prognoses",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.story",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.story",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.test",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.test",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.update_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.update_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.update_states_post",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.update_states_post",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People.update_states_pre",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.update_states_pre",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people.People",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.people",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plot_compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plot_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plot_result",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plot_scens",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_scens",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plot_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plotly_animate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plotly_animate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plotly_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plotly_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting.plotly_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plotly_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotting",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.population.make_hybrid_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_hybrid_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.population.make_microstructured_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_microstructured_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.population.make_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.population.make_random_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_random_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.population.make_randpop",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_randpop",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.population.make_synthpop",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_synthpop",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.population",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.requirements.check_sciris",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/requirements.html#covasim.requirements.check_sciris",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.requirements.check_synthpops",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/requirements.html#covasim.requirements.check_synthpops",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.requirements",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/requirements.html#covasim.requirements",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.brief",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.brief",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.combine",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.combine",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.init_sims",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.init_sims",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.mean",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.mean",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.median",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.median",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.merge",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.merge",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.plot_compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.plot_compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.plot_result",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.plot_result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.reduce",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.reduce",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.reset",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.reset",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.result_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.result_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.split",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.split",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.to_excel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.to_excel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.MultiSim",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.brief",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.brief",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.result_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.result_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.to_excel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.to_excel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.Scenarios",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.make_metapars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.make_metapars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.multi_run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.multi_run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.parallel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.parallel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run.single_run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.single_run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.run",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.changed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.changed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.context",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.context",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.get_default",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.get_default",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.get_orig_options",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.get_orig_options",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.help",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.help",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.set",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.set",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.set_matplotlib_global",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.set_matplotlib_global",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.to_dict",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.to_dict",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.use_style",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.use_style",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options.with_style",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.with_style",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings.Options",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.settings",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.AlreadyRunError",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.AlreadyRunError",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.brief",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.brief",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.calibrate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.calibrate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_doubling",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_doubling",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_fit",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_fit",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_gen_time",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_gen_time",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_r_eff",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_r_eff",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_results",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_results",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_states",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_states",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_summary",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_summary",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.compute_yield",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_yield",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.init_analyzers",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_analyzers",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.init_immunity",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_immunity",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.init_infections",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_infections",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.init_interventions",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_interventions",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.init_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.init_results",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_results",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.init_variants",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_variants",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.layer_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.layer_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.load_data",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.load_data",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.load_population",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.load_population",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.make_age_histogram",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.make_age_histogram",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.make_transtree",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.make_transtree",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.plot_result",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.plot_result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.rescale",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.rescale",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.reset_layer_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.reset_layer_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.step",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.step",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.validate_layer_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.validate_layer_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim.validate_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.validate_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.Sim",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.demo",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.demo",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim.diff_sims",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.diff_sims",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sim",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.binomial_arr",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.binomial_arr",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.binomial_filter",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.binomial_filter",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.choose",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.choose",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.choose_r",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.choose_r",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.choose_w",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.choose_w",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.defined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.defined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.false",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.false",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.get_pdf",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.get_pdf",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.idefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.idefined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.idefinedi",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.idefinedi",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.ifalse",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.ifalse",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.ifalsei",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.ifalsei",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.itrue",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.itrue",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.itruei",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.itruei",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.iundefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.iundefined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.iundefinedi",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.iundefinedi",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.n_binomial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_binomial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.n_multinomial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_multinomial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.n_neg_binomial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_neg_binomial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.n_poisson",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_poisson",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.poisson",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.poisson",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.sample",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.sample",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.set_seed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.set_seed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.true",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.true",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils.undefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.undefined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.utils",
+      "domain": "py",
+      "role": "module",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Analyzer.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Analyzer.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Analyzer.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Analyzer.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Analyzer.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Analyzer",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Analyzer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.calibrate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.calibrate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.make_study",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.make_study",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.parse_study",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.parse_study",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.plot_all",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_all",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.plot_best",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_best",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.plot_sims",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_sims",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.plot_stride",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_stride",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.plot_trend",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.plot_trend",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.remove_db",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.remove_db",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.run_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.run_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.run_trial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.run_trial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.run_workers",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.run_workers",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration.worker",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration.worker",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Calibration",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Calibration",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.compute",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.compute_diffs",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_diffs",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.compute_gofs",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_gofs",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.compute_losses",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_losses",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.compute_mismatch",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.compute_mismatch",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.reconcile_inputs",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.reconcile_inputs",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Fit",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.Fit",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.animate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.animate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.count_targets",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.count_targets",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.count_transmissions",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.count_transmissions",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.day",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.day",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.make_detailed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.make_detailed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.plot_histograms",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.plot_histograms",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree.r0",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree.r0",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.TransTree",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.TransTree",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.age_histogram.compute_windows",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.compute_windows",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.age_histogram.from_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.from_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.age_histogram.get",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.get",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.age_histogram.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.age_histogram",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.age_histogram",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_age_stats.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_age_stats.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_age_stats.to_total_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats.to_total_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_age_stats",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_age_stats",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_stats.intersect",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.intersect",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_stats.make_report",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.make_report",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_stats.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_stats.report",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.report",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_stats.transpose",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats.transpose",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.daily_stats",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.daily_stats",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.nab_histogram.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.nab_histogram.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.nab_histogram",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.nab_histogram",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.snapshot.get",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.snapshot.get",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.snapshot",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/analysis.html#covasim.analysis.snapshot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.add_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.add_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.count",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.count",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.count_by_variant",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.count_by_variant",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.count_not",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.count_not",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.date_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.date_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.defined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.defined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.dur_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.dur_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.false",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.false",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.from_list",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.from_list",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.get",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.get",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.indices",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.indices",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.init_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.init_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.layer_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.layer_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.lock",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.lock",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.make_edgelist",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.make_edgelist",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.person",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.person",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.person_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.person_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.remove_duplicates",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.remove_duplicates",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.set",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.set",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.set_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.set_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.state_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.state_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.to_arr",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_arr",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.to_graph",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_graph",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.to_list",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.to_list",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.true",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.true",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.undefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.undefined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.unlock",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.unlock",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople.validate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople.validate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BasePeople",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BasePeople",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.copy",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.copy",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.date",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.date",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.datevec",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.datevec",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.day",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.day",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.export_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.export_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.export_results",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.export_results",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.get_analyzer",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_analyzer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.get_analyzers",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_analyzers",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.get_intervention",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_intervention",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.get_interventions",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.get_interventions",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.n",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.n",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.npts",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.npts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.result_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.result_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.scaled_pop_size",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.scaled_pop_size",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.set_metadata",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.set_metadata",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.set_seed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.set_seed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.to_excel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.to_excel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.tvec",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.tvec",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim.update_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim.update_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseSim",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.BaseSim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Contacts.add_layer",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts.add_layer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Contacts.pop_layer",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts.pop_layer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Contacts.to_graph",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts.to_graph",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Contacts",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.FlexDict",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.FlexDict",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.append",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.append",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.find_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.find_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.from_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.from_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.members",
+      "domain": "py",
+      "role": "attribute",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.members",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.meta_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.meta_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.pop_inds",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.pop_inds",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.to_df",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.to_df",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.to_graph",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.to_graph",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.update",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.update",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer.validate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer.validate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Layer",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Layer",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.ParsObj.update_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.ParsObj.update_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.ParsObj",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.ParsObj",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Person",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Person",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Result",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/base.html#covasim.base.Result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_default_colors",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/defaults.html#covasim.defaults.get_default_colors",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_default_plots",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/defaults.html#covasim.defaults.get_default_plots",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.variant.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.variant.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.variant.parse",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant.parse",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.variant",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/immunity.html#covasim.immunity.variant",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseVaccination.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseVaccination.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseVaccination.select_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.select_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseVaccination.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseVaccination.vaccinate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination.vaccinate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.BaseVaccination",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.BaseVaccination",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention.plot_intervention",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.plot_intervention",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Intervention",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.Intervention",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.InterventionDict",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.InterventionDict",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.change_beta.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.change_beta.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.change_beta",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.change_beta",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.clip_edges.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.clip_edges.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.clip_edges",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.clip_edges",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.contact_tracing.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.contact_tracing.identify_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.identify_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.contact_tracing.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.contact_tracing.notify_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.notify_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.contact_tracing.select_cases",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing.select_cases",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.contact_tracing",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.contact_tracing",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.dynamic_pars.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.dynamic_pars.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.dynamic_pars",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.dynamic_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.historical_vaccinate_prob.estimate_prob",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_vaccinate_prob.estimate_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.historical_vaccinate_prob.process_days",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_vaccinate_prob.process_days",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.historical_vaccinate_prob",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_vaccinate_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.historical_wave",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.historical_wave",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.prior_immunity",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.prior_immunity",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sequence.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.sequence.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sequence.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.sequence.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sequence",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.sequence",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.simple_vaccine.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.simple_vaccine.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.simple_vaccine.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.simple_vaccine.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.simple_vaccine",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.simple_vaccine",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.test_num.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_num.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.test_num.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_num.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.test_num",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_num",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.test_prob.apply",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob.apply",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.test_prob.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.test_prob.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.test_prob",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.test_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.vaccinate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.vaccinate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.vaccinate_num",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.vaccinate_num",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.vaccinate_prob",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/interventions.html#covasim.interventions.vaccinate_prob",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.check_save_version",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.check_save_version",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.check_version",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.check_version",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.compute_gof",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.compute_gof",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_doubling_time",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.get_doubling_time",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_png_metadata",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.get_png_metadata",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_version_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.get_version_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.git_info",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.git_info",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.help",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.help",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.load_data",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.load_data",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.migrate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.migrate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.savefig",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/misc.html#covasim.misc.savefig",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_cross_immunity",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_cross_immunity",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_prognoses",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_prognoses",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_vaccine_choices",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_vaccine_choices",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_vaccine_dose_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_vaccine_dose_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_vaccine_variant_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_vaccine_variant_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_variant_choices",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_variant_choices",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_variant_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.get_variant_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.make_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.reset_layer_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/parameters.html#covasim.parameters.reset_layer_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_critical",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_critical",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_death",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_death",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_diagnosed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_diagnosed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_exit_iso",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_exit_iso",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_inds",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_inds",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_infectious",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_infectious",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_quar",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_quar",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_recovery",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_recovery",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_severe",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_severe",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.check_symptomatic",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.check_symptomatic",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.infect",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.infect",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.init_flows",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.init_flows",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.make_naive",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.make_naive",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.make_nonnaive",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.make_nonnaive",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.schedule_quarantine",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.schedule_quarantine",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.set_prognoses",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.set_prognoses",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.story",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.story",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.test",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.test",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.update_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.update_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.update_states_post",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.update_states_post",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People.update_states_pre",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People.update_states_pre",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.People",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/people.html#covasim.people.People",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plot_compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plot_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plot_result",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plot_scens",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_scens",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plot_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plot_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotly_animate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plotly_animate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotly_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plotly_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.plotly_sim",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/plotting.html#covasim.plotting.plotly_sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_hybrid_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_hybrid_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_microstructured_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_microstructured_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_random_contacts",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_random_contacts",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_randpop",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_randpop",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_synthpop",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/population.html#covasim.population.make_synthpop",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.brief",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.brief",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.combine",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.combine",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.init_sims",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.init_sims",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.mean",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.mean",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.median",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.median",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.merge",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.merge",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.plot_compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.plot_compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.plot_result",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.plot_result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.reduce",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.reduce",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.reset",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.reset",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.result_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.result_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.shrink",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.shrink",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.split",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.split",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.to_excel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.to_excel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.MultiSim",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.MultiSim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.brief",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.brief",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.compare",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.compare",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.result_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.result_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.to_excel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.to_excel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios.to_json",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios.to_json",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Scenarios",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.Scenarios",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.make_metapars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.make_metapars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.multi_run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.multi_run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.parallel",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.parallel",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.single_run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/run.html#covasim.run.single_run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.changed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.changed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.context",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.context",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.get_default",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.get_default",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.get_orig_options",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.get_orig_options",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.help",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.help",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.load",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.load",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.save",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.save",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.set",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.set",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.set_matplotlib_global",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.set_matplotlib_global",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.to_dict",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.to_dict",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.use_style",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.use_style",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options.with_style",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options.with_style",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Options",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/settings.html#covasim.settings.Options",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.AlreadyRunError",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.AlreadyRunError",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.brief",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.brief",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.calibrate",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.calibrate",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_doubling",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_doubling",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_fit",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_fit",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_gen_time",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_gen_time",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_r_eff",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_r_eff",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_results",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_results",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_states",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_states",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_summary",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_summary",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.compute_yield",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.compute_yield",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.disp",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.disp",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.finalize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.finalize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.init_analyzers",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_analyzers",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.init_immunity",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_immunity",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.init_infections",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_infections",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.init_interventions",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_interventions",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.init_people",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_people",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.init_results",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_results",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.init_variants",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.init_variants",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.initialize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.initialize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.layer_keys",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.layer_keys",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.load_data",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.load_data",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.load_population",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.load_population",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.make_age_histogram",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.make_age_histogram",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.make_transtree",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.make_transtree",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.plot",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.plot",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.plot_result",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.plot_result",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.rescale",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.rescale",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.reset_layer_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.reset_layer_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.run",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.run",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.step",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.step",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.summarize",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.summarize",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.validate_layer_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.validate_layer_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim.validate_pars",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim.validate_pars",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.Sim",
+      "domain": "py",
+      "role": "class",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.Sim",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.demo",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.demo",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.diff_sims",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/sim.html#covasim.sim.diff_sims",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.binomial_arr",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.binomial_arr",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.binomial_filter",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.binomial_filter",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.choose",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.choose",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.choose_r",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.choose_r",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.choose_w",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.choose_w",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.defined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.defined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.false",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.false",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.get_pdf",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.get_pdf",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.idefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.idefined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.idefinedi",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.idefinedi",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.ifalse",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.ifalse",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.ifalsei",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.ifalsei",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.itrue",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.itrue",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.itruei",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.itruei",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.iundefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.iundefined",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.iundefinedi",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.iundefinedi",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.n_binomial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_binomial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.n_multinomial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_multinomial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.n_neg_binomial",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_neg_binomial",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.n_poisson",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.n_poisson",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.poisson",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.poisson",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.sample",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.sample",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.set_seed",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.set_seed",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.true",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.true",
+      "dispname": "-"
+    },
+    {
+      "name": "covasim.undefined",
+      "domain": "py",
+      "role": "function",
+      "priority": "1",
+      "uri": "api/utils.html#covasim.utils.undefined",
+      "dispname": "-"
+    }
+  ]
+}

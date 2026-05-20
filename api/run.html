@@ -1,0 +1,3143 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>run – Covasim</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../api/settings.html" rel="next">
+<link href="../api/requirements.html" rel="prev">
+<link href="..//assets/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-aafc68b2255684af78b035618dac2a51.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo light-content">
+    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../overview.html" aria-current="page"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/index.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../whatsnew.html"> 
+<span class="menu-text">What’s new</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../faq.html"> 
+<span class="menu-text">FAQ</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../api/index.html"> 
+<span class="menu-text">API reference</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-more" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">More</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-more">    
+        <li>
+    <a class="dropdown-item" href="../papers.html">
+ <span class="dropdown-text">Publications</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../parameters.html">
+ <span class="dropdown-text">Parameters</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../data.html">
+ <span class="dropdown-text">Data scrapers</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../glossary.html">
+ <span class="dropdown-text">Glossary</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../code_of_conduct.html">
+ <span class="dropdown-text">Code of conduct</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../contributing.html">
+ <span class="dropdown-text">Contributing to Covasim</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../style.html">
+ <span class="dropdown-text">Style guide</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools tools-wide">
+    <a href="https://github.com/starsimhub/covasim" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+    <a href="mailto:info@covasim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-envelope-at-fill"></i></a>
+    <a href="https://covasim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-globe"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/run.html">run</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Overview</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>API reference</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/base.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">base</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/data.loaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">data.loaders</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/defaults.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">defaults</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/immunity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">immunity</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/interventions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">interventions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/misc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">misc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/parameters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parameters</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/people.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">people</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/plotting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plotting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/population.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">population</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/requirements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">requirements</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/run.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">run</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/settings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">settings</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/sim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sim</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">utils</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#covasim.run" id="toc-covasim.run" class="nav-link active" data-scroll-target="#covasim.run">run</a>
+  <ul>
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul>
+  <li><a href="#covasim.run.MultiSim" id="toc-covasim.run.MultiSim" class="nav-link" data-scroll-target="#covasim.run.MultiSim">MultiSim</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.run.MultiSim.brief" id="toc-covasim.run.MultiSim.brief" class="nav-link" data-scroll-target="#covasim.run.MultiSim.brief">brief</a></li>
+  <li><a href="#covasim.run.MultiSim.combine" id="toc-covasim.run.MultiSim.combine" class="nav-link" data-scroll-target="#covasim.run.MultiSim.combine">combine</a></li>
+  <li><a href="#covasim.run.MultiSim.compare" id="toc-covasim.run.MultiSim.compare" class="nav-link" data-scroll-target="#covasim.run.MultiSim.compare">compare</a></li>
+  <li><a href="#covasim.run.MultiSim.disp" id="toc-covasim.run.MultiSim.disp" class="nav-link" data-scroll-target="#covasim.run.MultiSim.disp">disp</a></li>
+  <li><a href="#covasim.run.MultiSim.init_sims" id="toc-covasim.run.MultiSim.init_sims" class="nav-link" data-scroll-target="#covasim.run.MultiSim.init_sims">init_sims</a></li>
+  <li><a href="#covasim.run.MultiSim.load" id="toc-covasim.run.MultiSim.load" class="nav-link" data-scroll-target="#covasim.run.MultiSim.load">load</a></li>
+  <li><a href="#covasim.run.MultiSim.mean" id="toc-covasim.run.MultiSim.mean" class="nav-link" data-scroll-target="#covasim.run.MultiSim.mean">mean</a></li>
+  <li><a href="#covasim.run.MultiSim.median" id="toc-covasim.run.MultiSim.median" class="nav-link" data-scroll-target="#covasim.run.MultiSim.median">median</a></li>
+  <li><a href="#covasim.run.MultiSim.merge" id="toc-covasim.run.MultiSim.merge" class="nav-link" data-scroll-target="#covasim.run.MultiSim.merge">merge</a></li>
+  <li><a href="#covasim.run.MultiSim.plot" id="toc-covasim.run.MultiSim.plot" class="nav-link" data-scroll-target="#covasim.run.MultiSim.plot">plot</a></li>
+  <li><a href="#covasim.run.MultiSim.plot_compare" id="toc-covasim.run.MultiSim.plot_compare" class="nav-link" data-scroll-target="#covasim.run.MultiSim.plot_compare">plot_compare</a></li>
+  <li><a href="#covasim.run.MultiSim.plot_result" id="toc-covasim.run.MultiSim.plot_result" class="nav-link" data-scroll-target="#covasim.run.MultiSim.plot_result">plot_result</a></li>
+  <li><a href="#covasim.run.MultiSim.reduce" id="toc-covasim.run.MultiSim.reduce" class="nav-link" data-scroll-target="#covasim.run.MultiSim.reduce">reduce</a></li>
+  <li><a href="#covasim.run.MultiSim.reset" id="toc-covasim.run.MultiSim.reset" class="nav-link" data-scroll-target="#covasim.run.MultiSim.reset">reset</a></li>
+  <li><a href="#covasim.run.MultiSim.result_keys" id="toc-covasim.run.MultiSim.result_keys" class="nav-link" data-scroll-target="#covasim.run.MultiSim.result_keys">result_keys</a></li>
+  <li><a href="#covasim.run.MultiSim.run" id="toc-covasim.run.MultiSim.run" class="nav-link" data-scroll-target="#covasim.run.MultiSim.run">run</a></li>
+  <li><a href="#covasim.run.MultiSim.save" id="toc-covasim.run.MultiSim.save" class="nav-link" data-scroll-target="#covasim.run.MultiSim.save">save</a></li>
+  <li><a href="#covasim.run.MultiSim.shrink" id="toc-covasim.run.MultiSim.shrink" class="nav-link" data-scroll-target="#covasim.run.MultiSim.shrink">shrink</a></li>
+  <li><a href="#covasim.run.MultiSim.split" id="toc-covasim.run.MultiSim.split" class="nav-link" data-scroll-target="#covasim.run.MultiSim.split">split</a></li>
+  <li><a href="#covasim.run.MultiSim.summarize" id="toc-covasim.run.MultiSim.summarize" class="nav-link" data-scroll-target="#covasim.run.MultiSim.summarize">summarize</a></li>
+  <li><a href="#covasim.run.MultiSim.to_excel" id="toc-covasim.run.MultiSim.to_excel" class="nav-link" data-scroll-target="#covasim.run.MultiSim.to_excel">to_excel</a></li>
+  <li><a href="#covasim.run.MultiSim.to_json" id="toc-covasim.run.MultiSim.to_json" class="nav-link" data-scroll-target="#covasim.run.MultiSim.to_json">to_json</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.run.Scenarios" id="toc-covasim.run.Scenarios" class="nav-link" data-scroll-target="#covasim.run.Scenarios">Scenarios</a>
+  <ul class="collapse">
+  <li><a href="#parameters-17" id="toc-parameters-17" class="nav-link" data-scroll-target="#parameters-17">Parameters</a></li>
+  <li><a href="#returns-9" id="toc-returns-9" class="nav-link" data-scroll-target="#returns-9">Returns</a></li>
+  <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.run.Scenarios.brief" id="toc-covasim.run.Scenarios.brief" class="nav-link" data-scroll-target="#covasim.run.Scenarios.brief">brief</a></li>
+  <li><a href="#covasim.run.Scenarios.compare" id="toc-covasim.run.Scenarios.compare" class="nav-link" data-scroll-target="#covasim.run.Scenarios.compare">compare</a></li>
+  <li><a href="#covasim.run.Scenarios.disp" id="toc-covasim.run.Scenarios.disp" class="nav-link" data-scroll-target="#covasim.run.Scenarios.disp">disp</a></li>
+  <li><a href="#covasim.run.Scenarios.load" id="toc-covasim.run.Scenarios.load" class="nav-link" data-scroll-target="#covasim.run.Scenarios.load">load</a></li>
+  <li><a href="#covasim.run.Scenarios.plot" id="toc-covasim.run.Scenarios.plot" class="nav-link" data-scroll-target="#covasim.run.Scenarios.plot">plot</a></li>
+  <li><a href="#covasim.run.Scenarios.result_keys" id="toc-covasim.run.Scenarios.result_keys" class="nav-link" data-scroll-target="#covasim.run.Scenarios.result_keys">result_keys</a></li>
+  <li><a href="#covasim.run.Scenarios.run" id="toc-covasim.run.Scenarios.run" class="nav-link" data-scroll-target="#covasim.run.Scenarios.run">run</a></li>
+  <li><a href="#covasim.run.Scenarios.save" id="toc-covasim.run.Scenarios.save" class="nav-link" data-scroll-target="#covasim.run.Scenarios.save">save</a></li>
+  <li><a href="#covasim.run.Scenarios.summarize" id="toc-covasim.run.Scenarios.summarize" class="nav-link" data-scroll-target="#covasim.run.Scenarios.summarize">summarize</a></li>
+  <li><a href="#covasim.run.Scenarios.to_excel" id="toc-covasim.run.Scenarios.to_excel" class="nav-link" data-scroll-target="#covasim.run.Scenarios.to_excel">to_excel</a></li>
+  <li><a href="#covasim.run.Scenarios.to_json" id="toc-covasim.run.Scenarios.to_json" class="nav-link" data-scroll-target="#covasim.run.Scenarios.to_json">to_json</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <ul>
+  <li><a href="#covasim.run.make_metapars" id="toc-covasim.run.make_metapars" class="nav-link" data-scroll-target="#covasim.run.make_metapars">make_metapars</a></li>
+  <li><a href="#covasim.run.multi_run" id="toc-covasim.run.multi_run" class="nav-link" data-scroll-target="#covasim.run.multi_run">multi_run</a>
+  <ul class="collapse">
+  <li><a href="#parameters-27" id="toc-parameters-27" class="nav-link" data-scroll-target="#parameters-27">Parameters</a></li>
+  <li><a href="#returns-16" id="toc-returns-16" class="nav-link" data-scroll-target="#returns-16">Returns</a></li>
+  </ul></li>
+  <li><a href="#covasim.run.parallel" id="toc-covasim.run.parallel" class="nav-link" data-scroll-target="#covasim.run.parallel">parallel</a>
+  <ul class="collapse">
+  <li><a href="#parameters-28" id="toc-parameters-28" class="nav-link" data-scroll-target="#parameters-28">Parameters</a></li>
+  <li><a href="#returns-17" id="toc-returns-17" class="nav-link" data-scroll-target="#returns-17">Returns</a></li>
+  </ul></li>
+  <li><a href="#covasim.run.single_run" id="toc-covasim.run.single_run" class="nav-link" data-scroll-target="#covasim.run.single_run">single_run</a>
+  <ul class="collapse">
+  <li><a href="#parameters-29" id="toc-parameters-29" class="nav-link" data-scroll-target="#parameters-29">Parameters</a></li>
+  <li><a href="#returns-18" id="toc-returns-18" class="nav-link" data-scroll-target="#returns-18">Returns</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+
+
+<section id="covasim.run" class="level1">
+<h1>run</h1>
+<p><code>run</code></p>
+<p>Functions and classes for running multiple Covasim runs.</p>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim">MultiSim</a></td>
+<td>Class for running multiple copies of a simulation. The parameter n_runs</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.Scenarios">Scenarios</a></td>
+<td>Class for running multiple sets of multiple simulations – e.g., scenarios.</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.run.MultiSim" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.run.MultiSim">MultiSim</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim(sims<span class="op">=</span><span class="va">None</span>, base_sim<span class="op">=</span><span class="va">None</span>, label<span class="op">=</span><span class="va">None</span>, initialize<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Class for running multiple copies of a simulation. The parameter n_runs controls how many copies of the simulation there will be, if a list of sims is not provided. This is the main class that’s used to run multiple versions of a simulation (e.g., with different random seeds).</p>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 6%">
+<col style="width: 66%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sims (Sim/list)</td>
+<td></td>
+<td>a single sim or a list of sims</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>base_sim (Sim)</td>
+<td></td>
+<td>the sim used for shared properties; if not supplied, the first of the sims provided</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>label (str)</td>
+<td></td>
+<td>the name of the multisim</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>initialize (bool)</td>
+<td></td>
+<td>whether or not to initialize the sims (otherwise, initialize them during run)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>kwargs (dict)</td>
+<td></td>
+<td>stored in run_args and passed to run()</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>msim</td>
+<td></td>
+<td>a MultiSim object</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>sim = cv.Sim() # Create the sim
+msim = cv.MultiSim(sim, n_runs=5) # Create the multisim
+msim.run() # Run them in parallel
+msim.combine() # Combine into one sim
+msim.plot() # Plot results
+
+sim = cv.Sim() # Create the sim
+msim = cv.MultiSim(sim, n_runs=11, noise=0.1, keep_people=True) # Set up a multisim with noise
+msim.run() # Run
+msim.reduce() # Compute statistics
+msim.plot() # Plot
+
+sims = [cv.Sim(beta=0.015*(1+0.02*i)) for i in range(5)] # Create sims
+for sim in sims: sim.run() # Run sims in serial
+msim = cv.MultiSim(sims) # Convert to multisim
+msim.plot() # Plot as single sim</code></pre>
+</section>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.brief">brief</a></td>
+<td>Print a compact representation of the multisim. See also multisim.disp()</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.combine">combine</a></td>
+<td>Combine multiple sims into a single sim with scaled results.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.compare">compare</a></td>
+<td>Create a dataframe compare sims at a single point in time.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.disp">disp</a></td>
+<td>Display a verbose description of a multisim. See also multisim.summarize()</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.init_sims">init_sims</a></td>
+<td>Initialize the sims, but don’t actually run them. Syntax is the same</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.load">load</a></td>
+<td>Load from disk from a gzipped pickle.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.mean">mean</a></td>
+<td>Alias for reduce(use_mean=True). See reduce() for full description.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.median">median</a></td>
+<td>Alias for reduce(use_mean=False). See reduce() for full description.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.merge">merge</a></td>
+<td>Convenience method for merging two MultiSim objects.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.plot">plot</a></td>
+<td>Plot all the sims – arguments passed to Sim.plot(). The</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.plot_compare">plot_compare</a></td>
+<td>Plot a comparison between sims, using bars to show different values for</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.plot_result">plot_result</a></td>
+<td>Convenience method for plotting – arguments passed to sim.plot_result()</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.reduce">reduce</a></td>
+<td>Combine multiple sims into a single sim statistically: by default, use</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.reset">reset</a></td>
+<td>Undo a combine() or reduce() by resetting the base sim, which, and results</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.result_keys">result_keys</a></td>
+<td>Attempt to retrieve the results keys from the base sim</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.run">run</a></td>
+<td>Run the actual sims</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.save">save</a></td>
+<td>Save to disk as a gzipped pickle. Load with cv.load(filename) or</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.shrink">shrink</a></td>
+<td>Not to be confused with reduce(), this shrinks each sim in the msim;</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.split">split</a></td>
+<td>Convenience method for splitting one MultiSim into several. You can specify</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.summarize">summarize</a></td>
+<td>Print a moderate length summary of the MultiSim. See also multisim.disp()</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.MultiSim.to_excel">to_excel</a></td>
+<td>Shortcut for base_sim.to_excel()</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.MultiSim.to_json">to_json</a></td>
+<td>Shortcut for base_sim.to_json()</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.run.MultiSim.brief" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.brief">brief</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.brief(output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print a compact representation of the multisim. See also multisim.disp() (detailed output) and multisim.summarize() (medium length output).</p>
+<section id="parameters-1" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>output</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>if true, return a string instead of printing output</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>msim = cv.MultiSim(cv.Sim(verbose=0), label='Example multisim')
+msim.run()
+msim.brief() # Prints one-line output</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.combine" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.combine">combine</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.combine(output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Combine multiple sims into a single sim with scaled results.</p>
+<p><strong>Example</strong>::</p>
+<pre><code>msim = cv.MultiSim(cv.Sim())
+msim.run()
+msim.combine()
+msim.summarize()</code></pre>
+</section>
+<section id="covasim.run.MultiSim.compare" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.compare">compare</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.compare(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    t<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    sim_inds<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    output<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    do_plot<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create a dataframe compare sims at a single point in time.</p>
+<section id="parameters-2" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 7%">
+<col style="width: 61%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>t (int/str)</td>
+<td></td>
+<td>the day (or date) to do the comparison; default, the end</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>sim_inds (list)</td>
+<td></td>
+<td>list of integers of which sims to include (default: all)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>output (bool)</td>
+<td></td>
+<td>whether or not to return the comparison as a dataframe</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>do_plot (bool)</td>
+<td></td>
+<td>whether or not to plot the comparison (see also plot_compare())</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>kwargs (dict)</td>
+<td></td>
+<td>passed to plot_compare()</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>df</td>
+<td><code>dataframe</code></td>
+<td>a dataframe comparison</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.MultiSim.disp" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.disp">disp</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.disp(output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Display a verbose description of a multisim. See also multisim.summarize() (medium length output) and multisim.brief() (short output).</p>
+<section id="parameters-3" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>output</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>if true, return a string instead of printing output</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>msim = cv.MultiSim(cv.Sim(verbose=0), label='Example multisim')
+msim.run()
+msim.disp() # Displays detailed output</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.init_sims" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.init_sims">init_sims</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.init_sims(<span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Initialize the sims, but don’t actually run them. Syntax is the same as MultiSim.run(). Note: in most cases you can just call run() directly, there is no need to call this separately.</p>
+<section id="parameters-4" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to multi_run()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.MultiSim.load" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.load">load</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.load(msimfile, <span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Load from disk from a gzipped pickle.</p>
+<section id="parameters-5" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>msimfile</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the name or path of the file to load from</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+<td>passed to cv.load()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>msim</td>
+<td><a href="../api/run.html#covasim.run.MultiSim">MultiSim</a></td>
+<td>the loaded MultiSim object</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>msim = cv.MultiSim.load('my-multisim.msim')</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.mean" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.mean">mean</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.mean(bounds<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Alias for reduce(use_mean=True). See reduce() for full description.</p>
+<section id="parameters-6" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>bounds</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>multiplier on the standard deviation for the upper and lower bounds (default, 2)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to reduce()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.MultiSim.median" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.median">median</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.median(quantiles<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Alias for reduce(use_mean=False). See reduce() for full description.</p>
+<section id="parameters-7" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>quantiles</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a> or <a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>upper and lower quantiles (default, 0.1 and 0.9)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to reduce()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.MultiSim.merge" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.merge">merge</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.merge(<span class="op">*</span>args, base<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convenience method for merging two MultiSim objects.</p>
+<section id="parameters-8" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-8">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>args</td>
+<td><a href="../api/run.html#covasim.run.MultiSim">MultiSim</a></td>
+<td>the MultiSims to merge (either a list, or separate)</td>
+<td><code>()</code></td>
+</tr>
+<tr class="even">
+<td>base</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>if True, make a new list of sims from the multisim’s two base sims; otherwise, merge the multisim’s lists of sims</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>msim</td>
+<td><a href="../api/run.html#covasim.run.MultiSim">MultiSim</a></td>
+<td>a new MultiSim object</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>:</p>
+<pre><code>mm1 = cv.MultiSim.merge(msim1, msim2, base=True)
+mm2 = cv.MultiSim.merge([m1, m2, m3, m4], base=False)</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.plot(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    to_plot<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    inds<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    plot_sims<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    color_by_sim<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    max_sims<span class="op">=</span><span class="dv">5</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    colors<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    labels<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    alpha_range<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    plot_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    show_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot all the sims – arguments passed to Sim.plot(). The behavior depends on whether or not combine() or reduce() has been called. If so, this function by default plots only the combined/reduced sim (which you can override with plot_sims=True). Otherwise, it plots a separate line for each sim.</p>
+<p>Note that this function is complex because it aims to capture the flexibility of both sim.plot() and scens.plot(). By default, if combine() or reduce() has been used, it will resemble sim.plot(); otherwise, it will resemble scens.plot(). This can be changed via color_by_sim, together with the other options.</p>
+<section id="parameters-9" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-9">Parameters</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 4%">
+<col style="width: 79%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>to_plot (list)</td>
+<td></td>
+<td>list or dict of which results to plot; see cv.get_default_plots() for structure</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds (list)</td>
+<td></td>
+<td>if not combined or reduced, the indices of the simulations to plot (if None, plot all)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>plot_sims (bool)</td>
+<td></td>
+<td>whether to plot individual sims, even if combine() or reduce() has been used</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>color_by_sim (bool)</td>
+<td></td>
+<td>if True, set colors based on the simulation type; otherwise, color by result type; True implies a scenario-style plotting, False implies sim-style plotting</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>max_sims (int)</td>
+<td></td>
+<td>maximum number of sims to use with color-by-sim; can be overridden by other options</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>colors (list)</td>
+<td></td>
+<td>if supplied, override default colors for color_by_sim</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>labels (list)</td>
+<td></td>
+<td>if supplied, override default labels for color_by_sim</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>alpha_range (list)</td>
+<td></td>
+<td>a 2-element list/tuple/array providing the range of alpha values to use to distinguish the lines</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>plot_args (dict)</td>
+<td></td>
+<td>passed to sim.plot()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>show_args (dict)</td>
+<td></td>
+<td>passed to sim.plot()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>kwargs (dict)</td>
+<td></td>
+<td>passed to sim.plot()</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-4" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fig</td>
+<td></td>
+<td>Figure handle</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>sim = cv.Sim()
+msim = cv.MultiSim(sim)
+msim.run()
+msim.plot() # Plots individual sims
+msim.reduce()
+msim.plot() # Plots the combined sim</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.plot_compare" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.plot_compare">plot_compare</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.plot_compare(t<span class="op">=-</span><span class="dv">1</span>, sim_inds<span class="op">=</span><span class="va">None</span>, log_scale<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot a comparison between sims, using bars to show different values for each result. For an explanation of other available arguments, see Sim.plot().</p>
+<section id="parameters-10" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-10">Parameters</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 8%">
+<col style="width: 61%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>t (int)</td>
+<td></td>
+<td>index of results, passed to compare()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>sim_inds (list)</td>
+<td></td>
+<td>which sims to include, passed to compare()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>log_scale (bool)</td>
+<td></td>
+<td>whether to plot with a logarithmic x-axis</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>kwargs (dict)</td>
+<td></td>
+<td>standard plotting arguments, see Sim.plot() for explanation</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-5" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-5">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fig</td>
+<td></td>
+<td>Figure handle</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.MultiSim.plot_result" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.plot_result">plot_result</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.plot_result(key, colors<span class="op">=</span><span class="va">None</span>, labels<span class="op">=</span><span class="va">None</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convenience method for plotting – arguments passed to sim.plot_result()</p>
+</section>
+<section id="covasim.run.MultiSim.reduce" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.reduce">reduce</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.<span class="bu">reduce</span>(quantiles<span class="op">=</span><span class="va">None</span>, use_mean<span class="op">=</span><span class="va">False</span>, bounds<span class="op">=</span><span class="va">None</span>, output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Combine multiple sims into a single sim statistically: by default, use the median value and the 10th and 90th percentiles for the lower and upper bounds. If use_mean=True, then use the mean and ±2 standard deviations for lower and upper bounds.</p>
+<section id="parameters-11" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-11">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>quantiles</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>the quantiles to use, e.g.&nbsp;[0.1, 0.9] or {‘low : ’0.1, ’high’ : 0.9}</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>use_mean</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to use the mean instead of the median</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+<tr class="odd">
+<td>bounds</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>if use_mean=True, the multiplier on the standard deviation for upper and lower bounds (default 2)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>output</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to return the “reduced” sim (in any case, modify the multisim in-place)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>msim = cv.MultiSim(cv.Sim())
+msim.run()
+msim.reduce()
+msim.summarize()</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.reset" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.reset">reset</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.reset()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Undo a combine() or reduce() by resetting the base sim, which, and results</p>
+</section>
+<section id="covasim.run.MultiSim.result_keys" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.result_keys">result_keys</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.result_keys()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Attempt to retrieve the results keys from the base sim</p>
+</section>
+<section id="covasim.run.MultiSim.run" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.run">run</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.run(<span class="bu">reduce</span><span class="op">=</span><span class="va">False</span>, combine<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run the actual sims</p>
+<section id="parameters-12" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-12">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>reduce</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether or not to reduce after running (see reduce())</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+<tr class="even">
+<td>combine</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether or not to combine after running (see combine(), not compatible with reduce)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to multi_run(); use run_args to pass arguments to sim.run()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-6" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-6">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>None (modifies MultiSim object in place)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>msim.run()
+msim.run(run_args=dict(until='2020-0601', restore_pars=False))</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.save" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.save">save</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.save(filename<span class="op">=</span><span class="va">None</span>, keep_people<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Save to disk as a gzipped pickle. Load with cv.load(filename) or cv.MultiSim.load(filename).</p>
+<section id="parameters-13" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-13">Parameters</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 6%">
+<col style="width: 65%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>filename (str)</td>
+<td></td>
+<td>the name or path of the file to save to; if None, uses default</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>keep_people (bool)</td>
+<td></td>
+<td>whether or not to store the population in the Sim objects (NB, very large)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>kwargs (dict)</td>
+<td></td>
+<td>passed to <code>sc.makefilepath()</code></td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-7" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-7">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scenfile</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the validated absolute path to the saved file</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>msim.save() # Saves to an .msim file</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.shrink" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.shrink">shrink</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.shrink(<span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Not to be confused with reduce(), this shrinks each sim in the msim; see sim.shrink() for more information.</p>
+<section id="parameters-14" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-14">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to sim.shrink() for each sim</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.MultiSim.split" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.split">split</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.split(inds<span class="op">=</span><span class="va">None</span>, chunks<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convenience method for splitting one MultiSim into several. You can specify either individual indices of simulations to extract, via inds, or consecutive chunks of indices, via chunks. If this function is called on a merged MultiSim, the chunks can be retrieved automatically and no arguments are necessary.</p>
+<section id="parameters-15" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-15">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>a list of lists of indices, with each list turned into a MultiSim</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>chunks</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> or <a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>if an int, split the MultiSim into that many chunks; if a list return chunks of that many sims</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-8" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-8">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>A list of MultiSim objects</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>m1 = cv.MultiSim(cv.Sim(label='sim1'), initialize=True)
+m2 = cv.MultiSim(cv.Sim(label='sim2'), initialize=True)
+m3 = cv.MultiSim.merge(m1, m2)
+m3.run()
+m1b, m2b = m3.split()
+
+msim = cv.MultiSim(cv.Sim(), n_runs=6)
+msim.run()
+m1, m2 = msim.split(inds=[[0,2,4], [1,3,5]])
+mlist1 = msim.split(chunks=[2,4]) # Equivalent to inds=[[0,1], [2,3,4,5]]
+mlist2 = msim.split(chunks=2) # Equivalent to inds=[[0,1,2], [3,4,5]]</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.summarize" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.summarize">summarize</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.summarize(output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print a moderate length summary of the MultiSim. See also multisim.disp() (detailed output) and multisim.brief() (short output).</p>
+<section id="parameters-16" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-16">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>output</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>if true, return a string instead of printing output</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>msim = cv.MultiSim(cv.Sim(verbose=0), label='Example multisim')
+msim.run()
+msim.summarize() # Prints moderate length output</code></pre>
+</section>
+</section>
+<section id="covasim.run.MultiSim.to_excel" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.to_excel">to_excel</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.to_excel(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Shortcut for base_sim.to_excel()</p>
+</section>
+<section id="covasim.run.MultiSim.to_json" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.MultiSim.to_json">to_json</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>run.MultiSim.to_json(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Shortcut for base_sim.to_json()</p>
+</section>
+</section>
+</section>
+<section id="covasim.run.Scenarios" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.run.Scenarios">Scenarios</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    sim<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    metapars<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    scenarios<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    basepars<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    scenfile<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Class for running multiple sets of multiple simulations – e.g., scenarios. Note that most users are recommended to use MultiSim rather than Scenarios, as it gives more control over run options. Scenarios should be used primarily for quick investigations. See the examples folder for example usage.</p>
+<section id="parameters-17" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-17">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 5%">
+<col style="width: 73%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim (Sim)</td>
+<td></td>
+<td>if supplied, use a pre-created simulation as the basis for the scenarios</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>metapars (dict)</td>
+<td></td>
+<td>meta-parameters for the run, e.g.&nbsp;number of runs; see make_metapars() for structure</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>scenarios (dict)</td>
+<td></td>
+<td>a dictionary defining the scenarios; see examples folder for examples; see below for baseline</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>basepars (dict)</td>
+<td></td>
+<td>a dictionary of sim parameters to be used for the basis of the scenarios (not required if sim is provided)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>scenfile (str)</td>
+<td></td>
+<td>a filename for saving (defaults to the creation date)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>label (str)</td>
+<td></td>
+<td>the name of the scenarios</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scens = cv.Scenarios()</code></pre>
+</section>
+<section id="returns-9" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-9">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scens</td>
+<td></td>
+<td>a Scenarios object</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="methods-1" class="level4">
+<h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.run.Scenarios.brief">brief</a></td>
+<td>Print a compact representation of the scenarios. See also scenarios.disp()</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.Scenarios.compare">compare</a></td>
+<td>Print out a comparison of each scenario.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.Scenarios.disp">disp</a></td>
+<td>Display a verbose description of the scenarios. See also scenarios.summarize()</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.Scenarios.load">load</a></td>
+<td>Load from disk from a gzipped pickle.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.Scenarios.plot">plot</a></td>
+<td>Plot the results of a scenario. For an explanation of available arguments,</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.Scenarios.result_keys">result_keys</a></td>
+<td>Attempt to retrieve the results keys from the base sim</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.Scenarios.run">run</a></td>
+<td>Run the specified scenarios.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.Scenarios.save">save</a></td>
+<td>Save to disk as a gzipped pickle.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.Scenarios.summarize">summarize</a></td>
+<td>Print a moderate length summary of the scenarios. See also scenarios.disp()</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.Scenarios.to_excel">to_excel</a></td>
+<td>Export results as XLSX</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.Scenarios.to_json">to_json</a></td>
+<td>Export results as JSON.</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.run.Scenarios.brief" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.brief">brief</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.brief(output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print a compact representation of the scenarios. See also scenarios.disp() (detailed output) and scenarios.summarize() (medium length output).</p>
+<section id="parameters-18" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-18">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>output</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>if true, return a string instead of printing output</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scens = cv.Scenarios(label='Example scenarios')
+scens.run()
+scens.brief() # Prints one-line output</code></pre>
+</section>
+</section>
+<section id="covasim.run.Scenarios.compare" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.compare">compare</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.compare(t<span class="op">=</span><span class="va">None</span>, output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print out a comparison of each scenario.</p>
+<section id="parameters-19" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-19">Parameters</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 8%">
+<col style="width: 62%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>t (int/str)</td>
+<td></td>
+<td>the day (or date) to do the comparison; default, the end</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>output (bool)</td>
+<td></td>
+<td>if true, return the dataframe instead of printing output</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scenarios = {'base': {'name':'Base','pars': {}}, 'beta': {'name':'Beta', 'pars': {'beta': 0.020}}}
+scens = cv.Scenarios(scenarios=scenarios, label='Example scenarios')
+scens.run()
+scens.compare(t=30) # Prints comparison for day 30</code></pre>
+</section>
+</section>
+<section id="covasim.run.Scenarios.disp" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.disp">disp</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.disp(output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Display a verbose description of the scenarios. See also scenarios.summarize() (medium length output) and scenarios.brief() (short output).</p>
+<section id="parameters-20" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-20">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>output</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>if true, return a string instead of printing output</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scens = cv.Scenarios(cv.Sim(), label='Example scenarios')
+scens.run(verbose=0) # Run silently
+scens.disp() # Displays detailed output</code></pre>
+</section>
+</section>
+<section id="covasim.run.Scenarios.load" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.load">load</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.load(scenfile, <span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Load from disk from a gzipped pickle.</p>
+<section id="parameters-21" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-21">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scenfile</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the name or path of the file to load from</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td></td>
+<td>passed to cv.load()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-10" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-10">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scens</td>
+<td><a href="../api/run.html#covasim.run.Scenarios">Scenarios</a></td>
+<td>the loaded scenarios object</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scens = cv.Scenarios.load('my-scenarios.scens')</code></pre>
+</section>
+</section>
+<section id="covasim.run.Scenarios.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.plot(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the results of a scenario. For an explanation of available arguments, see Sim.plot().</p>
+<section id="returns-11" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-11">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fig</td>
+<td></td>
+<td>Figure handle</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scens = cv.Scenarios()
+scens.run()
+scens.plot()</code></pre>
+</section>
+</section>
+<section id="covasim.run.Scenarios.result_keys" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.result_keys">result_keys</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.result_keys(which<span class="op">=</span><span class="st">'all'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Attempt to retrieve the results keys from the base sim</p>
+</section>
+<section id="covasim.run.Scenarios.run" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.run">run</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.run(debug<span class="op">=</span><span class="va">False</span>, keep_people<span class="op">=</span><span class="va">False</span>, verbose<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run the specified scenarios.</p>
+<section id="parameters-22" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-22">Parameters</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 7%">
+<col style="width: 68%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>debug (bool)</td>
+<td></td>
+<td>if True, runs a single run instead of multiple, which makes debugging easier</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>verbose (int)</td>
+<td></td>
+<td>level of detail to print, passed to sim.run()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>kwargs (dict)</td>
+<td></td>
+<td>passed to multi_run() and thence to sim.run()</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-12" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-12">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>None (modifies Scenarios object in place)</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.Scenarios.save" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.save">save</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.save(scenfile<span class="op">=</span><span class="va">None</span>, keep_sims<span class="op">=</span><span class="va">True</span>, keep_people<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Save to disk as a gzipped pickle.</p>
+<section id="parameters-23" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-23">Parameters</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 17%">
+<col style="width: 6%">
+<col style="width: 65%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scenfile (str)</td>
+<td></td>
+<td>the name or path of the file to save to; if None, uses stored</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>keep_sims (bool)</td>
+<td></td>
+<td>whether or not to store the actual Sim objects in the Scenarios object</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>keep_people (bool)</td>
+<td></td>
+<td>whether or not to store the population in the Sim objects (NB, very large)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>kwargs (dict)</td>
+<td></td>
+<td>passed to makefilepath()</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-13" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-13">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>scenfile</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the validated absolute path to the saved file</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scens.save() # Saves to a .scens file with the date and time of creation by default</code></pre>
+</section>
+</section>
+<section id="covasim.run.Scenarios.summarize" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.summarize">summarize</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.summarize(output<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print a moderate length summary of the scenarios. See also scenarios.disp() (detailed output) and scenarios.brief() (short output).</p>
+<section id="parameters-24" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-24">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>output</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>if true, return a string instead of printing output</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>scens = cv.Scenarios(cv.Sim(), label='Example scenarios')
+scens.run(verbose=0) # Run silently
+scens.summarize() # Prints moderate length output</code></pre>
+</section>
+</section>
+<section id="covasim.run.Scenarios.to_excel" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.to_excel">to_excel</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.to_excel(filename<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Export results as XLSX</p>
+<section id="parameters-25" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-25">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>filename</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>if None, return string; else, write to file</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-14" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-14">Returns</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 80%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>An sc.Spreadsheet with an Excel file, or writes the file to disk</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.run.Scenarios.to_json" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.run.Scenarios.to_json">to_json</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>run.Scenarios.to_json(</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    tostring<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>    indent<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>args,</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Export results as JSON.</p>
+<section id="parameters-26" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-26">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>filename</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>if None, return string; else, write to file</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-15" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-15">Returns</h6>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 9%">
+<col style="width: 80%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>A unicode string containing a JSON representation of the results,</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td>or writes the JSON file to disk</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+</section>
+</section>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.run.make_metapars">make_metapars</a></td>
+<td>Create default metaparameters for a Scenarios run</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.multi_run">multi_run</a></td>
+<td>For running multiple runs in parallel. If the first argument is a list of sims,</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.run.parallel">parallel</a></td>
+<td>A shortcut to <a href="../api/run.html#covasim.run.MultiSim" title="0"><code>cv.MultiSim()</code></a>, allowing the quick running of multiple simulations</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.run.single_run">single_run</a></td>
+<td>Convenience function to perform a single simulation run. Mostly used for</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.run.make_metapars" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.run.make_metapars">make_metapars</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>run.make_metapars()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create default metaparameters for a Scenarios run</p>
+</section>
+<section id="covasim.run.multi_run" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.run.multi_run">multi_run</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>run.multi_run(</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>    sim,</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>    n_runs<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>    reseed<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>    noise<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>    noisepar<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>    iterpars<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>    combine<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>    keep_people<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>    run_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>    sim_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>    par_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>    do_run<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>    parallel<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>    n_cpus<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>    retry<span class="op">=</span><span class="st">'warn'</span>,</span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>For running multiple runs in parallel. If the first argument is a list of sims, exactly these will be run and most other arguments will be ignored.</p>
+<section id="parameters-27" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-27">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 4%">
+<col style="width: 75%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim (Sim)</td>
+<td></td>
+<td>the sim instance to be run, or a list of sims.</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n_runs (int)</td>
+<td></td>
+<td>the number of parallel runs</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>reseed (bool)</td>
+<td></td>
+<td>whether or not to generate a fresh seed for each run (default: true for single, false for list of sims)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>noise (float)</td>
+<td></td>
+<td>the amount of noise to add to each run</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>noisepar (str)</td>
+<td></td>
+<td>the name of the parameter to add noise to</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>iterpars (dict)</td>
+<td></td>
+<td>any other parameters to iterate over the runs; see sc.parallelize() for syntax</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>combine (bool)</td>
+<td></td>
+<td>whether or not to combine all results into one sim, rather than return multiple sim objects</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>keep_people (bool)</td>
+<td></td>
+<td>whether to keep the people after the sim run (default false)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>run_args (dict)</td>
+<td></td>
+<td>arguments passed to sim.run()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>sim_args (dict)</td>
+<td></td>
+<td>extra parameters to pass to the sim</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>par_args (dict)</td>
+<td></td>
+<td>arguments passed to sc.parallelize()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>do_run (bool)</td>
+<td></td>
+<td>whether to actually run the sim (if not, just initialize it)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>parallel (bool)</td>
+<td></td>
+<td>whether to run in parallel using multiprocessing (else, just run in a loop)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n_cpus (int)</td>
+<td></td>
+<td>the number of CPUs to run on (if blank, set automatically; otherwise, passed to par_args)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>verbose (int)</td>
+<td></td>
+<td>detail to print</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>retry (str)</td>
+<td></td>
+<td>what to do if default parallelizer fails: choices are ‘warn’ (default), ‘die’ (raise exception), or ‘silent’ (keep going)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>kwargs (dict)</td>
+<td></td>
+<td>also passed to the sim</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-16" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-16">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 83%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>If combine is True, a single sim object with the combined results from each sim.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td>Otherwise, a list of sim objects (default).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>import covasim as cv
+sim = cv.Sim()
+sims = cv.multi_run(sim, n_runs=6, noise=0.2)</code></pre>
+</section>
+</section>
+<section id="covasim.run.parallel" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.run.parallel">parallel</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>run.parallel(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A shortcut to <a href="../api/run.html#covasim.run.MultiSim" title="0"><code>cv.MultiSim()</code></a>, allowing the quick running of multiple simulations at once.</p>
+<section id="parameters-28" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-28">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>The simulations to run</td>
+<td><code>()</code></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to multi_run()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-17" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-17">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>A run MultiSim object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>s1 = cv.Sim(beta=0.01, label='Low')
+s2 = cv.Sim(beta=0.02, label='High')
+cv.parallel(s1, s2).plot()
+msim = cv.parallel([s1, s2], keep_people=True)</code></pre>
+<p>New in version 3.1.1.</p>
+</section>
+</section>
+<section id="covasim.run.single_run" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.run.single_run">single_run</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>run.single_run(</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>    sim,</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>    ind<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>    reseed<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a>    noise<span class="op">=</span><span class="fl">0.0</span>,</span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a>    noisepar<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a>    keep_people<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a>    run_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb61-9"><a href="#cb61-9" aria-hidden="true" tabindex="-1"></a>    sim_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb61-10"><a href="#cb61-10" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb61-11"><a href="#cb61-11" aria-hidden="true" tabindex="-1"></a>    do_run<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb61-12"><a href="#cb61-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb61-13"><a href="#cb61-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convenience function to perform a single simulation run. Mostly used for parallelization, but can also be used directly.</p>
+<section id="parameters-29" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-29">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 7%">
+<col style="width: 60%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim (Sim)</td>
+<td></td>
+<td>the sim instance to be run</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>ind (int)</td>
+<td></td>
+<td>the index of this sim</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>reseed (bool)</td>
+<td></td>
+<td>whether or not to generate a fresh seed for each run</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>noise (float)</td>
+<td></td>
+<td>the amount of noise to add to each run</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>noisepar (str)</td>
+<td></td>
+<td>the name of the parameter to add noise to</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>keep_people (bool)</td>
+<td></td>
+<td>whether to keep the people after the sim run</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>run_args (dict)</td>
+<td></td>
+<td>arguments passed to sim.run()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>sim_args (dict)</td>
+<td></td>
+<td>extra parameters to pass to the sim, e.g.&nbsp;‘n_infected’</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>verbose (int)</td>
+<td></td>
+<td>detail to print</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>do_run (bool)</td>
+<td></td>
+<td>whether to actually run the sim (if not, just initialize it)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>kwargs (dict)</td>
+<td></td>
+<td>also passed to the sim</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-18" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-18">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim</td>
+<td><a href="../api/sim.html#covasim.sim.Sim">Sim</a></td>
+<td>a single sim object with results</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>import covasim as cv
+sim = cv.Sim() # Create a default simulation
+sim = cv.single_run(sim) # Run it, equivalent(ish) to sim.run()</code></pre>
+
+
+</section>
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../api/requirements.html" class="pagination-link" aria-label="requirements">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">requirements</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../api/settings.html" class="pagination-link" aria-label="settings">
+        <span class="nav-page-text">settings</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Docs built for Covasim v3.1.7 (2026-02-18).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/starsimhub/covasim">
+      <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="mailto:info@covasim.org">
+      <i class="bi bi-envelope-at-fill" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://covasim.org/">
+      <i class="bi bi-globe" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

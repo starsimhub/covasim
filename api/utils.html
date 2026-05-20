@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>utils – Covasim</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../api/sim.html" rel="prev">
+<link href="..//assets/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-aafc68b2255684af78b035618dac2a51.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo light-content">
+    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../overview.html" aria-current="page"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/index.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../whatsnew.html"> 
+<span class="menu-text">What’s new</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../faq.html"> 
+<span class="menu-text">FAQ</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../api/index.html"> 
+<span class="menu-text">API reference</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-more" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">More</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-more">    
+        <li>
+    <a class="dropdown-item" href="../papers.html">
+ <span class="dropdown-text">Publications</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../parameters.html">
+ <span class="dropdown-text">Parameters</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../data.html">
+ <span class="dropdown-text">Data scrapers</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../glossary.html">
+ <span class="dropdown-text">Glossary</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../code_of_conduct.html">
+ <span class="dropdown-text">Code of conduct</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../contributing.html">
+ <span class="dropdown-text">Contributing to Covasim</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../style.html">
+ <span class="dropdown-text">Style guide</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools tools-wide">
+    <a href="https://github.com/starsimhub/covasim" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+    <a href="mailto:info@covasim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-envelope-at-fill"></i></a>
+    <a href="https://covasim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-globe"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/utils.html">utils</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Overview</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>API reference</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/base.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">base</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/data.loaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">data.loaders</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/defaults.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">defaults</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/immunity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">immunity</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/interventions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">interventions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/misc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">misc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/parameters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parameters</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/people.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">people</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/plotting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plotting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/population.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">population</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/requirements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">requirements</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/run.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/settings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">settings</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/sim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sim</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">utils</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#covasim.utils" id="toc-covasim.utils" class="nav-link active" data-scroll-target="#covasim.utils">utils</a>
+  <ul>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a>
+  <ul>
+  <li><a href="#covasim.utils.binomial_arr" id="toc-covasim.utils.binomial_arr" class="nav-link" data-scroll-target="#covasim.utils.binomial_arr">binomial_arr</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#returns" id="toc-returns" class="nav-link" data-scroll-target="#returns">Returns</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.binomial_filter" id="toc-covasim.utils.binomial_filter" class="nav-link" data-scroll-target="#covasim.utils.binomial_filter">binomial_filter</a>
+  <ul class="collapse">
+  <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
+  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.choose" id="toc-covasim.utils.choose" class="nav-link" data-scroll-target="#covasim.utils.choose">choose</a>
+  <ul class="collapse">
+  <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.choose_r" id="toc-covasim.utils.choose_r" class="nav-link" data-scroll-target="#covasim.utils.choose_r">choose_r</a>
+  <ul class="collapse">
+  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.choose_w" id="toc-covasim.utils.choose_w" class="nav-link" data-scroll-target="#covasim.utils.choose_w">choose_w</a>
+  <ul class="collapse">
+  <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.defined" id="toc-covasim.utils.defined" class="nav-link" data-scroll-target="#covasim.utils.defined">defined</a>
+  <ul class="collapse">
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.false" id="toc-covasim.utils.false" class="nav-link" data-scroll-target="#covasim.utils.false">false</a>
+  <ul class="collapse">
+  <li><a href="#parameters-6" id="toc-parameters-6" class="nav-link" data-scroll-target="#parameters-6">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.get_pdf" id="toc-covasim.utils.get_pdf" class="nav-link" data-scroll-target="#covasim.utils.get_pdf">get_pdf</a></li>
+  <li><a href="#covasim.utils.idefined" id="toc-covasim.utils.idefined" class="nav-link" data-scroll-target="#covasim.utils.idefined">idefined</a>
+  <ul class="collapse">
+  <li><a href="#parameters-7" id="toc-parameters-7" class="nav-link" data-scroll-target="#parameters-7">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.idefinedi" id="toc-covasim.utils.idefinedi" class="nav-link" data-scroll-target="#covasim.utils.idefinedi">idefinedi</a>
+  <ul class="collapse">
+  <li><a href="#parameters-8" id="toc-parameters-8" class="nav-link" data-scroll-target="#parameters-8">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.ifalse" id="toc-covasim.utils.ifalse" class="nav-link" data-scroll-target="#covasim.utils.ifalse">ifalse</a>
+  <ul class="collapse">
+  <li><a href="#parameters-9" id="toc-parameters-9" class="nav-link" data-scroll-target="#parameters-9">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.ifalsei" id="toc-covasim.utils.ifalsei" class="nav-link" data-scroll-target="#covasim.utils.ifalsei">ifalsei</a>
+  <ul class="collapse">
+  <li><a href="#parameters-10" id="toc-parameters-10" class="nav-link" data-scroll-target="#parameters-10">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.itrue" id="toc-covasim.utils.itrue" class="nav-link" data-scroll-target="#covasim.utils.itrue">itrue</a>
+  <ul class="collapse">
+  <li><a href="#parameters-11" id="toc-parameters-11" class="nav-link" data-scroll-target="#parameters-11">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.itruei" id="toc-covasim.utils.itruei" class="nav-link" data-scroll-target="#covasim.utils.itruei">itruei</a>
+  <ul class="collapse">
+  <li><a href="#parameters-12" id="toc-parameters-12" class="nav-link" data-scroll-target="#parameters-12">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.iundefined" id="toc-covasim.utils.iundefined" class="nav-link" data-scroll-target="#covasim.utils.iundefined">iundefined</a>
+  <ul class="collapse">
+  <li><a href="#parameters-13" id="toc-parameters-13" class="nav-link" data-scroll-target="#parameters-13">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.iundefinedi" id="toc-covasim.utils.iundefinedi" class="nav-link" data-scroll-target="#covasim.utils.iundefinedi">iundefinedi</a>
+  <ul class="collapse">
+  <li><a href="#parameters-14" id="toc-parameters-14" class="nav-link" data-scroll-target="#parameters-14">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.n_binomial" id="toc-covasim.utils.n_binomial" class="nav-link" data-scroll-target="#covasim.utils.n_binomial">n_binomial</a>
+  <ul class="collapse">
+  <li><a href="#parameters-15" id="toc-parameters-15" class="nav-link" data-scroll-target="#parameters-15">Parameters</a></li>
+  <li><a href="#returns-2" id="toc-returns-2" class="nav-link" data-scroll-target="#returns-2">Returns</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.n_multinomial" id="toc-covasim.utils.n_multinomial" class="nav-link" data-scroll-target="#covasim.utils.n_multinomial">n_multinomial</a>
+  <ul class="collapse">
+  <li><a href="#parameters-16" id="toc-parameters-16" class="nav-link" data-scroll-target="#parameters-16">Parameters</a></li>
+  <li><a href="#returns-3" id="toc-returns-3" class="nav-link" data-scroll-target="#returns-3">Returns</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.n_neg_binomial" id="toc-covasim.utils.n_neg_binomial" class="nav-link" data-scroll-target="#covasim.utils.n_neg_binomial">n_neg_binomial</a>
+  <ul class="collapse">
+  <li><a href="#parameters-17" id="toc-parameters-17" class="nav-link" data-scroll-target="#parameters-17">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.n_poisson" id="toc-covasim.utils.n_poisson" class="nav-link" data-scroll-target="#covasim.utils.n_poisson">n_poisson</a>
+  <ul class="collapse">
+  <li><a href="#parameters-18" id="toc-parameters-18" class="nav-link" data-scroll-target="#parameters-18">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.poisson" id="toc-covasim.utils.poisson" class="nav-link" data-scroll-target="#covasim.utils.poisson">poisson</a>
+  <ul class="collapse">
+  <li><a href="#parameters-19" id="toc-parameters-19" class="nav-link" data-scroll-target="#parameters-19">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.sample" id="toc-covasim.utils.sample" class="nav-link" data-scroll-target="#covasim.utils.sample">sample</a>
+  <ul class="collapse">
+  <li><a href="#parameters-20" id="toc-parameters-20" class="nav-link" data-scroll-target="#parameters-20">Parameters</a></li>
+  <li><a href="#returns-4" id="toc-returns-4" class="nav-link" data-scroll-target="#returns-4">Returns</a></li>
+  <li><a href="#notes" id="toc-notes" class="nav-link" data-scroll-target="#notes">Notes</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.set_seed" id="toc-covasim.utils.set_seed" class="nav-link" data-scroll-target="#covasim.utils.set_seed">set_seed</a>
+  <ul class="collapse">
+  <li><a href="#parameters-21" id="toc-parameters-21" class="nav-link" data-scroll-target="#parameters-21">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.true" id="toc-covasim.utils.true" class="nav-link" data-scroll-target="#covasim.utils.true">true</a>
+  <ul class="collapse">
+  <li><a href="#parameters-22" id="toc-parameters-22" class="nav-link" data-scroll-target="#parameters-22">Parameters</a></li>
+  </ul></li>
+  <li><a href="#covasim.utils.undefined" id="toc-covasim.utils.undefined" class="nav-link" data-scroll-target="#covasim.utils.undefined">undefined</a>
+  <ul class="collapse">
+  <li><a href="#parameters-23" id="toc-parameters-23" class="nav-link" data-scroll-target="#parameters-23">Parameters</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+
+
+<section id="covasim.utils" class="level1">
+<h1>utils</h1>
+<p><code>utils</code></p>
+<p>Numerical utilities for running Covasim.</p>
+<p>These include the viral load, transmissibility, and infection calculations at the heart of the integration loop.</p>
+<section id="functions" class="level2">
+<h2 class="anchored" data-anchor-id="functions">Functions</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.utils.binomial_arr">binomial_arr</a></td>
+<td>Binomial (Bernoulli) trials each with different probabilities.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.binomial_filter">binomial_filter</a></td>
+<td>Binomial “filter” – the same as n_binomial, except return</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.choose">choose</a></td>
+<td>Choose a subset of items (e.g., people) without replacement.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.choose_r">choose_r</a></td>
+<td>Choose a subset of items (e.g., people), with replacement.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.choose_w">choose_w</a></td>
+<td>Choose n items (e.g.&nbsp;people), each with a probability from the distribution probs.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.defined">defined</a></td>
+<td>Returns the indices of the values of the array that are not-nan.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.false">false</a></td>
+<td>Returns the indices of the values of the array that are false.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.get_pdf">get_pdf</a></td>
+<td>Return a probability density function for the specified distribution. This</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.idefined">idefined</a></td>
+<td>Returns the indices that are defined in the array – name is short for indices<a href="#covasim.utils.defined">defined</a></td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.idefinedi">idefinedi</a></td>
+<td>Returns the indices that are defined in the array – name is short for indices[defined[indices]]</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.ifalse">ifalse</a></td>
+<td>Returns the indices that are true in the array – name is short for indices<a href="#covasim.utils.false">false</a></td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.ifalsei">ifalsei</a></td>
+<td>Returns the indices that are false in the array – name is short for indices[false[indices]]</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.itrue">itrue</a></td>
+<td>Returns the indices that are true in the array – name is short for indices<a href="#covasim.utils.true">true</a></td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.itruei">itruei</a></td>
+<td>Returns the indices that are true in the array – name is short for indices[true[indices]]</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.iundefined">iundefined</a></td>
+<td>Returns the indices that are undefined in the array – name is short for indices<a href="#covasim.utils.undefined">undefined</a></td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.iundefinedi">iundefinedi</a></td>
+<td>Returns the indices that are undefined in the array – name is short for indices[defined[indices]]</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.n_binomial">n_binomial</a></td>
+<td>Perform multiple binomial (Bernolli) trials</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.n_multinomial">n_multinomial</a></td>
+<td>An array of multinomial trials.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.n_neg_binomial">n_neg_binomial</a></td>
+<td>An array of negative binomial trials. See cv.sample() for more explanation.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.n_poisson">n_poisson</a></td>
+<td>An array of Poisson trials.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.poisson">poisson</a></td>
+<td>A Poisson trial.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.sample">sample</a></td>
+<td>Draw a sample from the distribution specified by the input. The available</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.set_seed">set_seed</a></td>
+<td>Reset the random seed – complicated because of Numba, which requires special</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.utils.true">true</a></td>
+<td>Returns the indices of the values of the array that are true: just an alias</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.utils.undefined">undefined</a></td>
+<td>Returns the indices of the values of the array that are not-nan.</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.utils.binomial_arr" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.binomial_arr">binomial_arr</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>utils.binomial_arr(prob_arr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Binomial (Bernoulli) trials each with different probabilities.</p>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>prob_arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>array of probabilities</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 78%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>Boolean array of which trials on the input array succeeded</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>outcomes = cv.binomial_arr([0.1, 0.1, 0.2, 0.2, 0.8, 0.8]) # Perform 6 trials with different probabilities</code></pre>
+</section>
+</section>
+<section id="covasim.utils.binomial_filter" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.binomial_filter">binomial_filter</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>utils.binomial_filter(prob, arr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Binomial “filter” – the same as n_binomial, except return the elements of arr that succeeded.</p>
+<section id="parameters-1" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>prob</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>probability of each trial succeeding</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>the array to be filtered</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>Subset of array for which trials succeeded</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.binomial_filter(0.5, np.arange(20)**2) # Return which values out of the (arbitrary) array passed the coin flip</code></pre>
+</section>
+</section>
+<section id="covasim.utils.choose" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.choose">choose</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>utils.choose(max_n, n)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Choose a subset of items (e.g., people) without replacement.</p>
+<section id="parameters-2" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>max_n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>the total number of items</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>the number of items to choose</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>choices = cv.choose(5, 2) # choose 2 out of 5 people with equal probability (without repeats)</code></pre>
+</section>
+</section>
+<section id="covasim.utils.choose_r" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.choose_r">choose_r</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>utils.choose_r(max_n, n)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Choose a subset of items (e.g., people), with replacement.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>max_n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>the total number of items</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>the number of items to choose</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>choices = cv.choose_r(5, 10) # choose 10 out of 5 people with equal probability (with repeats)</code></pre>
+</section>
+</section>
+<section id="covasim.utils.choose_w" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.choose_w">choose_w</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>utils.choose_w(probs, n, unique<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Choose n items (e.g.&nbsp;people), each with a probability from the distribution probs.</p>
+<section id="parameters-4" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>probs</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>list of probabilities, should sum to 1</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>number of samples to choose</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>unique</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether or not to ensure unique indices</td>
+<td><a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>choices = cv.choose_w([0.2, 0.5, 0.1, 0.1, 0.1], 2) # choose 2 out of 5 people with nonequal probability.</code></pre>
+</section>
+</section>
+<section id="covasim.utils.defined" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.defined">defined</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>utils.defined(arr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices of the values of the array that are not-nan.</p>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.defined(np.array([1,np.nan,0,np.nan,1,0,1]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.false" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.false">false</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>utils.false(arr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices of the values of the array that are false.</p>
+<section id="parameters-6" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.false(np.array([1,0,0,1,1,0,1]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.get_pdf" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.get_pdf">get_pdf</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>utils.get_pdf(dist<span class="op">=</span><span class="va">None</span>, par1<span class="op">=</span><span class="va">None</span>, par2<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Return a probability density function for the specified distribution. This is used for example by test_num to retrieve the distribution of times from symptom-to-swab for testing. For example, for Washington State, these values are dist=‘lognormal’, par1=10, par2=170.</p>
+</section>
+<section id="covasim.utils.idefined" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.idefined">idefined</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>utils.idefined(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are defined in the array – name is short for indices<a href="#covasim.utils.defined">defined</a></p>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any other array (usually, an array of indices) of the same size</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.idefined(np.array([3,np.nan,np.nan,4]), inds=np.array([5,22,47,93]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.idefinedi" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.idefinedi">idefinedi</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>utils.idefinedi(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are defined in the array – name is short for indices[defined[indices]]</p>
+<section id="parameters-8" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-8">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>an array of indices for the original array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.idefinedi(np.array([4,np.nan,0,np.nan,np.nan,4,7,4,np.nan]), inds=np.array([0,1,3,5]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.ifalse" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.ifalse">ifalse</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>utils.ifalse(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are true in the array – name is short for indices<a href="#covasim.utils.false">false</a></p>
+<section id="parameters-9" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-9">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>a Boolean array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any other array (usually, an array of indices) of the same size</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.ifalse(np.array([True,False,True,True]), inds=np.array([5,22,47,93]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.ifalsei" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.ifalsei">ifalsei</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>utils.ifalsei(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are false in the array – name is short for indices[false[indices]]</p>
+<section id="parameters-10" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-10">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>a Boolean array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>an array of indices for the original array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.ifalsei(np.array([True,False,True,True,False,False,True,False]), inds=np.array([0,1,3,5]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.itrue" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.itrue">itrue</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>utils.itrue(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are true in the array – name is short for indices<a href="#covasim.utils.true">true</a></p>
+<section id="parameters-11" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-11">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>a Boolean array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any other array (usually, an array of indices) of the same size</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.itrue(np.array([True,False,True,True]), inds=np.array([5,22,47,93]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.itruei" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.itruei">itruei</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>utils.itruei(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are true in the array – name is short for indices[true[indices]]</p>
+<section id="parameters-12" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-12">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>a Boolean array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>an array of indices for the original array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.itruei(np.array([True,False,True,True,False,False,True,False]), inds=np.array([0,1,3,5]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.iundefined" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.iundefined">iundefined</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>utils.iundefined(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are undefined in the array – name is short for indices<a href="#covasim.utils.undefined">undefined</a></p>
+<section id="parameters-13" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-13">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any other array (usually, an array of indices) of the same size</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.iundefined(np.array([3,np.nan,np.nan,4]), inds=np.array([5,22,47,93]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.iundefinedi" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.iundefinedi">iundefinedi</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>utils.iundefinedi(arr, inds)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices that are undefined in the array – name is short for indices[defined[indices]]</p>
+<section id="parameters-14" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-14">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array, used as a filter</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>inds</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>an array of indices for the original array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.iundefinedi(np.array([4,np.nan,0,np.nan,np.nan,4,7,4,np.nan]), inds=np.array([0,1,3,5]))</code></pre>
+</section>
+</section>
+<section id="covasim.utils.n_binomial" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.n_binomial">n_binomial</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>utils.n_binomial(prob, n)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Perform multiple binomial (Bernolli) trials</p>
+<section id="parameters-15" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-15">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>prob</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>probability of each trial succeeding</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>number of trials (size of array)</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>Boolean array of which trials succeeded</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>outcomes = cv.n_binomial(0.5, 100) # Perform 100 coin-flips</code></pre>
+</section>
+</section>
+<section id="covasim.utils.n_multinomial" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.n_multinomial">n_multinomial</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>utils.n_multinomial(probs, n)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>An array of multinomial trials.</p>
+<section id="parameters-16" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-16">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>probs</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>probability of each outcome, which usually should sum to 1</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>number of trials</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>Array of integer outcomes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>outcomes = cv.multinomial(np.ones(6)/6.0, 50)+1 # Return 50 die-rolls</code></pre>
+</section>
+</section>
+<section id="covasim.utils.n_neg_binomial" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.n_neg_binomial">n_neg_binomial</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>utils.n_neg_binomial(rate, dispersion, n, step<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>An array of negative binomial trials. See cv.sample() for more explanation.</p>
+<section id="parameters-17" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-17">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>rate</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>the rate of the process (mean, same as Poisson)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>dispersion</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>dispersion parameter; lower is more dispersion, i.e.&nbsp;0 = infinite, ∞ = Poisson</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>number of trials</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>step</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>the step size to use if non-integer outputs are desired</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>outcomes = cv.n_neg_binomial(100, 1, 50) # 50 negative binomial trials with mean 100 and dispersion roughly equal to mean (large-mean limit)
+outcomes = cv.n_neg_binomial(1, 100, 20) # 20 negative binomial trials with mean 1 and dispersion still roughly equal to mean (approximately Poisson)</code></pre>
+</section>
+</section>
+<section id="covasim.utils.n_poisson" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.n_poisson">n_poisson</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>utils.n_poisson(rate, n)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>An array of Poisson trials.</p>
+<section id="parameters-18" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-18">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>rate</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>the rate of the Poisson process (mean)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>number of trials</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>outcomes = cv.n_poisson(100, 20) # 20 Poisson trials with mean 100</code></pre>
+</section>
+</section>
+<section id="covasim.utils.poisson" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.poisson">poisson</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>utils.poisson(rate)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A Poisson trial.</p>
+<section id="parameters-19" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-19">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>rate</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>the rate of the Poisson process</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>outcome = cv.poisson(100) # Single Poisson trial with mean 100</code></pre>
+</section>
+</section>
+<section id="covasim.utils.sample" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.sample">sample</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>utils.sample(dist<span class="op">=</span><span class="va">None</span>, par1<span class="op">=</span><span class="va">None</span>, par2<span class="op">=</span><span class="va">None</span>, size<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Draw a sample from the distribution specified by the input. The available distributions are:</p>
+<ul>
+<li>‘uniform’ : uniform distribution from low=par1 to high=par2; mean is equal to (par1+par2)/2</li>
+<li>‘normal’ : normal distribution with mean=par1 and std=par2</li>
+<li>‘lognormal’ : lognormal distribution with mean=par1 and std=par2 (parameters are for the lognormal distribution, <em>not</em> the underlying normal distribution)</li>
+<li>‘normal_pos’ : right-sided normal distribution (i.e.&nbsp;only positive values), with mean=par1 and std=par2 <em>of the underlying normal distribution</em></li>
+<li>‘normal_int’ : normal distribution with mean=par1 and std=par2, returns only integer values</li>
+<li>‘lognormal_int’ : lognormal distribution with mean=par1 and std=par2, returns only integer values</li>
+<li>‘poisson’ : Poisson distribution with rate=par1 (par2 is not used); mean and variance are equal to par1</li>
+<li>‘neg_binomial’ : negative binomial distribution with mean=par1 and k=par2; converges to Poisson with k=∞</li>
+</ul>
+<section id="parameters-20" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-20">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dist</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the distribution to sample from</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>par1</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>the “main” distribution parameter (e.g.&nbsp;mean)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>par2</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>the “secondary” distribution parameter (e.g.&nbsp;std)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>size</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>the number of samples (default=1)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to individual sampling functions</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-4" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-4">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>A length N array of samples</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>cv.sample() # returns Unif(0,1)
+cv.sample(dist='normal', par1=3, par2=0.5) # returns Normal(μ=3, σ=0.5)
+cv.sample(dist='lognormal_int', par1=5, par2=3) # returns a lognormally distributed set of values with mean 5 and std 3</code></pre>
+</section>
+<section id="notes" class="level4 doc-section doc-section-notes">
+<h4 class="doc-section doc-section-notes anchored" data-anchor-id="notes">Notes</h4>
+<p>Lognormal distributions are parameterized with reference to the underlying normal distribution (see: https://docs.scipy.org/doc/numpy-1.14.0/reference/generated/numpy.random.lognormal.html), but this function assumes the user wants to specify the mean and std of the lognormal distribution.</p>
+<p>Negative binomial distributions are parameterized with reference to the mean and dispersion parameter k (see: https://en.wikipedia.org/wiki/Negative_binomial_distribution). The r parameter of the underlying distribution is then calculated from the desired mean and k. For a small mean (~1), a dispersion parameter of ∞ corresponds to the variance and standard deviation being equal to the mean (i.e., Poisson). For a large mean (e.g.&nbsp;&gt;100), a dispersion parameter of 1 corresponds to the standard deviation being equal to the mean.</p>
+</section>
+</section>
+<section id="covasim.utils.set_seed" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.set_seed">set_seed</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>utils.set_seed(seed<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Reset the random seed – complicated because of Numba, which requires special syntax to reset the seed. This function also resets Python’s built-in random number generated.</p>
+<section id="parameters-21" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-21">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>seed</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>the random seed</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.utils.true" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.true">true</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>utils.true(arr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices of the values of the array that are true: just an alias for arr.nonzero()[0].</p>
+<section id="parameters-22" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-22">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.true(np.array([1,0,0,1,1,0,1])) # Returns array([0, 3, 4, 6])</code></pre>
+</section>
+</section>
+<section id="covasim.utils.undefined" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.utils.undefined">undefined</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>utils.undefined(arr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Returns the indices of the values of the array that are not-nan.</p>
+<section id="parameters-23" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-23">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>arr</td>
+<td><a href="https://docs.python.org/3/library/array.html#module-array">array</a></td>
+<td>any array</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>inds = cv.defined(np.array([1,np.nan,0,np.nan,1,0,1]))</code></pre>
+
+
+</section>
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../api/sim.html" class="pagination-link" aria-label="sim">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">sim</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Docs built for Covasim v3.1.7 (2026-02-18).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/starsimhub/covasim">
+      <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="mailto:info@covasim.org">
+      <i class="bi bi-envelope-at-fill" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://covasim.org/">
+      <i class="bi bi-globe" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,0 +1,2981 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>analysis – Covasim</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../api/base.html" rel="next">
+<link href="../api/index.html" rel="prev">
+<link href="..//assets/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-23bbe8b5e4efc1e257f6d59dce478b08.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-aafc68b2255684af78b035618dac2a51.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../assets/styles.css">
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo light-content">
+    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo dark-content">
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../overview.html" aria-current="page"> 
+<span class="menu-text">Overview</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../tutorials/index.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../whatsnew.html"> 
+<span class="menu-text">What’s new</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../faq.html"> 
+<span class="menu-text">FAQ</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../api/index.html"> 
+<span class="menu-text">API reference</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-more" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">More</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-more">    
+        <li>
+    <a class="dropdown-item" href="../papers.html">
+ <span class="dropdown-text">Publications</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../parameters.html">
+ <span class="dropdown-text">Parameters</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../data.html">
+ <span class="dropdown-text">Data scrapers</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../glossary.html">
+ <span class="dropdown-text">Glossary</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../code_of_conduct.html">
+ <span class="dropdown-text">Code of conduct</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../contributing.html">
+ <span class="dropdown-text">Contributing to Covasim</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../style.html">
+ <span class="dropdown-text">Style guide</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools tools-wide">
+    <a href="https://github.com/starsimhub/covasim" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+    <a href="mailto:info@covasim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-envelope-at-fill"></i></a>
+    <a href="https://covasim.org" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-globe"></i></a>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../api/analysis.html">analysis</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Overview</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>API reference</strong></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/analysis.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/base.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">base</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/data.loaders.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">data.loaders</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/defaults.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">defaults</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/immunity.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">immunity</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/interventions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">interventions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/misc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">misc</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/parameters.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">parameters</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/people.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">people</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/plotting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">plotting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/population.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">population</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/requirements.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">requirements</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/run.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">run</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/settings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">settings</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/sim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">sim</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../api/utils.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">utils</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#covasim.analysis" id="toc-covasim.analysis" class="nav-link active" data-scroll-target="#covasim.analysis">analysis</a>
+  <ul>
+  <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
+  <ul>
+  <li><a href="#covasim.analysis.Analyzer" id="toc-covasim.analysis.Analyzer" class="nav-link" data-scroll-target="#covasim.analysis.Analyzer">Analyzer</a>
+  <ul class="collapse">
+  <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.Analyzer.apply" id="toc-covasim.analysis.Analyzer.apply" class="nav-link" data-scroll-target="#covasim.analysis.Analyzer.apply">apply</a></li>
+  <li><a href="#covasim.analysis.Analyzer.finalize" id="toc-covasim.analysis.Analyzer.finalize" class="nav-link" data-scroll-target="#covasim.analysis.Analyzer.finalize">finalize</a></li>
+  <li><a href="#covasim.analysis.Analyzer.initialize" id="toc-covasim.analysis.Analyzer.initialize" class="nav-link" data-scroll-target="#covasim.analysis.Analyzer.initialize">initialize</a></li>
+  <li><a href="#covasim.analysis.Analyzer.shrink" id="toc-covasim.analysis.Analyzer.shrink" class="nav-link" data-scroll-target="#covasim.analysis.Analyzer.shrink">shrink</a></li>
+  <li><a href="#covasim.analysis.Analyzer.to_json" id="toc-covasim.analysis.Analyzer.to_json" class="nav-link" data-scroll-target="#covasim.analysis.Analyzer.to_json">to_json</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.Calibration" id="toc-covasim.analysis.Calibration" class="nav-link" data-scroll-target="#covasim.analysis.Calibration">Calibration</a>
+  <ul class="collapse">
+  <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
+  <li><a href="#returns-1" id="toc-returns-1" class="nav-link" data-scroll-target="#returns-1">Returns</a></li>
+  <li><a href="#methods-1" id="toc-methods-1" class="nav-link" data-scroll-target="#methods-1">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.Calibration.calibrate" id="toc-covasim.analysis.Calibration.calibrate" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.calibrate">calibrate</a></li>
+  <li><a href="#covasim.analysis.Calibration.make_study" id="toc-covasim.analysis.Calibration.make_study" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.make_study">make_study</a></li>
+  <li><a href="#covasim.analysis.Calibration.parse_study" id="toc-covasim.analysis.Calibration.parse_study" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.parse_study">parse_study</a></li>
+  <li><a href="#covasim.analysis.Calibration.plot_all" id="toc-covasim.analysis.Calibration.plot_all" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.plot_all">plot_all</a></li>
+  <li><a href="#covasim.analysis.Calibration.plot_best" id="toc-covasim.analysis.Calibration.plot_best" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.plot_best">plot_best</a></li>
+  <li><a href="#covasim.analysis.Calibration.plot_sims" id="toc-covasim.analysis.Calibration.plot_sims" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.plot_sims">plot_sims</a></li>
+  <li><a href="#covasim.analysis.Calibration.plot_stride" id="toc-covasim.analysis.Calibration.plot_stride" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.plot_stride">plot_stride</a></li>
+  <li><a href="#covasim.analysis.Calibration.plot_trend" id="toc-covasim.analysis.Calibration.plot_trend" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.plot_trend">plot_trend</a></li>
+  <li><a href="#covasim.analysis.Calibration.remove_db" id="toc-covasim.analysis.Calibration.remove_db" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.remove_db">remove_db</a></li>
+  <li><a href="#covasim.analysis.Calibration.run_sim" id="toc-covasim.analysis.Calibration.run_sim" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.run_sim">run_sim</a></li>
+  <li><a href="#covasim.analysis.Calibration.run_trial" id="toc-covasim.analysis.Calibration.run_trial" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.run_trial">run_trial</a></li>
+  <li><a href="#covasim.analysis.Calibration.run_workers" id="toc-covasim.analysis.Calibration.run_workers" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.run_workers">run_workers</a></li>
+  <li><a href="#covasim.analysis.Calibration.summarize" id="toc-covasim.analysis.Calibration.summarize" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.summarize">summarize</a></li>
+  <li><a href="#covasim.analysis.Calibration.to_json" id="toc-covasim.analysis.Calibration.to_json" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.to_json">to_json</a></li>
+  <li><a href="#covasim.analysis.Calibration.worker" id="toc-covasim.analysis.Calibration.worker" class="nav-link" data-scroll-target="#covasim.analysis.Calibration.worker">worker</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.Fit" id="toc-covasim.analysis.Fit" class="nav-link" data-scroll-target="#covasim.analysis.Fit">Fit</a>
+  <ul class="collapse">
+  <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
+  <li><a href="#methods-2" id="toc-methods-2" class="nav-link" data-scroll-target="#methods-2">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.Fit.compute" id="toc-covasim.analysis.Fit.compute" class="nav-link" data-scroll-target="#covasim.analysis.Fit.compute">compute</a></li>
+  <li><a href="#covasim.analysis.Fit.compute_diffs" id="toc-covasim.analysis.Fit.compute_diffs" class="nav-link" data-scroll-target="#covasim.analysis.Fit.compute_diffs">compute_diffs</a></li>
+  <li><a href="#covasim.analysis.Fit.compute_gofs" id="toc-covasim.analysis.Fit.compute_gofs" class="nav-link" data-scroll-target="#covasim.analysis.Fit.compute_gofs">compute_gofs</a></li>
+  <li><a href="#covasim.analysis.Fit.compute_losses" id="toc-covasim.analysis.Fit.compute_losses" class="nav-link" data-scroll-target="#covasim.analysis.Fit.compute_losses">compute_losses</a></li>
+  <li><a href="#covasim.analysis.Fit.compute_mismatch" id="toc-covasim.analysis.Fit.compute_mismatch" class="nav-link" data-scroll-target="#covasim.analysis.Fit.compute_mismatch">compute_mismatch</a></li>
+  <li><a href="#covasim.analysis.Fit.plot" id="toc-covasim.analysis.Fit.plot" class="nav-link" data-scroll-target="#covasim.analysis.Fit.plot">plot</a></li>
+  <li><a href="#covasim.analysis.Fit.reconcile_inputs" id="toc-covasim.analysis.Fit.reconcile_inputs" class="nav-link" data-scroll-target="#covasim.analysis.Fit.reconcile_inputs">reconcile_inputs</a></li>
+  <li><a href="#covasim.analysis.Fit.summarize" id="toc-covasim.analysis.Fit.summarize" class="nav-link" data-scroll-target="#covasim.analysis.Fit.summarize">summarize</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.TransTree" id="toc-covasim.analysis.TransTree" class="nav-link" data-scroll-target="#covasim.analysis.TransTree">TransTree</a>
+  <ul class="collapse">
+  <li><a href="#parameters-7" id="toc-parameters-7" class="nav-link" data-scroll-target="#parameters-7">Parameters</a></li>
+  <li><a href="#methods-3" id="toc-methods-3" class="nav-link" data-scroll-target="#methods-3">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.TransTree.animate" id="toc-covasim.analysis.TransTree.animate" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.animate">animate</a></li>
+  <li><a href="#covasim.analysis.TransTree.count_targets" id="toc-covasim.analysis.TransTree.count_targets" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.count_targets">count_targets</a></li>
+  <li><a href="#covasim.analysis.TransTree.count_transmissions" id="toc-covasim.analysis.TransTree.count_transmissions" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.count_transmissions">count_transmissions</a></li>
+  <li><a href="#covasim.analysis.TransTree.day" id="toc-covasim.analysis.TransTree.day" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.day">day</a></li>
+  <li><a href="#covasim.analysis.TransTree.make_detailed" id="toc-covasim.analysis.TransTree.make_detailed" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.make_detailed">make_detailed</a></li>
+  <li><a href="#covasim.analysis.TransTree.plot" id="toc-covasim.analysis.TransTree.plot" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.plot">plot</a></li>
+  <li><a href="#covasim.analysis.TransTree.plot_histograms" id="toc-covasim.analysis.TransTree.plot_histograms" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.plot_histograms">plot_histograms</a></li>
+  <li><a href="#covasim.analysis.TransTree.r0" id="toc-covasim.analysis.TransTree.r0" class="nav-link" data-scroll-target="#covasim.analysis.TransTree.r0">r0</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.age_histogram" id="toc-covasim.analysis.age_histogram" class="nav-link" data-scroll-target="#covasim.analysis.age_histogram">age_histogram</a>
+  <ul class="collapse">
+  <li><a href="#parameters-12" id="toc-parameters-12" class="nav-link" data-scroll-target="#parameters-12">Parameters</a></li>
+  <li><a href="#methods-4" id="toc-methods-4" class="nav-link" data-scroll-target="#methods-4">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.age_histogram.compute_windows" id="toc-covasim.analysis.age_histogram.compute_windows" class="nav-link" data-scroll-target="#covasim.analysis.age_histogram.compute_windows">compute_windows</a></li>
+  <li><a href="#covasim.analysis.age_histogram.from_sim" id="toc-covasim.analysis.age_histogram.from_sim" class="nav-link" data-scroll-target="#covasim.analysis.age_histogram.from_sim">from_sim</a></li>
+  <li><a href="#covasim.analysis.age_histogram.get" id="toc-covasim.analysis.age_histogram.get" class="nav-link" data-scroll-target="#covasim.analysis.age_histogram.get">get</a></li>
+  <li><a href="#covasim.analysis.age_histogram.plot" id="toc-covasim.analysis.age_histogram.plot" class="nav-link" data-scroll-target="#covasim.analysis.age_histogram.plot">plot</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.daily_age_stats" id="toc-covasim.analysis.daily_age_stats" class="nav-link" data-scroll-target="#covasim.analysis.daily_age_stats">daily_age_stats</a>
+  <ul class="collapse">
+  <li><a href="#parameters-14" id="toc-parameters-14" class="nav-link" data-scroll-target="#parameters-14">Parameters</a></li>
+  <li><a href="#methods-5" id="toc-methods-5" class="nav-link" data-scroll-target="#methods-5">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.daily_age_stats.plot" id="toc-covasim.analysis.daily_age_stats.plot" class="nav-link" data-scroll-target="#covasim.analysis.daily_age_stats.plot">plot</a></li>
+  <li><a href="#covasim.analysis.daily_age_stats.to_df" id="toc-covasim.analysis.daily_age_stats.to_df" class="nav-link" data-scroll-target="#covasim.analysis.daily_age_stats.to_df">to_df</a></li>
+  <li><a href="#covasim.analysis.daily_age_stats.to_total_df" id="toc-covasim.analysis.daily_age_stats.to_total_df" class="nav-link" data-scroll-target="#covasim.analysis.daily_age_stats.to_total_df">to_total_df</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.daily_stats" id="toc-covasim.analysis.daily_stats" class="nav-link" data-scroll-target="#covasim.analysis.daily_stats">daily_stats</a>
+  <ul class="collapse">
+  <li><a href="#parameters-16" id="toc-parameters-16" class="nav-link" data-scroll-target="#parameters-16">Parameters</a></li>
+  <li><a href="#methods-6" id="toc-methods-6" class="nav-link" data-scroll-target="#methods-6">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.daily_stats.intersect" id="toc-covasim.analysis.daily_stats.intersect" class="nav-link" data-scroll-target="#covasim.analysis.daily_stats.intersect">intersect</a></li>
+  <li><a href="#covasim.analysis.daily_stats.make_report" id="toc-covasim.analysis.daily_stats.make_report" class="nav-link" data-scroll-target="#covasim.analysis.daily_stats.make_report">make_report</a></li>
+  <li><a href="#covasim.analysis.daily_stats.plot" id="toc-covasim.analysis.daily_stats.plot" class="nav-link" data-scroll-target="#covasim.analysis.daily_stats.plot">plot</a></li>
+  <li><a href="#covasim.analysis.daily_stats.report" id="toc-covasim.analysis.daily_stats.report" class="nav-link" data-scroll-target="#covasim.analysis.daily_stats.report">report</a></li>
+  <li><a href="#covasim.analysis.daily_stats.transpose" id="toc-covasim.analysis.daily_stats.transpose" class="nav-link" data-scroll-target="#covasim.analysis.daily_stats.transpose">transpose</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.nab_histogram" id="toc-covasim.analysis.nab_histogram" class="nav-link" data-scroll-target="#covasim.analysis.nab_histogram">nab_histogram</a>
+  <ul class="collapse">
+  <li><a href="#parameters-18" id="toc-parameters-18" class="nav-link" data-scroll-target="#parameters-18">Parameters</a></li>
+  <li><a href="#methods-7" id="toc-methods-7" class="nav-link" data-scroll-target="#methods-7">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.nab_histogram.plot" id="toc-covasim.analysis.nab_histogram.plot" class="nav-link" data-scroll-target="#covasim.analysis.nab_histogram.plot">plot</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#covasim.analysis.snapshot" id="toc-covasim.analysis.snapshot" class="nav-link" data-scroll-target="#covasim.analysis.snapshot">snapshot</a>
+  <ul class="collapse">
+  <li><a href="#parameters-20" id="toc-parameters-20" class="nav-link" data-scroll-target="#parameters-20">Parameters</a></li>
+  <li><a href="#methods-8" id="toc-methods-8" class="nav-link" data-scroll-target="#methods-8">Methods</a>
+  <ul class="collapse">
+  <li><a href="#covasim.analysis.snapshot.get" id="toc-covasim.analysis.snapshot.get" class="nav-link" data-scroll-target="#covasim.analysis.snapshot.get">get</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+
+
+
+
+
+<section id="covasim.analysis" class="level1">
+<h1>analysis</h1>
+<p><code>analysis</code></p>
+<p>Additional analysis functions that are not part of the core Covasim workflow, but which are useful for particular investigations.</p>
+<section id="classes" class="level2">
+<h2 class="anchored" data-anchor-id="classes">Classes</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.Analyzer">Analyzer</a></td>
+<td>Base class for analyzers. Based on the Intervention class. Analyzers are used</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration">Calibration</a></td>
+<td>A class to handle calibration of Covasim simulations. Uses the Optuna hyperparameter</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Fit">Fit</a></td>
+<td>A class for calculating the fit between the model and the data. Note the</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.TransTree">TransTree</a></td>
+<td>A class for holding a transmission tree. There are several different representations</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.age_histogram">age_histogram</a></td>
+<td>Calculate statistics across age bins, including histogram plotting functionality.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.daily_age_stats">daily_age_stats</a></td>
+<td>Calculate daily counts by age, saving for each day of the simulation. Can</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.daily_stats">daily_stats</a></td>
+<td>Print out daily statistics about the simulation. Note that this analyzer takes</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.nab_histogram">nab_histogram</a></td>
+<td>Store histogram of log_{10}(NAb) distribution</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.snapshot">snapshot</a></td>
+<td>Analyzer that takes a “snapshot” of the sim.people array at specified points</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.Analyzer" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.Analyzer">Analyzer</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>analysis.Analyzer(label<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Base class for analyzers. Based on the Intervention class. Analyzers are used to provide more detailed information about a simulation than is available by default – for example, pulling states out of sim.people on a particular timestep before it gets updated in the next timestep.</p>
+<p>To retrieve a particular analyzer from a sim, use sim.get_analyzer().</p>
+<section id="parameters" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>label</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>a label for the Analyzer (used for ease of identification)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="methods" class="level4">
+<h4 class="anchored" data-anchor-id="methods">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.Analyzer.apply">apply</a></td>
+<td>Apply analyzer at each time point. The analyzer has full access to the</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Analyzer.finalize">finalize</a></td>
+<td>Finalize analyzer</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Analyzer.initialize">initialize</a></td>
+<td>Initialize the analyzer, e.g.&nbsp;convert date strings to integers.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Analyzer.shrink">shrink</a></td>
+<td>Remove any excess stored data from the intervention; for use with sim.shrink().</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Analyzer.to_json">to_json</a></td>
+<td>Return JSON-compatible representation</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.Analyzer.apply" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Analyzer.apply">apply</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>analysis.Analyzer.<span class="bu">apply</span>(sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Apply analyzer at each time point. The analyzer has full access to the sim object, and typically stores data/results in itself. This is the core method which each analyzer object needs to implement.</p>
+<section id="parameters-1" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-1">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim</td>
+<td></td>
+<td>the Sim instance</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.Analyzer.finalize" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Analyzer.finalize">finalize</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>analysis.Analyzer.finalize(sim<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Finalize analyzer</p>
+<p>This method is run once as part of <code>sim.finalize()</code> enabling the analyzer to perform any final operations after the simulation is complete (e.g.&nbsp;rescaling)</p>
+</section>
+<section id="covasim.analysis.Analyzer.initialize" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Analyzer.initialize">initialize</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>analysis.Analyzer.initialize(sim<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Initialize the analyzer, e.g.&nbsp;convert date strings to integers.</p>
+</section>
+<section id="covasim.analysis.Analyzer.shrink" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Analyzer.shrink">shrink</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>analysis.Analyzer.shrink(in_place<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Remove any excess stored data from the intervention; for use with sim.shrink().</p>
+<section id="parameters-2" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-2">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>in_place</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to shrink the intervention (else shrink a copy)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.Analyzer.to_json" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Analyzer.to_json">to_json</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>analysis.Analyzer.to_json()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Return JSON-compatible representation</p>
+<p>Custom classes can’t be directly represented in JSON. This method is a one-way export to produce a JSON-compatible representation of the intervention. This method will attempt to JSONify each attribute of the intervention, skipping any that fail.</p>
+<section id="returns" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>JSON-serializable representation</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.Calibration" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.Calibration">Calibration</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    sim,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    calib_pars<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    fit_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    custom_fn<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    par_samplers<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    n_trials<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    n_workers<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    total_trials<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    db_name<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    keep_db<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    storage<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    die<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A class to handle calibration of Covasim simulations. Uses the Optuna hyperparameter optimization library (optuna.org), which must be installed separately (via pip install optuna).</p>
+<p>Note: running a calibration does not guarantee a good fit! You must ensure that you run for a sufficient number of iterations, have enough free parameters, and that the parameters have wide enough bounds. Please see the tutorial on calibration for more information.</p>
+<section id="parameters-3" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-3">Parameters</h4>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 4%">
+<col style="width: 75%">
+<col style="width: 7%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim (Sim)</td>
+<td></td>
+<td>the simulation to calibrate</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>calib_pars (dict)</td>
+<td></td>
+<td>a dictionary of the parameters to calibrate of the format dict(key1=[best, low, high])</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>fit_args (dict)</td>
+<td></td>
+<td>a dictionary of options that are passed to sim.compute_fit() to calculate the goodness-of-fit</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>par_samplers (dict)</td>
+<td></td>
+<td>an optional mapping from parameters to the Optuna sampler to use for choosing new points for each; by default, suggest_float</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>custom_fn (func)</td>
+<td></td>
+<td>a custom function for modifying the simulation; receives the sim and calib_pars as inputs, should return the modified sim</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>n_trials (int)</td>
+<td></td>
+<td>the number of trials per worker</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>n_workers (int)</td>
+<td></td>
+<td>the number of parallel workers (default: maximum</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>total_trials (int)</td>
+<td></td>
+<td>if n_trials is not supplied, calculate by dividing this number by n_workers)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>name (str)</td>
+<td></td>
+<td>the name of the database (default: ‘covasim_calibration’)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>db_name (str)</td>
+<td></td>
+<td>the name of the database file (default: ‘covasim_calibration.db’)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>keep_db (bool)</td>
+<td></td>
+<td>whether to keep the database after calibration (default: false)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>storage (str)</td>
+<td></td>
+<td>the location of the database (default: sqlite)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>label (str)</td>
+<td></td>
+<td>a label for this calibration object</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>die (bool)</td>
+<td></td>
+<td>whether to stop if an exception is encountered (default: false)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>verbose (bool)</td>
+<td></td>
+<td>whether to print details of the calibration</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>kwargs (dict)</td>
+<td></td>
+<td>passed to cv.Calibration()</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-1" class="level4 doc-section doc-section-returns">
+<h4 class="doc-section doc-section-returns anchored" data-anchor-id="returns-1">Returns</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>A Calibration object</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>sim = cv.Sim(datafile='data.csv')
+calib_pars = dict(beta=[0.015, 0.010, 0.020])
+calib = cv.Calibration(sim, calib_pars, total_trials=100)
+calib.calibrate()
+calib.plot()</code></pre>
+<p>New in version 3.0.3.</p>
+</section>
+<section id="methods-1" class="level4">
+<h4 class="anchored" data-anchor-id="methods-1">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.calibrate">calibrate</a></td>
+<td>Actually perform calibration.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration.make_study">make_study</a></td>
+<td>Make a study, deleting one if it already exists</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.parse_study">parse_study</a></td>
+<td>Parse the study into a data frame – called automatically</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration.plot_all">plot_all</a></td>
+<td>Plot every point in the calibration. Warning, very slow for more than a few hundred trials.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.plot_best">plot_best</a></td>
+<td>Plot only the points with lowest mismatch. New in version 3.1.1.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration.plot_sims">plot_sims</a></td>
+<td>Plot sims, before and after calibration.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.plot_stride">plot_stride</a></td>
+<td>Plot a fixed number of points in order across the results.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration.plot_trend">plot_trend</a></td>
+<td>Plot the trend in best mismatch over time.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.remove_db">remove_db</a></td>
+<td>Remove the database file if keep_db is false and the path exists.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration.run_sim">run_sim</a></td>
+<td>Create and run a simulation</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.run_trial">run_trial</a></td>
+<td>Define the objective for Optuna</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration.run_workers">run_workers</a></td>
+<td>Run multiple workers in parallel</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.summarize">summarize</a></td>
+<td>Print out results from the calibration</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Calibration.to_json">to_json</a></td>
+<td>Convert the data to JSON.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Calibration.worker">worker</a></td>
+<td>Run a single worker</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.Calibration.calibrate" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.calibrate">calibrate</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.calibrate(calib_pars<span class="op">=</span><span class="va">None</span>, verbose<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Actually perform calibration.</p>
+<section id="parameters-4" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-4">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>calib_pars</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>if supplied, overwrite stored calib_pars</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to print output from each trial</td>
+<td><a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>if supplied, overwrite stored run_args (n_trials, n_workers, etc.)</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.Calibration.make_study" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.make_study">make_study</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.make_study()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Make a study, deleting one if it already exists</p>
+</section>
+<section id="covasim.analysis.Calibration.parse_study" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.parse_study">parse_study</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.parse_study()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Parse the study into a data frame – called automatically</p>
+</section>
+<section id="covasim.analysis.Calibration.plot_all" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.plot_all">plot_all</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.plot_all()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot every point in the calibration. Warning, very slow for more than a few hundred trials.</p>
+<p>New in version 3.1.1.</p>
+</section>
+<section id="covasim.analysis.Calibration.plot_best" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.plot_best">plot_best</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.plot_best(best_thresh<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot only the points with lowest mismatch. New in version 3.1.1.</p>
+</section>
+<section id="covasim.analysis.Calibration.plot_sims" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.plot_sims">plot_sims</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.plot_sims(<span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot sims, before and after calibration.</p>
+<p>New in version 3.1.1: renamed from plot() to plot_sims().</p>
+</section>
+<section id="covasim.analysis.Calibration.plot_stride" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.plot_stride">plot_stride</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.plot_stride(npts<span class="op">=</span><span class="dv">200</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot a fixed number of points in order across the results.</p>
+<p>New in version 3.1.1.</p>
+</section>
+<section id="covasim.analysis.Calibration.plot_trend" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.plot_trend">plot_trend</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.plot_trend(best_thresh<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the trend in best mismatch over time.</p>
+<p>New in version 3.1.1.</p>
+</section>
+<section id="covasim.analysis.Calibration.remove_db" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.remove_db">remove_db</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.remove_db()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Remove the database file if keep_db is false and the path exists.</p>
+<p>New in version 3.1.0.</p>
+</section>
+<section id="covasim.analysis.Calibration.run_sim" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.run_sim">run_sim</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.run_sim(calib_pars, label<span class="op">=</span><span class="va">None</span>, return_sim<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create and run a simulation</p>
+</section>
+<section id="covasim.analysis.Calibration.run_trial" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.run_trial">run_trial</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.run_trial(trial)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Define the objective for Optuna</p>
+</section>
+<section id="covasim.analysis.Calibration.run_workers" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.run_workers">run_workers</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.run_workers()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run multiple workers in parallel</p>
+</section>
+<section id="covasim.analysis.Calibration.summarize" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.summarize">summarize</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.summarize()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print out results from the calibration</p>
+</section>
+<section id="covasim.analysis.Calibration.to_json" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.to_json">to_json</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.to_json(filename<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convert the data to JSON.</p>
+<p>New in version 3.1.1.</p>
+</section>
+<section id="covasim.analysis.Calibration.worker" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Calibration.worker">worker</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>analysis.Calibration.worker()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run a single worker</p>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.Fit" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.Fit">Fit</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    sim,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    weights<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    custom<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    compute<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    die<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A class for calculating the fit between the model and the data. Note the following terminology is used here:</p>
+<pre><code>- fit: nonspecific term for how well the model matches the data
+- difference: the absolute numerical differences between the model and the data (one time series per result)
+- goodness-of-fit: the result of passing the difference through a statistical function, such as mean squared error
+- loss: the goodness-of-fit for each result multiplied by user-specified weights (one time series per result)
+- mismatches: the sum of all the losses (a single scalar value per time series)
+- mismatch: the sum of the mismatches -- this is the value to be minimized during calibration</code></pre>
+<section id="parameters-5" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-5">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim</td>
+<td><a href="../api/sim.html#covasim.sim.Sim">Sim</a></td>
+<td>the sim object</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>weights</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>the relative weight to place on each result (by default: 10 for deaths, 5 for diagnoses, 1 for everything else)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>keys</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>the keys to use in the calculation</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>custom</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>a custom dictionary of additional data to fit; format is e.g.&nbsp;{‘my_output’:{‘data’:[1,2,3], ‘sim’:[1,2,4], ‘weights’:2.0}}</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>compute</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to compute the mismatch immediately</td>
+<td><a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a></td>
+</tr>
+<tr class="even">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>detail to print</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+<tr class="odd">
+<td>die</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to raise an exception if no data are supplied</td>
+<td><a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a></td>
+</tr>
+<tr class="even">
+<td>label</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the label for the analyzer</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to cv.compute_gof() – see this function for more detail on goodness-of-fit calculation options</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>sim = cv.Sim(datafile='my-data-file.csv')
+sim.run()
+fit = sim.compute_fit()
+fit.plot()</code></pre>
+</section>
+<section id="methods-2" class="level4">
+<h4 class="anchored" data-anchor-id="methods-2">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.Fit.compute">compute</a></td>
+<td>Perform all required computations</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Fit.compute_diffs">compute_diffs</a></td>
+<td>Find the differences between the sim and the data</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Fit.compute_gofs">compute_gofs</a></td>
+<td>Compute the goodness-of-fit</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Fit.compute_losses">compute_losses</a></td>
+<td>Compute the weighted goodness-of-fit</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Fit.compute_mismatch">compute_mismatch</a></td>
+<td>Compute the final mismatch</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Fit.plot">plot</a></td>
+<td>Plot the fit of the model to the data. For each result, plot the data</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.Fit.reconcile_inputs">reconcile_inputs</a></td>
+<td>Find matching keys and indices between the model and the data</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.Fit.summarize">summarize</a></td>
+<td>Print out results from the fit</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.Fit.compute" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.compute">compute</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.compute()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Perform all required computations</p>
+</section>
+<section id="covasim.analysis.Fit.compute_diffs" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.compute_diffs">compute_diffs</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.compute_diffs(absolute<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Find the differences between the sim and the data</p>
+</section>
+<section id="covasim.analysis.Fit.compute_gofs" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.compute_gofs">compute_gofs</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.compute_gofs(<span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Compute the goodness-of-fit</p>
+</section>
+<section id="covasim.analysis.Fit.compute_losses" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.compute_losses">compute_losses</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.compute_losses()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Compute the weighted goodness-of-fit</p>
+</section>
+<section id="covasim.analysis.Fit.compute_mismatch" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.compute_mismatch">compute_mismatch</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.compute_mismatch(use_median<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Compute the final mismatch</p>
+</section>
+<section id="covasim.analysis.Fit.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.plot(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    keys<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    width<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    fig_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    axis_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    plot_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    date_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    do_show<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    fig<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the fit of the model to the data. For each result, plot the data and the model; the difference; and the loss (weighted difference). Also plots the loss as a function of time.</p>
+<section id="parameters-6" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-6">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>keys</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>which keys to plot (default, all)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>width</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>bar width</td>
+<td><code>0.8</code></td>
+</tr>
+<tr class="odd">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>pl.figure()</code></td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>axis_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>pl.subplots_adjust()</code></td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>plot_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>pl.plot()</code></td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>date_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>cv.plotting.reset_ticks()</code> (handle date format, rotation, etc.)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>do_show</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to show the plot</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>fig</td>
+<td><code>fig</code></td>
+<td>if supplied, use this figure to plot in</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>cv.options.with_style()</code></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-2" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-2">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td>Figure object</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.Fit.reconcile_inputs" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.reconcile_inputs">reconcile_inputs</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.reconcile_inputs()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Find matching keys and indices between the model and the data</p>
+</section>
+<section id="covasim.analysis.Fit.summarize" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.Fit.summarize">summarize</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>analysis.Fit.summarize()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print out results from the fit</p>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.TransTree" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.TransTree">TransTree</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree(sim, to_networkx<span class="op">=</span><span class="va">False</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>A class for holding a transmission tree. There are several different representations of the transmission tree: “infection_log” is copied from the people object and is the simplest representation. “detailed h” includes additional attributes about the source and target. If NetworkX is installed (required for most methods), “graph” includes an NX representation of the transmission tree.</p>
+<section id="parameters-7" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-7">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>sim</td>
+<td><a href="../api/sim.html#covasim.sim.Sim">Sim</a></td>
+<td>the sim object</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>to_networkx</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to convert the graph to a NetworkX object</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>sim = cv.Sim().run()
+sim.run()
+tt = sim.make_transtree()
+tt.plot()
+tt.plot_histograms()</code></pre>
+<p>New in version 2.1.0: <code>tt.detailed</code> is a dataframe rather than a list of dictionaries; for the latter, use <code>tt.detailed.to_dict('records')</code>.</p>
+</section>
+<section id="methods-3" class="level4">
+<h4 class="anchored" data-anchor-id="methods-3">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.TransTree.animate">animate</a></td>
+<td>Animate the transmission tree.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.TransTree.count_targets">count_targets</a></td>
+<td>Count the number of targets each infected person has. If start and/or end</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.TransTree.count_transmissions">count_transmissions</a></td>
+<td>Iterable over edges corresponding to transmission events</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.TransTree.day">day</a></td>
+<td>Convenience function for converting an input to an integer day</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.TransTree.make_detailed">make_detailed</a></td>
+<td>Construct a detailed transmission tree, with additional information for each person</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.TransTree.plot">plot</a></td>
+<td>Plot the transmission tree.</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.TransTree.plot_histograms">plot_histograms</a></td>
+<td>Plots a histogram of the number of transmissions.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.TransTree.r0">r0</a></td>
+<td>Return average number of transmissions per person</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.TransTree.animate" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.animate">animate</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.animate(<span class="op">*</span>args, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Animate the transmission tree.</p>
+<section id="parameters-8" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-8">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>animate</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to animate the plot (otherwise, show when finished)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>print out progress of each frame</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>markersize</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a></td>
+<td>size of the markers</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>sus_color</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>color for susceptibles</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>arguments passed to pl.figure()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>axis_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>arguments passed to pl.subplots_adjust()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>plot_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>arguments passed to pl.plot()</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>delay</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>delay between frames in seconds</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>colors</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>color of each person</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>cmap</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>colormap for each person (if colors is not supplied)</td>
+<td><em>required</em></td>
+</tr>
+<tr class="odd">
+<td>fig</td>
+<td><code>fig</code></td>
+<td>if supplied, use this figure</td>
+<td><em>required</em></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="returns-3" class="level6 doc-section doc-section-returns">
+<h6 class="doc-section doc-section-returns anchored" data-anchor-id="returns-3">Returns</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fig</td>
+<td></td>
+<td>the figure object</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.TransTree.count_targets" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.count_targets">count_targets</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.count_targets(start_day<span class="op">=</span><span class="va">None</span>, end_day<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Count the number of targets each infected person has. If start and/or end days are given, it will only count the targets of people who got infected between those dates (it does not, however, filter on the date the target got infected).</p>
+<section id="parameters-9" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-9">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>start_day</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> / <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the day on which to start counting people who got infected</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>end_day</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> / <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the day on which to stop counting people who got infected</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.TransTree.count_transmissions" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.count_transmissions">count_transmissions</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.count_transmissions()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Iterable over edges corresponding to transmission events</p>
+<p>This excludes edges corresponding to seeded infections without a source</p>
+</section>
+<section id="covasim.analysis.TransTree.day" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.day">day</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.day(day<span class="op">=</span><span class="va">None</span>, which<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convenience function for converting an input to an integer day</p>
+</section>
+<section id="covasim.analysis.TransTree.make_detailed" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.make_detailed">make_detailed</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.make_detailed(people, reset<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Construct a detailed transmission tree, with additional information for each person</p>
+</section>
+<section id="covasim.analysis.TransTree.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.plot(fig_args<span class="op">=</span><span class="va">None</span>, plot_args<span class="op">=</span><span class="va">None</span>, do_show<span class="op">=</span><span class="va">None</span>, fig<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the transmission tree.</p>
+<section id="parameters-10" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-10">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.figure()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>plot_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.plot()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>do_show</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to show the plot</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>fig</td>
+<td><code>fig</code></td>
+<td>if supplied, use this figure</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.TransTree.plot_histograms" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.plot_histograms">plot_histograms</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.plot_histograms(</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    start_day<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    end_day<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    bins<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    width<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>    fig_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    fig<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plots a histogram of the number of transmissions.</p>
+<section id="parameters-11" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-11">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>start_day</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> / <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the day on which to start counting people who got infected</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>end_day</td>
+<td><a href="https://docs.python.org/3/library/functions.html#int">int</a> / <a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the day on which to stop counting people who got infected</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>bins</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>bin edges to use for the histogram</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>width</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>width of bars</td>
+<td><code>0.8</code></td>
+</tr>
+<tr class="odd">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.figure()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>fig</td>
+<td><code>fig</code></td>
+<td>if supplied, use this figure</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.TransTree.r0" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.TransTree.r0">r0</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>analysis.TransTree.r0(recovered_only<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Return average number of transmissions per person</p>
+<p>This doesn’t include seed transmissions. By default, it also doesn’t adjust for length of infection (e.g.&nbsp;people infected towards the end of the simulation will have fewer transmissions because their infection may extend past the end of the simulation, these people are not included). If ‘recovered_only=True’ then the downstream transmissions will only be included for people that recover before the end of the simulation, thus ensuring they all had the same amount of time to transmit.</p>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.age_histogram" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.age_histogram">age_histogram</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>analysis.age_histogram(</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    days<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    states<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    edges<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    datafile<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    sim<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    die<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Calculate statistics across age bins, including histogram plotting functionality.</p>
+<section id="parameters-12" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-12">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>days</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>list of ints/strings/date objects, the days on which to calculate the histograms (default: last day)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>states</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>which states of people to record (default: exposed, tested, diagnosed, dead)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>edges</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>edges of age bins to use (default: 10 year bins from 0 to 100)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>datafile</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the name of the data file to load in for comparison, or a dataframe of data (optional)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>sim</td>
+<td><a href="../api/sim.html#covasim.sim.Sim">Sim</a></td>
+<td>only used if the analyzer is being used after a sim has already been run</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>die</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to raise an exception if dates are not found (default true)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to Analyzer()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>sim = cv.Sim(analyzers=cv.age_histogram())
+sim.run()
+
+agehist = sim.get_analyzer()
+agehist = cv.age_histogram(sim=sim) # Alternate method
+agehist.plot()</code></pre>
+</section>
+<section id="methods-4" class="level4">
+<h4 class="anchored" data-anchor-id="methods-4">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.age_histogram.compute_windows">compute_windows</a></td>
+<td>Convert cumulative histograms to windows</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.age_histogram.from_sim">from_sim</a></td>
+<td>Create an age histogram from an already run sim</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.age_histogram.get">get</a></td>
+<td>Retrieve a specific histogram from the given key (int, str, or date)</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.age_histogram.plot">plot</a></td>
+<td>Simple method for plotting the histograms.</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.age_histogram.compute_windows" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.age_histogram.compute_windows">compute_windows</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>analysis.age_histogram.compute_windows()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Convert cumulative histograms to windows</p>
+</section>
+<section id="covasim.analysis.age_histogram.from_sim" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.age_histogram.from_sim">from_sim</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>analysis.age_histogram.from_sim(sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create an age histogram from an already run sim</p>
+</section>
+<section id="covasim.analysis.age_histogram.get" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.age_histogram.get">get</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>analysis.age_histogram.get(key<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Retrieve a specific histogram from the given key (int, str, or date)</p>
+</section>
+<section id="covasim.analysis.age_histogram.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.age_histogram.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>analysis.age_histogram.plot(</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    windows<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    width<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">'#F8A493'</span>,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    fig_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    axis_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    data_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Simple method for plotting the histograms.</p>
+<section id="parameters-13" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-13">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>windows</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to plot windows instead of cumulative counts</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+<tr class="even">
+<td>width</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>width of bars</td>
+<td><code>0.8</code></td>
+</tr>
+<tr class="odd">
+<td>color</td>
+<td><a href="https://docs.python.org/3/library/functions.html#hex">hex</a> or <code>rgb</code></td>
+<td>the color of the bars</td>
+<td><code>'#F8A493'</code></td>
+</tr>
+<tr class="even">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.figure()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>axis_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.subplots_adjust()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>data_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>‘width’, ‘color’, and ‘offset’ arguments for the data</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>cv.options.with_style()</code>; see that function for choices</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.daily_age_stats" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.daily_age_stats">daily_age_stats</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_age_stats(states<span class="op">=</span><span class="va">None</span>, edges<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Calculate daily counts by age, saving for each day of the simulation. Can plot either time series by age or a histogram over all time.</p>
+<section id="parameters-14" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-14">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>states</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>which states of people to record (default: [‘diagnoses’, ‘deaths’, ‘tests’, ‘severe’])</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>edges</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>edges of age bins to use (default: 10 year bins from 0 to 100)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to Analyzer()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Examples</strong>::</p>
+<pre><code>sim = cv.Sim(analyzers=cv.daily_age_stats())
+sim = cv.Sim(pars, analyzers=daily_age)
+sim.run()
+daily_age = sim.get_analyzer()
+daily_age.plot()
+daily_age.plot(total=True)</code></pre>
+</section>
+<section id="methods-5" class="level4">
+<h4 class="anchored" data-anchor-id="methods-5">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.daily_age_stats.plot">plot</a></td>
+<td>Plot the results.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.daily_age_stats.to_df">to_df</a></td>
+<td>Create dataframe totals for each day</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.daily_age_stats.to_total_df">to_total_df</a></td>
+<td>Create dataframe totals across days</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.daily_age_stats.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_age_stats.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_age_stats.plot(</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>    total<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    do_show<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    fig_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>    axis_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>    plot_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>    dateformat<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>    width<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">'#F8A493'</span>,</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the results.</p>
+<section id="parameters-15" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-15">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>total</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to plot the total histograms rather than time series</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+<tr class="even">
+<td>do_show</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to show the plot</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.figure()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>axis_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.subplots_adjust()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>plot_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.plot()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>dateformat</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#str">str</a></td>
+<td>the format to use for the x-axes (only used for time series)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>width</td>
+<td><a href="https://docs.python.org/3/library/functions.html#float">float</a></td>
+<td>width of bars (only used for histograms)</td>
+<td><code>0.8</code></td>
+</tr>
+<tr class="even">
+<td>color</td>
+<td><a href="https://docs.python.org/3/library/functions.html#hex">hex</a> / <code>rgb</code></td>
+<td>the color of the bars (only used for histograms)</td>
+<td><code>'#F8A493'</code></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>cv.options.with_style()</code></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.daily_age_stats.to_df" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_age_stats.to_df">to_df</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_age_stats.to_df()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create dataframe totals for each day</p>
+</section>
+<section id="covasim.analysis.daily_age_stats.to_total_df" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_age_stats.to_total_df">to_total_df</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_age_stats.to_total_df()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Create dataframe totals across days</p>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.daily_stats" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.daily_stats">daily_stats</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_stats(</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>    days<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>    verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>    reporter<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    save_inds<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print out daily statistics about the simulation. Note that this analyzer takes a considerable amount of time, so should be used primarily for debugging, not in production code. To keep the intervention but toggle it off, pass an empty list of days.</p>
+<p>To show the stats for a day after a run has finished, use e.g.&nbsp;<code>daily_stats.report('2020-04-04')</code>.</p>
+<section id="parameters-16" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-16">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>days</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>days on which to print out statistics (if None, assume all)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>verbose</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to print on each timestep</td>
+<td><a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a></td>
+</tr>
+<tr class="odd">
+<td>reporter</td>
+<td><code>func</code></td>
+<td>if supplied, a custom parser of the stats object into a report (see make_report() function for syntax)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>save_inds</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to save the indices of every infection at every timestep (also recoverable from the infection log)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>sim = cv.Sim(analyzers=cv.daily_stats())
+sim.run()
+sim['analyzers'][0].plot()</code></pre>
+</section>
+<section id="methods-6" class="level4">
+<h4 class="anchored" data-anchor-id="methods-6">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.daily_stats.intersect">intersect</a></td>
+<td>Compute the intersection between arrays of indices, handling either keys</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.daily_stats.make_report">make_report</a></td>
+<td>Turn the statistics into a report</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.daily_stats.plot">plot</a></td>
+<td>Plot the daily statistics recorded. Some overlap with e.g.&nbsp;<code>sim.plot(to_plot='overview')</code>.</td>
+</tr>
+<tr class="even">
+<td><a href="#covasim.analysis.daily_stats.report">report</a></td>
+<td>Print out one or all reports – take a date string or an int</td>
+</tr>
+<tr class="odd">
+<td><a href="#covasim.analysis.daily_stats.transpose">transpose</a></td>
+<td>Transpose the data from a list-of-dicts-of-dicts to a dict-of-dicts-of-lists</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.daily_stats.intersect" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_stats.intersect">intersect</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_stats.intersect(<span class="op">*</span>args)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Compute the intersection between arrays of indices, handling either keys to precomputed indices or lists of indices. With two array inputs, simply performs np.intersect1d(arr1, arr2).</p>
+</section>
+<section id="covasim.analysis.daily_stats.make_report" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_stats.make_report">make_report</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_stats.make_report(sim, stats, show_empty<span class="op">=</span><span class="st">'count'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Turn the statistics into a report</p>
+</section>
+<section id="covasim.analysis.daily_stats.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_stats.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_stats.plot(</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>    fig_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    axis_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    plot_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>    do_show<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the daily statistics recorded. Some overlap with e.g.&nbsp;<code>sim.plot(to_plot='overview')</code>.</p>
+<section id="parameters-17" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-17">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.figure()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>axis_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.subplots_adjust()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>plot_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.plot()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>do_show</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to show the plot</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>cv.options.with_style()</code></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="covasim.analysis.daily_stats.report" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_stats.report">report</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb61"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_stats.report(day<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Print out one or all reports – take a date string or an int</p>
+</section>
+<section id="covasim.analysis.daily_stats.transpose" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.daily_stats.transpose">transpose</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>analysis.daily_stats.transpose(keys<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Transpose the data from a list-of-dicts-of-dicts to a dict-of-dicts-of-lists</p>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.nab_histogram" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.nab_histogram">nab_histogram</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>analysis.nab_histogram(days<span class="op">=</span><span class="va">None</span>, edges<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Store histogram of log_{10}(NAb) distribution</p>
+<section id="parameters-18" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-18">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>days</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>days on which calculate the NAb histogram (if None, assume last day)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>edges</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>log10 bin edges for histogram</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>sim = cv.Sim(analyzers=cv.nab_histogram())
+sim.run()
+sim.get_analyzer().plot()</code></pre>
+<p>New in version 3.1.0.</p>
+</section>
+<section id="methods-7" class="level4">
+<h4 class="anchored" data-anchor-id="methods-7">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.nab_histogram.plot">plot</a></td>
+<td>Plot the results</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.nab_histogram.plot" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.nab_histogram.plot">plot</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>analysis.nab_histogram.plot(</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>    fig_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>    axis_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    plot_args<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>    do_show<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    <span class="op">**</span>kwargs,</span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Plot the results</p>
+<section id="parameters-19" class="level6 doc-section doc-section-parameters">
+<h6 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-19">Parameters</h6>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fig_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.figure()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>axis_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.subplots_adjust()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>plot_args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to pl.plot()</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="even">
+<td>do_show</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether to show the plot</td>
+<td><a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></td>
+</tr>
+<tr class="odd">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to <code>cv.options.with_style()</code></td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</section>
+</section>
+<section id="covasim.analysis.snapshot" class="level3">
+<h3 class="anchored" data-anchor-id="covasim.analysis.snapshot">snapshot</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>analysis.snapshot(days, <span class="op">*</span>args, die<span class="op">=</span><span class="va">True</span>, <span class="op">**</span>kwargs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Analyzer that takes a “snapshot” of the sim.people array at specified points in time, and saves them to itself. To retrieve them, you can either access the dictionary directly, or use the get() method.</p>
+<section id="parameters-20" class="level4 doc-section doc-section-parameters">
+<h4 class="doc-section doc-section-parameters anchored" data-anchor-id="parameters-20">Parameters</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>days</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>list of ints/strings/date objects, the days on which to take the snapshot</td>
+<td><em>required</em></td>
+</tr>
+<tr class="even">
+<td>args</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#list">list</a></td>
+<td>additional day(s)</td>
+<td><code>()</code></td>
+</tr>
+<tr class="odd">
+<td>die</td>
+<td><a href="https://docs.python.org/3/library/functions.html#bool">bool</a></td>
+<td>whether or not to raise an exception if a date is not found (default true)</td>
+<td><a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a></td>
+</tr>
+<tr class="even">
+<td>kwargs</td>
+<td><a href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a></td>
+<td>passed to Analyzer()</td>
+<td><code>{}</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>::</p>
+<pre><code>sim = cv.Sim(analyzers=cv.snapshot('2020-04-04', '2020-04-14'))
+sim.run()
+snapshot = sim['analyzers'][0]
+people = snapshot.snapshots[0]            # Option 1
+people = snapshot.snapshots['2020-04-04'] # Option 2
+people = snapshot.get('2020-04-14')       # Option 3
+people = snapshot.get(34)                 # Option 4
+people = snapshot.get()                   # Option 5</code></pre>
+</section>
+<section id="methods-8" class="level4">
+<h4 class="anchored" data-anchor-id="methods-8">Methods</h4>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#covasim.analysis.snapshot.get">get</a></td>
+<td>Retrieve a snapshot from the given key (int, str, or date)</td>
+</tr>
+</tbody>
+</table>
+<section id="covasim.analysis.snapshot.get" class="level5">
+<h5 class="anchored" data-anchor-id="covasim.analysis.snapshot.get">get</h5>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>analysis.snapshot.get(key<span class="op">=</span><span class="va">None</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Retrieve a snapshot from the given key (int, str, or date)</p>
+
+
+</section>
+</section>
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../api/index.html" class="pagination-link" aria-label="**API reference**">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><strong>API reference</strong></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../api/base.html" class="pagination-link" aria-label="base">
+        <span class="nav-page-text">base</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Docs built for Covasim v3.1.7 (2026-02-18).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/starsimhub/covasim">
+      <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="mailto:info@covasim.org">
+      <i class="bi bi-envelope-at-fill" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://covasim.org/">
+      <i class="bi bi-globe" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -1,5 +1,0 @@
-#!/bin/bash
-# Run all tests and check coverage.
-
-echo 'Running style checks...'
-pylint ../covasim
