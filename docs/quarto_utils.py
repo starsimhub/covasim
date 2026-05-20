@@ -6,6 +6,7 @@ import os
 import sys
 import importlib
 import subprocess
+import nbformat
 import sciris as sc
 import covasim as cv
 
@@ -251,6 +252,41 @@ def execute_notebooks(*args, folders=None, tidy=True, debug=False):
     return results
 
 
+def normalize(filename, validate=True, strip=True):
+    """Remove outputs and non-essential metadata from a notebook."""
+    print(filename)
+    with open(filename, 'r') as file:
+        nb_orig = nbformat.reader.read(file)
+
+    if strip:
+        for cell in nb_orig.cells:
+            if cell.cell_type == 'code':
+                cell.outputs = []
+                cell.execution_count = None
+
+    if validate:
+        nb_norm = nbformat.validator.normalize(nb_orig)[1]
+        nbformat.validator.validate(nb_norm)
+    else:
+        nb_norm = nb_orig
+
+    with open(filename, 'w') as file:
+        nbformat.write(nb_norm, file)
+    return
+
+
+@sc.timer('Normalize notebooks')
+def normalize_notebooks(folders=None):
+    """Normalize all notebooks (strip outputs, validate structure)."""
+    cwd = sc.thispath(__file__)
+    folders = sc.ifelse(folders, default_folders)
+    filenames = []
+    for folder in folders:
+        filenames += sc.getfilepaths(cwd / folder, '*.ipynb')
+    sc.parallelize(normalize, filenames)
+    return
+
+
 @sc.timer('Clean outputs')
 def clean_outputs(folders=None, sleep=3, patterns=None):
     """Clear temporary notebook outputs and artifacts."""
@@ -284,6 +320,7 @@ if __name__ == '__main__':
         build_objects_inv()
 
     elif 'post' in sys.argv:
+        normalize_notebooks()
         clean_outputs()
 
     elif len(sys.argv) > 1:
