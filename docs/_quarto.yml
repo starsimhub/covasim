@@ -47,7 +47,7 @@ website:
     left:
       - href: overview.md
         text: Overview
-      - href: tutorials/tut_intro.ipynb
+      - href: tutorials/index.md
         text: Tutorials
       - href: whatsnew.md
         text: What's new
@@ -78,7 +78,8 @@ website:
       contents:
         - href: overview.md
           text: "**Overview**"
-        - section: "**Tutorials**"
+        - section: "<b>Tutorials</b>"
+          href: tutorials/index.md
           contents:
             - tutorials/tut_intro.ipynb
             - tutorials/tut_plotting.ipynb
