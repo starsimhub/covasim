@@ -1,20 +1,39 @@
 # Covasim docs
 
-## Tutorials
+Published site: https://docs.covasim.org
 
-Please see the `tutorials` subfolder.
+## Build locally
 
-## Everything else
+1. Install Covasim and doc dependencies:
 
-This folder includes source code for building the docs. Users are unlikely to need to do this themselves. Instead, view the Covasim docs at https://docs.covasim.org.
+```sh
+pip install -e .
+pip install -r docs/requirements.txt
+```
 
-To build the docs, follow these steps:
+2. Install [Quarto](https://quarto.org/docs/get-started/) and the interlinks extension:
 
-1.  Make sure dependencies are installed::
-    ```
-    pip install -r requirements.txt
-    ```
+```sh
+cd docs
+quarto add machow/quartodoc --no-prompt
+```
 
-2.  Make the documents; there are many build options. In most cases, running `./build_docs` (to rerun the tutorials; takes 2 min) or `./build_docs never` (does not rebuild the tutorials; takes 15 s) is best. Alternatively, one can call `make html` directly.
+3. Render:
 
-3.  The built documents will be in `./_build/html`.
+```sh
+./render          # full site (API + notebooks with freeze/cache)
+./preview         # live preview
+./clean_all       # remove build artifacts
+```
+
+Output is written to `docs/_site/`.
+
+## Publish
+
+GitHub Pages publishing (maintainers):
+
+```sh
+./publish
+```
+
+Or use the **Publish Covasim docs** GitHub Actions workflow.

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Render full site
+set -euo pipefail # Fail fast if needed
+
+SECONDS=0
+
+# Do the render!
+quarto render $@
+
+echo -e "Done: docs built in ${SECONDS} s"
+echo -e "Index: $(pwd)/_site/index.html"

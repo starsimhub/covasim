@@ -1,27 +1,21 @@
-# .readthedocs.yaml
-# Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+# Read the Docs configuration — Quarto build
+# https://docs.readthedocs.com/platform/stable/config-file/v2.html
 
-# Required
 version: 2
 
-# Set the version of Python and other tools you might need
 build:
-  os: ubuntu-20.04
+  os: ubuntu-22.04
   tools:
-    python: "3.9"
+    python: "3.11"
+  commands:
+    - pip install -e .[full]
+    - pip install -r docs/requirements.txt
+    - curl -LO https://github.com/quarto-dev/quarto-cli/releases/download/v1.6.40/quarto-1.6.40-linux-amd64.deb
+    - sudo dpkg -i quarto-1.6.40-linux-amd64.deb
+    - cd docs && quarto add machow/quartodoc --no-prompt && quarto render
+    - mkdir -p $READTHEDOCS_OUTPUT/html && cp -r docs/_site/* $READTHEDOCS_OUTPUT/html/
 
-# Build documentation in the docs/ directory with Sphinx
-sphinx:
-   configuration: docs/conf.py
-
-# If using Sphinx, optionally build your docs in additional formats such as PDF
-#formats:
-#  - htmlzip
-
-# Optionally declare the Python requirements required to build your docs
 python:
   install:
-    - requirements: docs/requirements.txt
     - method: pip
       path: .

@@ -1,1 +1,0 @@
-.. include:: ../papers.rst

@@ -1,0 +1,208 @@
+project:
+  type: website
+  pre-render: python quarto_utils.py pre
+  post-render: python quarto_utils.py post
+  output-dir: _site
+  title: "Covasim"
+  execute-dir: file
+  resources:
+    - objects.json
+    - objects.inv
+
+website:
+  title: "Covasim"
+  image: /assets/covasim-logo.png
+  favicon: /assets/favicon.ico
+
+  repo-url: https://github.com/institutefordiseasemodeling/covasim
+  repo-actions: [issue]
+  page-navigation: true
+  search:
+    type: overlay
+
+  page-footer:
+    center: "Docs built for Covasim v{{< var version >}} ({{< var versiondate >}}).<br>© 2020–2026, Bill & Melinda Gates Foundation. All rights reserved."
+    right:
+      - icon: github
+        href: https://github.com/institutefordiseasemodeling/covasim
+        aria-label: GitHub
+      - icon: envelope-at-fill
+        href: mailto:info@covasim.org
+      - icon: globe
+        href: https://covasim.org/
+
+  navbar:
+    logo: /assets/covasim-logo.png
+    title: false
+    collapse-below: lg
+
+    tools:
+      - icon: github
+        href: https://github.com/institutefordiseasemodeling/covasim
+      - icon: envelope-at-fill
+        href: mailto:info@covasim.org
+      - icon: globe
+        href: https://covasim.org
+
+    left:
+      - href: overview.md
+        text: Overview
+      - href: tutorials/tut_intro.ipynb
+        text: Tutorials
+      - href: whatsnew.md
+        text: What's new
+      - href: faq.md
+        text: FAQ
+      - href: api/index.qmd
+        text: API reference
+      - href: papers.md
+        text: Publications
+      - href: parameters.md
+        text: Parameters
+      - href: data.md
+        text: Data scrapers
+      - href: glossary.md
+        text: Glossary
+      - href: code_of_conduct.md
+        text: Code of conduct
+      - href: contributing.md
+        text: Contributing to Covasim
+      - href: style.md
+        text: Style guide
+
+  sidebar:
+    - id: main
+      collapse-level: 3
+      contents:
+        - href: overview.md
+          text: "**Overview**"
+        - section: "**Tutorials**"
+          contents:
+            - tutorials/tut_intro.ipynb
+            - tutorials/tut_plotting.ipynb
+            - tutorials/tut_running.ipynb
+            - tutorials/tut_people.ipynb
+            - tutorials/tut_interventions.ipynb
+            - tutorials/tut_analyzers.ipynb
+            - tutorials/tut_calibration.ipynb
+            - tutorials/tut_immunity.ipynb
+            - tutorials/tut_deployment.ipynb
+            - tutorials/tut_tips.ipynb
+            - tutorials/tut_advanced.ipynb
+        - href: whatsnew.md
+          text: "**What's new**"
+        - href: faq.md
+          text: "**FAQ**"
+        - href: api/index.qmd
+          text: "**API reference**"
+        - href: papers.md
+          text: "**Publications**"
+        - href: parameters.md
+          text: "**Parameters**"
+        - href: data.md
+          text: "**Data scrapers**"
+        - href: glossary.md
+          text: "**Glossary**"
+        - href: code_of_conduct.md
+          text: "**Code of conduct**"
+        - href: contributing.md
+          text: "**Contributing to Covasim**"
+        - href: style.md
+          text: "**Style guide**"
+    - id: api
+      collapse-level: 2
+      contents:
+        - href: overview.md
+          text: "**Overview**"
+        - href: api/index.qmd
+          text: "**API reference**"
+        - api/analysis.qmd
+        - api/base.qmd
+        - api/defaults.qmd
+        - api/immunity.qmd
+        - api/interventions.qmd
+        - api/misc.qmd
+        - api/parameters.qmd
+        - api/people.qmd
+        - api/plotting.qmd
+        - api/population.qmd
+        - api/requirements.qmd
+        - api/run.qmd
+        - api/settings.qmd
+        - api/sim.qmd
+        - api/utils.qmd
+        - api/data.qmd
+
+quartodoc:
+  package: covasim
+  title: API reference
+  style: pkgdown
+  dir: api
+  parser: google
+  render_interlinks: true
+  sections:
+    - title: API reference
+      contents:
+        - analysis
+        - base
+        - defaults
+        - immunity
+        - interventions
+        - misc
+        - parameters
+        - people
+        - plotting
+        - population
+        - requirements
+        - run
+        - settings
+        - sim
+        - utils
+        - data
+
+format:
+  html:
+    theme:
+      light: [cosmo, ./assets/styles-light.scss]
+      dark: [cosmo, ./assets/styles-dark.scss]
+    css: ./assets/styles.css
+    toc: true
+    toc-expand: true
+    toc-depth: 5
+    highlight-style: github
+
+filters:
+  - interlinks
+
+interlinks:
+  fast: false
+  sources:
+    python:
+      url: https://docs.python.org/3/
+    numpy:
+      url: https://numpy.org/doc/stable/
+    pandas:
+      url: https://pandas.pydata.org/pandas-docs/stable/
+    scipy:
+      url: https://docs.scipy.org/doc/scipy/
+    matplotlib:
+      url: https://matplotlib.org/stable/
+    sciris:
+      url: https://docs.sciris.org/en/latest/
+    starsim:
+      url: https://docs.starsim.org/
+  autolink: true
+  aliases:
+    numpy: [np]
+    pandas: [pd]
+    matplotlib: [plt]
+    sciris: [sc]
+    starsim: [ss]
+    covasim: [cv]
+
+execute:
+  freeze: auto
+  cache: true
+  error: false
+  echo: true
+  warning: true

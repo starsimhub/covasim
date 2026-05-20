@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Build & publish site to GitHub Pages
+set -euo pipefail # Fail fast if needed
+
+quarto render --cache-refresh
+quarto publish gh-pages --no-render --no-prompt --no-browser
