@@ -1,0 +1,6 @@
+#!/bin/bash
+# Run the data scrapers
+
+python load_corona_data_scraper_data.py
+python load_covid_tracking_project_data.py
+python load_ecdp_data.py

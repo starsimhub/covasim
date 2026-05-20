@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+
+'''
+Simple script for running Covasim scenarios
+'''
+
+import sciris as sc
+import covasim as cv
+try:
+    import fire # Optional import
+except ModuleNotFoundError as E:
+    errormsg = f'Please install the "fire" module first, e.g. pip install fire' # Also caught in make_people()
+    raise ModuleNotFoundError(errormsg) from E
+
+
+sc.heading('Setting up...')
+
+basepars = {'pop_size': 5000}
+
+metapars = dict(
+    n_runs    = 3, # Number of parallel runs; change to 3 for quick, 11 for real
+    noise     = 0.1, # Use noise, optionally
+    noisepar  = 'beta',
+    rand_seed = 1,
+    quantiles = {'low':0.1, 'high':0.9},
+)
+
+# For saving
+version  = 'v0'
+date     = '2020mar24'
+folder   = 'results'
+basename = f'{folder}/covasim_scenarios_{date}_{version}'
+fig_path = f'{basename}.png'
+obj_path = f'{basename}.scens'
+
+
+def run(do_run=True,
+        basepars=basepars,
+        metapars=metapars,
+        do_plot=True,
+        do_save=False, 
+        do_show=False,
+        fig_path=fig_path,
+        obj_path=obj_path,
+        interv_day=35,
+        interv_eff=0.7,
+        verbose=False):
+    '''
+    Run pre-determined scenarios with the ability to expose certain parameters.
+
+    To run the scenario with default parameters
+    > python scenarios.py
+
+    To run simulation with a custom configuration:
+    > python scenarios.py --basepars "{pop_size: 5000}" --metapars "{n_runs:3, noise:0.1, noisepar:'beta', rand_seed:1, quantiles:{'low':0.1, 'high':0.9}}"
+
+    To run simulation with an intervention changing social distancing duration and effectiveness:
+    > python scenarios.py --interv_day=35 --interv_eff=0.7
+
+    To run simulation and save plot to disk:
+    > python scenarios.py --do_save=True
+
+        Args:
+        basepars: (dict): configuration for the sim.  See description for example.  Defaults to "{pop_size: 5000}"
+        metapars: (dict): metaparameters for the sim.  See description for example. Defaults to "{n_runs:3, noise:0.1, noisepar:'beta', rand_seed:1, quantiles:{'low':0.1, 'high':0.9}}
+        do_plot: (bool): whether or not to generate a plot.  Defaults to True.
+        do_save: (bool): If a plot is generated, whether or not to save it.  Defaults to False.
+        do_show: (bool): If a plot is generated, whether or not to show it.  Defaults to False.
+        fig_path: (str): Path to which save filename.  Defaults to results/covasim_run_{date}_{version}.png
+        obj_path: (str): Path to which save filename.  Defaults to results/covasim_run_{date}_{version}.scens
+        verbose: (bool): whether or not turn verbose mode while running simulation.  Defaults to False.
+    '''
+    sc.tic()
+
+    if do_run:
+        # Define the scenarios
+        scenarios = {'baseline': {
+                        'name':'Baseline',
+                        'pars': {
+                            'interventions': None,
+                            }
+                      },
+                     'distance': {
+                        'name':'Social distancing',
+                        'pars': {
+                            'interventions': cv.change_beta(days=interv_day, changes=interv_eff)
+                            }
+                        },
+                    }
+        scens = cv.Scenarios(basepars=basepars, metapars=metapars, scenarios=scenarios)
+        scens.run(verbose=verbose)
+        if do_save:
+            scens.save(filename=obj_path)
+
+    # Don't run
+    else:
+        scens = cv.Scenarios.load(obj_path)
+
+    if do_plot:
+        fig1 = scens.plot(do_save=do_save, do_show=do_show, fig_path=fig_path)
+
+    sc.toc()
+
+if __name__ == "__main__": # Required for parallel processing on Windows
+    fire.Fire(run)
+
+

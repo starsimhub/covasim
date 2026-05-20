@@ -1,0 +1,14 @@
+#!/bin/bash
+# Note that although the script runs when parallelized, the coverage results are wrong.
+
+echo 'Running tests...'
+pytest -v test_*.py --cov-config=../.coveragerc --cov=../../covasim --workers auto --durations=0
+
+echo 'Creating HTML report...'
+coverage html
+
+echo 'Printing report...'
+coverage report
+
+echo 'Report location:'
+echo "`pwd`/htmlcov/index.html"

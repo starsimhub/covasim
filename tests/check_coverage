@@ -1,0 +1,14 @@
+#!/bin/bash
+# Run all tests and check coverage.
+
+echo 'Running tests...'
+pytest -v test_*.py --cov-config=.coveragerc --cov=../covasim -n auto --durations=0
+
+echo 'Creating HTML report...'
+coverage html
+
+echo 'Printing report...'
+coverage report
+
+echo 'Report location:'
+echo "`pwd`/htmlcov/index.html"

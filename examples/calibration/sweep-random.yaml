@@ -1,0 +1,21 @@
+program: sweep/sweep.py
+method: random
+metric:
+  name: likelihood
+  goal: maximize
+parameters:
+  beta:
+    min: 0.005
+    max: 0.05
+  pop_infected:
+    min: 1
+    max: 100 
+  rel_death_prob:
+    min: .3
+    max: 3.0
+  rel_severe_prob:
+    min: .3
+    max: 3.0
+  rel_crit_prob:
+    min: .1
+    max: 1.0

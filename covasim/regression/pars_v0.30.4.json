@@ -1,0 +1,157 @@
+{
+  "pop_size": 20000.0,
+  "pop_infected": 10,
+  "pop_type": "random",
+  "location": null,
+  "start_day": "2020-03-01",
+  "end_day": null,
+  "n_days": 60,
+  "rand_seed": 1,
+  "verbose": 1,
+  "pop_scale": 1,
+  "rescale": 0,
+  "rescale_threshold": 0.05,
+  "rescale_factor": 2,
+  "beta": 0.015,
+  "contacts": {
+    "a": 20
+  },
+  "dynam_layer": {
+    "a": 0
+  },
+  "beta_layer": {
+    "a": 1.0
+  },
+  "n_imports": 0,
+  "beta_dist": {
+    "dist": "lognormal",
+    "par1": 0.84,
+    "par2": 0.3
+  },
+  "viral_dist": {
+    "frac_time": 0.3,
+    "load_ratio": 2,
+    "high_cap": 4
+  },
+  "asymp_factor": 1.0,
+  "diag_factor": 0.2,
+  "quar_eff": {
+    "a": 0.3
+  },
+  "quar_period": 14,
+  "dur": {
+    "exp2inf": {
+      "dist": "lognormal_int",
+      "par1": 4.6,
+      "par2": 4.8
+    },
+    "inf2sym": {
+      "dist": "lognormal_int",
+      "par1": 1.0,
+      "par2": 0.9
+    },
+    "sym2sev": {
+      "dist": "lognormal_int",
+      "par1": 6.6,
+      "par2": 4.9
+    },
+    "sev2crit": {
+      "dist": "lognormal_int",
+      "par1": 3.0,
+      "par2": 7.4
+    },
+    "asym2rec": {
+      "dist": "lognormal_int",
+      "par1": 8.0,
+      "par2": 2.0
+    },
+    "mild2rec": {
+      "dist": "lognormal_int",
+      "par1": 8.0,
+      "par2": 2.0
+    },
+    "sev2rec": {
+      "dist": "lognormal_int",
+      "par1": 14.0,
+      "par2": 2.4
+    },
+    "crit2rec": {
+      "dist": "lognormal_int",
+      "par1": 14.0,
+      "par2": 2.4
+    },
+    "crit2die": {
+      "dist": "lognormal_int",
+      "par1": 6.2,
+      "par2": 1.7
+    }
+  },
+  "OR_no_treat": 2.0,
+  "rel_symp_prob": 1.0,
+  "rel_severe_prob": 1.0,
+  "rel_crit_prob": 1.0,
+  "rel_death_prob": 1.0,
+  "prog_by_age": true,
+  "prognoses": {
+    "age_cutoffs": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70,
+      80,
+      120
+    ],
+    "symp_probs": [
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9
+    ],
+    "severe_probs": [
+      0.002,
+      0.0018181818181818182,
+      0.018333333333333333,
+      0.05230769230769231,
+      0.06142857142857143,
+      0.10933333333333334,
+      0.1475,
+      0.19529411764705884,
+      0.20444444444444443
+    ],
+    "crit_probs": [
+      0.04,
+      0.11,
+      0.045454545454545456,
+      0.03617647058823529,
+      0.04976744186046512,
+      0.0975609756097561,
+      0.23305084745762714,
+      0.36144578313253006,
+      0.5615760869565217
+    ],
+    "death_probs": [
+      0.5,
+      0.5454545454545454,
+      0.6,
+      0.6504065040650407,
+      0.7009345794392524,
+      0.75,
+      0.7999999999999999,
+      0.85,
+      0.9000290331946191
+    ]
+  },
+  "interventions": [],
+  "interv_func": null,
+  "timelimit": 3600,
+  "stopping_func": null,
+  "n_beds": Infinity
+}

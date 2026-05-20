@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+'''
+Run this script to quickly check performance.
+'''
+
+# Disable loading message
+import os
+os.environ['COVASIM_VERBOSE'] = '0'
+
+# Import Covasim
+import test_baselines as tb
+
+# Run the test
+tb.test_benchmark(do_save=False, verbose=False, repeats=1)
+
+
+

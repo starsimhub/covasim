@@ -1,0 +1,30 @@
+#!/bin/bash
+# Run integration and unit tests, check coverage,
+# and check that the documentation builds. Will
+# create some plots. Requires pytest-parallel, 
+# pytest-cov, and Sphinx. 
+
+echo -e "RUNNING ALL TESTS"
+sleep 0.5
+
+echo -e "\n\n\n\nSTEP 1: RUNNING INTEGRATION TESTS"
+pwd; sleep 0.5
+./run_tests
+
+echo -e "\n\n\n\nSTEP 2: RUNNING UNIT TESTS"
+cd unittests; pwd; sleep 0.5
+./run_unittests
+
+echo -e "\n\n\n\nSTEP 3: RUNNING EXAMPLES"
+cd ../../examples; pwd; sleep 0.5
+pytest *.py
+
+echo -e "\n\n\n\nSTEP 4: CALCULATING COVERAGE"
+cd ../tests; pwd; sleep 0.5
+./check_coverage
+
+echo -e "\n\n\n\nSTEP 5: BUILDING DOCS"
+cd ../docs; pwd; sleep 0.5
+./build_docs
+
+echo -e '\n\n\n\nDONE.'

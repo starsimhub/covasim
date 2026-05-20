@@ -1,0 +1,7 @@
+#!/bin/bash
+# Run the integration tests. Requires pytest-parallel:
+#   pip install pytest-parallel
+
+export COVASIM_INTERACTIVE=0 # Don't show plots
+export COVASIM_WARNINGS='error' # Convert warnings to errors
+pytest test_*.py -n auto --ignore=manual --durations=0

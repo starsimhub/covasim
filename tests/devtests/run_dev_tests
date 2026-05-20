@@ -1,0 +1,4 @@
+#!/bin/bash
+# Run all dev tests. Note: these are not guaranteed to work.
+
+pytest test_all.py -v --durations=0 --workers=auto
