@@ -118,6 +118,7 @@ website:
           text: "**API reference**"
         - api/analysis.qmd
         - api/base.qmd
+        - api/data.loaders.qmd
         - api/defaults.qmd
         - api/immunity.qmd
         - api/interventions.qmd
@@ -131,7 +132,6 @@ website:
         - api/settings.qmd
         - api/sim.qmd
         - api/utils.qmd
-        - api/data.qmd
 
 quartodoc:
   package: covasim
@@ -143,22 +143,22 @@ quartodoc:
   sections:
     - title: API reference
       contents:
-        - analysis
-        - base
-        - defaults
-        - immunity
-        - interventions
-        - misc
-        - parameters
-        - people
-        - plotting
-        - population
-        - requirements
-        - run
-        - settings
-        - sim
-        - utils
-        - data
+      - analysis
+      - base
+      - data.loaders
+      - defaults
+      - immunity
+      - interventions
+      - misc
+      - parameters
+      - people
+      - plotting
+      - population
+      - requirements
+      - run
+      - settings
+      - sim
+      - utils
 
 format:
   html:
