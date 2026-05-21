@@ -576,7 +576,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="hello-world" class="level2">
 <h2 class="anchored" data-anchor-id="hello-world">Hello world</h2>
 <p>To create, run, and plot a sim with default options is just:</p>
-<div id="5a0f0d58" class="cell" data-execution_count="2">
+<div id="5a0f0d58" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim()</span>
@@ -585,13 +585,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code>Covasim 3.1.7 (2026-02-18) — © 2020-2026 by IDM
 Initializing sim with 20000 people for 60 days
-  Running 2020-03-01 ( 0/60) (0.06 s)  ———————————————————— 2%
-  Running 2020-03-11 (10/60) (0.07 s)  •••————————————————— 18%
-  Running 2020-03-21 (20/60) (0.09 s)  ••••••—————————————— 34%
-  Running 2020-03-31 (30/60) (0.11 s)  ••••••••••—————————— 51%
-  Running 2020-04-10 (40/60) (0.13 s)  •••••••••••••——————— 67%
-  Running 2020-04-20 (50/60) (0.16 s)  ••••••••••••••••———— 84%
-  Running 2020-04-30 (60/60) (0.20 s)  •••••••••••••••••••• 100%
+  Running 2020-03-01 ( 0/60) (0.11 s)  ———————————————————— 2%
+  Running 2020-03-11 (10/60) (0.14 s)  •••————————————————— 18%
+  Running 2020-03-21 (20/60) (0.18 s)  ••••••—————————————— 34%
+  Running 2020-03-31 (30/60) (0.23 s)  ••••••••••—————————— 51%
+  Running 2020-04-10 (40/60) (0.30 s)  •••••••••••••——————— 67%
+  Running 2020-04-20 (50/60) (0.36 s)  ••••••••••••••••———— 84%
+  Running 2020-04-30 (60/60) (0.44 s)  •••••••••••••••••••• 100%
 
 Simulation summary:
        12,730 cumulative infections
@@ -623,7 +623,7 @@ Simulation summary:
 <section id="defining-parameters-and-running-simulations" class="level2">
 <h2 class="anchored" data-anchor-id="defining-parameters-and-running-simulations">Defining parameters and running simulations</h2>
 <p>Parameters are defined as a dictionary. The most common parameters to modify are the population size, the initial number of people infected, and the start and end dates of the simulation. We can define those as:</p>
-<div id="0d66927f" class="cell" data-execution_count="3">
+<div id="0d66927f" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="op">=</span> <span class="fl">50e3</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    pop_infected <span class="op">=</span> <span class="dv">100</span>,</span>
@@ -632,18 +632,18 @@ Simulation summary:
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Running a simulation is pretty easy. In fact, running a sim with the parameters we defined above is just:</p>
-<div id="03660166" class="cell" data-execution_count="4">
+<div id="03660166" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(pars)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Initializing sim with 50000 people for 61 days
-  Running 2020-04-01 ( 0/61) (0.12 s)  ———————————————————— 2%
-  Running 2020-04-11 (10/61) (0.15 s)  •••————————————————— 18%
-  Running 2020-04-21 (20/61) (0.19 s)  ••••••—————————————— 34%
-  Running 2020-05-01 (30/61) (0.24 s)  ••••••••••—————————— 50%
-  Running 2020-05-11 (40/61) (0.31 s)  •••••••••••••——————— 66%
-  Running 2020-05-21 (50/61) (0.40 s)  ••••••••••••••••———— 82%
-  Running 2020-05-31 (60/61) (0.50 s)  •••••••••••••••••••— 98%
+  Running 2020-04-01 ( 0/61) (0.23 s)  ———————————————————— 2%
+  Running 2020-04-11 (10/61) (0.29 s)  •••————————————————— 18%
+  Running 2020-04-21 (20/61) (0.37 s)  ••••••—————————————— 34%
+  Running 2020-05-01 (30/61) (0.46 s)  ••••••••••—————————— 50%
+  Running 2020-05-11 (40/61) (0.59 s)  •••••••••••••——————— 66%
+  Running 2020-05-21 (50/61) (0.78 s)  ••••••••••••••••———— 82%
+  Running 2020-05-31 (60/61) (0.99 s)  •••••••••••••••••••— 98%
 Simulation summary:
        41,466 cumulative infections
         3,679 cumulative reinfections
@@ -668,18 +668,18 @@ Simulation summary:
 </div>
 <p>This will generate a results dictionary <code>sim.results</code>. For example, the number of new infections per day is <code>sim.results['new_infections']</code>.</p>
 <p>Rather than creating a parameter dictionary, any valid parameter can also be passed to the sim directly. For example, exactly equivalent to the above is:</p>
-<div id="b9bfc7f5" class="cell" data-execution_count="5">
+<div id="b9bfc7f5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(pop_size<span class="op">=</span><span class="fl">50e3</span>, pop_infected<span class="op">=</span><span class="dv">100</span>, start_day<span class="op">=</span><span class="st">'2020-04-01'</span>, end_day<span class="op">=</span><span class="st">'2020-06-01'</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Initializing sim with 50000 people for 61 days
-  Running 2020-04-01 ( 0/61) (0.12 s)  ———————————————————— 2%
-  Running 2020-04-11 (10/61) (0.15 s)  •••————————————————— 18%
-  Running 2020-04-21 (20/61) (0.19 s)  ••••••—————————————— 34%
-  Running 2020-05-01 (30/61) (0.24 s)  ••••••••••—————————— 50%
-  Running 2020-05-11 (40/61) (0.31 s)  •••••••••••••——————— 66%
-  Running 2020-05-21 (50/61) (0.40 s)  ••••••••••••••••———— 82%
-  Running 2020-05-31 (60/61) (0.60 s)  •••••••••••••••••••— 98%
+  Running 2020-04-01 ( 0/61) (0.23 s)  ———————————————————— 2%
+  Running 2020-04-11 (10/61) (0.29 s)  •••————————————————— 18%
+  Running 2020-04-21 (20/61) (0.37 s)  ••••••—————————————— 34%
+  Running 2020-05-01 (30/61) (0.46 s)  ••••••••••—————————— 50%
+  Running 2020-05-11 (40/61) (0.59 s)  •••••••••••••——————— 66%
+  Running 2020-05-21 (50/61) (0.78 s)  ••••••••••••••••———— 82%
+  Running 2020-05-31 (60/61) (1.13 s)  •••••••••••••••••••— 98%
 Simulation summary:
        41,466 cumulative infections
         3,679 cumulative reinfections
@@ -703,18 +703,18 @@ Simulation summary:
 </div>
 </div>
 <p>You can mix and match too – pass in a parameter dictionary with default options, and then include other parameters as keywords (including overrides; keyword arguments take precedence). For example:</p>
-<div id="cbfb680c" class="cell" data-execution_count="6">
+<div id="cbfb680c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(pars, pop_infected<span class="op">=</span><span class="dv">10</span>) <span class="co"># Use parameters defined above, except start with 10 infected people</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Initializing sim with 50000 people for 61 days
-  Running 2020-04-01 ( 0/61) (0.12 s)  ———————————————————— 2%
-  Running 2020-04-11 (10/61) (0.15 s)  •••————————————————— 18%
-  Running 2020-04-21 (20/61) (0.19 s)  ••••••—————————————— 34%
-  Running 2020-05-01 (30/61) (0.22 s)  ••••••••••—————————— 50%
-  Running 2020-05-11 (40/61) (0.27 s)  •••••••••••••——————— 66%
-  Running 2020-05-21 (50/61) (0.33 s)  ••••••••••••••••———— 82%
-  Running 2020-05-31 (60/61) (0.38 s)  •••••••••••••••••••— 98%
+  Running 2020-04-01 ( 0/61) (0.23 s)  ———————————————————— 2%
+  Running 2020-04-11 (10/61) (0.29 s)  •••————————————————— 18%
+  Running 2020-04-21 (20/61) (0.36 s)  ••••••—————————————— 34%
+  Running 2020-05-01 (30/61) (0.44 s)  ••••••••••—————————— 50%
+  Running 2020-05-11 (40/61) (0.52 s)  •••••••••••••——————— 66%
+  Running 2020-05-21 (50/61) (0.60 s)  ••••••••••••••••———— 82%
+  Running 2020-05-31 (60/61) (0.71 s)  •••••••••••••••••••— 98%
 Simulation summary:
        10,392 cumulative infections
           128 cumulative reinfections
@@ -741,7 +741,7 @@ Simulation summary:
 <section id="plotting-results" class="level2">
 <h2 class="anchored" data-anchor-id="plotting-results">Plotting results</h2>
 <p>As you saw above, plotting the results of a simulation is rather easy too:</p>
-<div id="2b1d5980" class="cell" data-execution_count="7">
+<div id="2b1d5980" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -755,7 +755,7 @@ Simulation summary:
 <section id="full-usage-example" class="level2">
 <h2 class="anchored" data-anchor-id="full-usage-example">Full usage example</h2>
 <p>Many of the details of this example will be explained in later tutorials, but to give you a taste, here’s an example of how you would run two simulations to determine the impact of a custom intervention aimed at protecting the elderly.</p>
-<div id="bdf8a9b9" class="cell" data-execution_count="8">
+<div id="bdf8a9b9" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Custom intervention -- see Tutorial 5</span></span>

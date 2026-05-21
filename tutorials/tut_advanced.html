@@ -573,7 +573,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="defining-contact-layers" class="level2">
 <h2 class="anchored" data-anchor-id="defining-contact-layers">Defining contact layers</h2>
 <p>As mentioned in Tutorial 4, contact layers are the graph connecting the people in the simulation. Each person is a node, and each contact is an edge. While enormous complexity can be used to define realistic contact networks, a reasonable approximation in many cases is random connectivity, often with some age assortativity. Here is an example for generating a new contact layer, nominally representing public transportation, and adding it to a simulation:</p>
-<div id="cf3585af" class="cell" data-execution_count="2">
+<div id="cf3585af" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cv.options(jupyter<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="dv">0</span>)</span>
@@ -618,7 +618,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="defining-dynamic-layers" class="level2">
 <h2 class="anchored" data-anchor-id="defining-dynamic-layers">Defining dynamic layers</h2>
 <p>You can also define custom layers that update dynamically, e.g.&nbsp;based on a supplied number of contacts per day. To do this, create a new <code>Layer</code> class and define the <code>update()</code> method. For example:</p>
-<div id="38903362" class="cell" data-execution_count="3">
+<div id="38903362" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
@@ -674,7 +674,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="defining-custom-population-properties" class="level2">
 <h2 class="anchored" data-anchor-id="defining-custom-population-properties">Defining custom population properties</h2>
 <p>Another useful feature is adding additional features to people, for use in subtargeting. For example, this example shows how to define a subpopulation with higher baseline mortality rates. This is a simple example illustrating how you would identify and target people based on whether or not the have a prime-number index, based on the protecting the elderly example from Tutorial 1.</p>
-<div id="cc2fcced" class="cell" data-execution_count="4">
+<div id="cc2fcced" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
@@ -714,7 +714,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="changing-numba-options" class="level2">
 <h2 class="anchored" data-anchor-id="changing-numba-options">Changing Numba options</h2>
 <p>Finally, this example shows how you can change the default Numba calculation options. It’s not recommended – especially running with multithreading, which is faster but gives stochastically unreproducible results – but it’s there if you want it.</p>
-<div id="952b0c78" class="cell" data-execution_count="5">
+<div id="952b0c78" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a standard 32-bit simulation</span></span>

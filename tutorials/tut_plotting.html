@@ -569,7 +569,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="global-plotting-configuration" class="level2">
 <h2 class="anchored" data-anchor-id="global-plotting-configuration">Global plotting configuration</h2>
 <p>Covasim allows the user to set various options that apply to all plots. You can change the font size, default DPI, whether plots should be shown by default, etc. (for the full list, see <code>cv.options.help()</code>). For example, we might want higher resolution, to turn off automatic figure display, close figures after they’re rendered, and to turn off the messages that print when a simulation is running. We can do this using built-in defaults for Jupyter notebooks (and then run a sim) with:</p>
-<div id="75ed9099" class="cell" data-execution_count="2">
+<div id="75ed9099" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cv.options(jupyter<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="dv">0</span>) <span class="co"># Standard options for Jupyter notebook</span></span>
@@ -586,14 +586,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="printing-objects" class="level2">
 <h2 class="anchored" data-anchor-id="printing-objects">Printing objects</h2>
 <p>There are three levels of detail available for most objects (sims, multisims, scenarios, and people). The shortest is <code>brief()</code>:</p>
-<div id="cbe48bff" class="cell" data-execution_count="3">
+<div id="cbe48bff" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sim.brief()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Sim(&lt;no label&gt;; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 12730⚙, 14☠)</code></pre>
 </div>
 </div>
 <p>You can get more detail with <code>summarize()</code>:</p>
-<div id="48cb59b1" class="cell" data-execution_count="4">
+<div id="48cb59b1" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sim.summarize()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Simulation summary:
@@ -616,10 +616,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Finally, to show the full object, including all methods and attributes, use <code>disp()</code>:</p>
-<div id="8160d931" class="cell" data-execution_count="5">
+<div id="8160d931" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sim.disp()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;covasim.sim.Sim at 0x79a5bf8ecd70&gt;
+<pre><code>&lt;covasim.sim.Sim at 0x71bad3120d70&gt;
 [&lt;class 'covasim.sim.Sim'&gt;, &lt;class 'covasim.base.BaseSim'&gt;, &lt;class 'covasim.base.ParsObj'&gt;, &lt;class 'covasim.base.FlexPretty'&gt;, &lt;class 'sciris.sc_printing.prettyobj'&gt;]
 ————————————————————————————————————————————————————————————————————————
 Methods:
@@ -652,7 +652,7 @@ Properties:
 _legacy_trans: False
    _orig_pars: {'interventions': [], 'analyzers': []}
      complete: True
-      created: datetime.datetime(2026, 5, 20, 15, 36, 34, 916324)
+      created: datetime.datetime(2026, 5, 21, 12, 7, 49, 751868)
          data: None
      datafile: None
      git_info: {'covasim': {'version': '3.1.7', 'branch': 'quarto-
@@ -667,7 +667,7 @@ _legacy_trans: False
   rescale_vec: array([1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
                1., 1., 1.,  [...]
       results: #0. 'cum_infections':
-               &lt;covasim.base.Result at 0x79a5bf609d30&gt;
+               &lt;covasim.base.Result at 0x71bad2e3dd30&gt;
                [&lt;cla [...]
 results_ready: True
       simfile: 'covasim.sim'
@@ -683,7 +683,7 @@ results_ready: True
 <section id="plotting-options" class="level2">
 <h2 class="anchored" data-anchor-id="plotting-options">Plotting options</h2>
 <p>While a sim can be plotted using default settings simply by <code>sim.plot()</code>, this is just a small fraction of what’s available. First, note that results can be plotted directly using e.g.&nbsp;Matplotlib. You can see what quantities are available for plotting with <code>sim.results.keys()</code> (remember, it’s just a dict). A simple example of plotting using Matplotlib is:</p>
-<div id="e3cf483b" class="cell" data-execution_count="6">
+<div id="e3cf483b" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pylab <span class="im">as</span> pl <span class="co"># Shortcut for import matplotlib.pyplot as plt</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>pl.plot(sim.results[<span class="st">'date'</span>], sim.results[<span class="st">'new_infections'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
@@ -696,7 +696,7 @@ results_ready: True
 </div>
 <p>However, as you can see, this isn’t ideal since the default formatting is…not great. (Also, note that each result is a <code>Result</code> object, not a simple Numpy array; like a pandas dataframe, you can get the array of values directly via e.g.&nbsp;<code>sim.results.new_infections.values</code>.)</p>
 <p>An alternative, if you only want to plot a single result, such as new infections, is to use the <code>plot_result()</code> method:</p>
-<div id="22b53e93" class="cell" data-execution_count="7">
+<div id="22b53e93" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sim.plot_result(<span class="st">'new_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -707,7 +707,7 @@ results_ready: True
 </div>
 </div>
 <p>You can also select one or more quantities to plot with the first (<code>to_plot</code>) argument, e.g.</p>
-<div id="91565b59" class="cell" data-execution_count="8">
+<div id="91565b59" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sim.plot(to_plot<span class="op">=</span>[<span class="st">'new_infections'</span>, <span class="st">'cum_infections'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -718,7 +718,7 @@ results_ready: True
 </div>
 </div>
 <p>Another useful option is to plot an overview of everything in a simulation. We can do this with the <code>to_plot='overview'</code> argument. It’s quite a lot of information so we might also want to make a larger figure for it, which we can do by passing additional arguments (which, if recognized, are passed to <code>pl.figure()</code>). We can also change the date format between <code>'sciris'</code> (the default), <code>'concise'</code> (better for cramped plots), and <code>'matplotlib'</code> (Matplotlib’s default):</p>
-<div id="edb12580" class="cell" data-execution_count="9">
+<div id="edb12580" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sim.plot(<span class="st">'overview'</span>, n_cols<span class="op">=</span><span class="dv">5</span>, figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">20</span>), dateformat<span class="op">=</span><span class="st">'concise'</span>, dpi<span class="op">=</span><span class="dv">50</span>) <span class="co"># NB: dateformat='concise' is already the default for &gt;2 columns</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -729,7 +729,7 @@ results_ready: True
 </div>
 </div>
 <p>While we can save this figure using Matplotlib’s built-in <code>savefig()</code>, if we use Covasim’s <a href="../api/misc.html#covasim.misc.savefig" title="0"><code>cv.savefig()</code></a> we get a couple advantages:</p>
-<div id="f4472b50" class="cell" data-execution_count="10">
+<div id="f4472b50" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cv.savefig(filename<span class="op">=</span><span class="st">'my-fig.png'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>'my-fig.png'</code></pre>
@@ -739,19 +739,19 @@ results_ready: True
 </div>
 </div>
 <p>First, it saves the figure at higher resolution by default (which you can adjust with the <code>dpi</code> argument). But second, it stores information about the code that was used to generate the figure as metadata, which can be loaded later. Made an awesome plot but can’t remember even what script you ran to generate it, much less what version of the code? You’ll never have to worry about that again.</p>
-<div id="bd4712dc" class="cell" data-execution_count="11">
+<div id="bd4712dc" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cv.get_png_metadata(<span class="st">'my-fig.png'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Covasim version: 3.1.7
 Covasim branch: quarto-docs
-Covasim hash: 09a7e89
-Covasim date: 2026-05-20 19:35:17 UTC
+Covasim hash: da3c0ab
+Covasim date: 2026-05-21 16:05:17 UTC
 Covasim caller branch: quarto-docs
-Covasim caller hash: 09a7e89
-Covasim caller date: 2026-05-20 19:35:17 UTC
+Covasim caller hash: da3c0ab
+Covasim caller date: 2026-05-21 16:05:17 UTC
 Covasim caller filename: /home/cliffk/idm/covasim/covasim/misc.py
-Covasim current time: 2026-May-20 15:36:37
-Covasim calling file: /tmp/ipykernel_1196867/1033588508.py</code></pre>
+Covasim current time: 2026-May-21 12:07:54
+Covasim calling file: /tmp/ipykernel_1256674/1033588508.py</code></pre>
 </div>
 </div>
 </section>
@@ -759,7 +759,7 @@ Covasim calling file: /tmp/ipykernel_1196867/1033588508.py</code></pre>
 <h2 class="anchored" data-anchor-id="customizing-plots">Customizing plots</h2>
 <p>We saw above how to set default plot configuration options for Jupyter. Covasim provides a lot of flexibility in customizing the appearance of plots as well. There are three different levels at which you can set plotting options: global, just for Covasim, or just for the current plot. To give an example with changing the figure DPI: - Change the setting globally (for both Covasim and Matplotlib): <code>sc.options(dpi=150)</code> or <code>pl.rc('figure', dpi=150)</code> (where <code>sc</code> is <code>import sciris as sc</code>) - Change for Covasim plots, but not for Matplotlib plots: <code>cv.options(dpi=150)</code> - Change for the current Covasim plot, but not other Covasim plots: <code>sim.plot(dpi=150)</code></p>
 <p>The easiest way to change the style of Covasim plots is with the <code>style</code> argument. For example, to plot using a built-in Matplotlib style would simply be:</p>
-<div id="318d91dd" class="cell" data-execution_count="12">
+<div id="318d91dd" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sim.plot(style<span class="op">=</span><span class="st">'ggplot'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -770,7 +770,7 @@ Covasim calling file: /tmp/ipykernel_1196867/1033588508.py</code></pre>
 </div>
 </div>
 <p>In addition to the default style (<code>'covasim'</code>), there is also a “simple” style. You can combine built-in styles with additional overrides, including any valid Matplotlib commands:</p>
-<div id="1f2dbb96" class="cell" data-execution_count="13">
+<div id="1f2dbb96" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>sim.plot(style<span class="op">=</span><span class="st">'simple'</span>, font<span class="op">=</span><span class="st">'Rosario'</span>, legend_args<span class="op">=</span>{<span class="st">'frameon'</span>:<span class="va">True</span>}, style_args<span class="op">=</span>{<span class="st">'ytick.direction'</span>:<span class="st">'in'</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -782,7 +782,7 @@ Covasim calling file: /tmp/ipykernel_1196867/1033588508.py</code></pre>
 </div>
 <p>(Note: Covasim comes bundled with two fonts, <a href="https://github.com/googlefonts/mulish">Mulish</a> (sans-serif, the default) and <a href="https://fonts.adobe.com/fonts/rosario">Rosario</a> (serif).)</p>
 <p>Although most style handling is done automatically, you can also use it yourself in a with block, e.g.:</p>
-<div id="d809e6c7" class="cell" data-execution_count="14">
+<div id="d809e6c7" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> cv.options.with_style(fontsize<span class="op">=</span><span class="dv">6</span>):</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    sim.plot() <span class="co"># This will have 6 point font</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    pl.figure()<span class="op">;</span> pl.plot(pl.rand(<span class="dv">20</span>), <span class="st">'o'</span>) <span class="co"># So will this</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -805,14 +805,14 @@ Covasim calling file: /tmp/ipykernel_1196867/1033588508.py</code></pre>
 <section id="saving-options" class="level2">
 <h2 class="anchored" data-anchor-id="saving-options">Saving options</h2>
 <p>Saving sims is also pretty simple. The simplest way to save is simply</p>
-<div id="b02a7818" class="cell" data-execution_count="15">
+<div id="b02a7818" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sim.save(<span class="st">'my-awesome-sim.sim'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <pre><code>'/home/cliffk/idm/covasim/docs/tutorials/my-awesome-sim.sim'</code></pre>
 </div>
 </div>
 <p>Technically, this saves as a gzipped pickle file (via <code>sc.saveobj()</code> using the Sciris library). By default this does not save the people in the sim since they are very large (and since, if the random seed is saved, they can usually be regenerated). If you want to save the people as well, you can use the <code>keep_people</code> argument. For example, here’s what it would look like to create a sim, run it halfway, save it, load it, change the overall transmissibility (beta), and finish running it:</p>
-<div id="86f47ce4" class="cell" data-execution_count="16">
+<div id="86f47ce4" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>sim_orig <span class="op">=</span> cv.Sim(start_day<span class="op">=</span><span class="st">'2020-04-01'</span>, end_day<span class="op">=</span><span class="st">'2020-06-01'</span>, label<span class="op">=</span><span class="st">'Load &amp; save example'</span>)</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>sim_orig.run(until<span class="op">=</span><span class="st">'2020-05-01'</span>)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>sim_orig.save(<span class="st">'my-half-finished-sim.sim'</span>) <span class="co"># Note: Covasim always saves the people if the sim isn't finished running yet</span></span>
@@ -830,7 +830,7 @@ Covasim calling file: /tmp/ipykernel_1196867/1033588508.py</code></pre>
 </div>
 </div>
 <p>Aside from saving the entire simulation, there are other export options available. You can export the results and parameters to a JSON file (using <code>sim.to_json()</code>), but probably the most useful is to export the results to an Excel workbook, where they can easily be stored and processed with e.g.&nbsp;Pandas:</p>
-<div id="b52a0cdf" class="cell" data-execution_count="17">
+<div id="b52a0cdf" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>sim.to_excel(<span class="st">'my-sim.xlsx'</span>)</span>

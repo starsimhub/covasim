@@ -568,7 +568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="getting-help" class="level2">
 <h2 class="anchored" data-anchor-id="getting-help">Getting help</h2>
 <p>In addition to the docs (yes, you’re reading them as we speak, well done), you can get help within Covasim. You can even search for a string in Covasim’s source code. Curious to know where binomial distributions are used? You can do:</p>
-<div id="afb52551" class="cell" data-execution_count="2">
+<div id="afb52551" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>cv.options(jupyter<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cv.<span class="bu">help</span>(<span class="st">'binomial'</span>, source<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -595,7 +595,7 @@ Found 16 matches for "binomial" among 113 available functions:
 </div>
 </div>
 <p>You can also get a detailed view of the options with <code>cv.options.help(detailed=True)</code>, or more concise ones with <code>cv.options.help()</code> or <code>cv.options.disp()</code>:</p>
-<div id="7d1a53fe" class="cell" data-execution_count="3">
+<div id="7d1a53fe" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cv.options.disp()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <div class="ansi-escaped-output">
@@ -662,7 +662,7 @@ Found 16 matches for "binomial" among 113 available functions:
 <section id="versioning" class="level2">
 <h2 class="anchored" data-anchor-id="versioning">Versioning</h2>
 <p>Covasim contains a number of built-in tools to make it easier to keep track of where results came from. The simplest of these is that if you save an image using <a href="../api/misc.html#covasim.misc.savefig" title="0"><code>cv.savefig()</code></a> instead of <code>pl.savefig()</code>, it will automatically store information about the script and Covasim version that generated it:</p>
-<div id="8ab56e1c" class="cell" data-execution_count="4">
+<div id="8ab56e1c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>cv.options(jupyter<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -677,21 +677,21 @@ Found 16 matches for "binomial" among 113 available functions:
 </div>
 </div>
 </div>
-<div id="7e2093c8" class="cell" data-execution_count="5">
+<div id="7e2093c8" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">'my-figure.png'</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>cv.savefig(filename) <span class="co"># Save including version information</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>cv.get_png_metadata(filename) <span class="co"># Retrieve and print information</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Covasim version: 3.1.7
 Covasim branch: quarto-docs
-Covasim hash: 09a7e89
-Covasim date: 2026-05-20 19:35:17 UTC
+Covasim hash: da3c0ab
+Covasim date: 2026-05-21 16:05:17 UTC
 Covasim caller branch: quarto-docs
-Covasim caller hash: 09a7e89
-Covasim caller date: 2026-05-20 19:35:17 UTC
+Covasim caller hash: da3c0ab
+Covasim caller date: 2026-05-21 16:05:17 UTC
 Covasim caller filename: /home/cliffk/idm/covasim/covasim/misc.py
-Covasim current time: 2026-May-20 15:36:55
-Covasim calling file: /tmp/ipykernel_1197111/2013902684.py</code></pre>
+Covasim current time: 2026-May-21 12:08:32
+Covasim calling file: /tmp/ipykernel_1256963/2013902684.py</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
@@ -699,16 +699,16 @@ Covasim calling file: /tmp/ipykernel_1197111/2013902684.py</code></pre>
 </div>
 <p>This can be extremely useful for figuring out where that intriguing result you generated 3 weeks ago came from!</p>
 <p>This information is also stored in sims and multisims themselves:</p>
-<div id="310e5349" class="cell" data-execution_count="6">
+<div id="310e5349" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sim.version)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sim.git_info)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>3.1.7
-{'covasim': {'version': '3.1.7', 'branch': 'quarto-docs', 'hash': '09a7e89', 'date': '2026-05-20 19:35:17 UTC'}, 'called_by': {'branch': 'Branch N/A', 'hash': 'Hash N/A', 'date': 'Date N/A', 'filename': '/tmp/ipykernel_1197111/3079231718.py'}}</code></pre>
+{'covasim': {'version': '3.1.7', 'branch': 'quarto-docs', 'hash': 'da3c0ab', 'date': '2026-05-21 16:05:17 UTC'}, 'called_by': {'branch': 'Branch N/A', 'hash': 'Hash N/A', 'date': 'Date N/A', 'filename': '/tmp/ipykernel_1256963/3079231718.py'}}</code></pre>
 </div>
 </div>
 <p>Finally, the function <a href="../api/misc.html#covasim.misc.check_version" title="0"><code>cv.check_version()</code></a> and <a href="../api/misc.html#covasim.misc.check_save_version" title="0"><code>cv.check_save_version()</code></a> are useful if you want to ensure that users are running the right version of your code. Placing <code>cv.check_save_version('2.0.0')</code> will save a file with the information above to the current folder – again, useful for debugging exactly what changed and when. (You can also provide additional information to it, e.g.&nbsp;to also save the versions of 3rd-party packages you’re importing). <a href="../api/misc.html#covasim.misc.check_version" title="0"><code>cv.check_version()</code></a> by itself can be used to provide a warning or even raise an exception (if <code>die=True</code>) if the version is not what’s expected:</p>
-<div id="03e1b8d2" class="cell" data-execution_count="7">
+<div id="03e1b8d2" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>cv.check_version(<span class="st">'1.5.0'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Note: Covasim is newer than expected (3.1.7 vs. 1.5.0)</code></pre>
@@ -721,7 +721,7 @@ Covasim calling file: /tmp/ipykernel_1197111/2013902684.py</code></pre>
 <section id="working-with-dates" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-dates">Working with dates</h2>
 <p>Dates can be tricky to work with. Covasim comes with a number of built-in features to work with dates. By default, by convention Covasim works with dates in the format <code>YYYY-MM-DD</code>, e.g.&nbsp;<code>'2020-12-01'</code>. However, it can handle a wide variety of other date and <a href="https://docs.python.org/3/library/datetime.html#module-datetime" title="1"><code>datetime</code></a> objects. In particular, <code>sim</code> objects know when they start and end, and can use this to do quite a bit of date math:</p>
-<div id="f759f244" class="cell" data-execution_count="8">
+<div id="f759f244" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(start_day<span class="op">=</span><span class="st">'20201122'</span>, end_day<span class="op">=</span><span class="st">'2020-12-09 02:14:58.727703'</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sim.initialize() <span class="co"># Date conversion happens on initialization</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(sim[<span class="st">'start_day'</span>])</span>
@@ -734,7 +734,7 @@ Covasim calling file: /tmp/ipykernel_1197111/2013902684.py</code></pre>
 </div>
 </div>
 <p>You can also easily calculate the difference between two dates, or generate a range of dates. These are returned as strings by default, but can be converted to datetime objects via Sciris:</p>
-<div id="16ff9fe9" class="cell" data-execution_count="9">
+<div id="16ff9fe9" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(cv.daydiff(<span class="st">'2020-06-01'</span>, <span class="st">'2020-07-01'</span>, <span class="st">'2020-08-01'</span>))</span>
@@ -756,7 +756,7 @@ Covasim calling file: /tmp/ipykernel_1197111/2013902684.py</code></pre>
 <p>“I already know how to work with dictionaries”, you say. Yes, you do. But there are a couple tricks that might make things easier.</p>
 <p>Covasim is built on Sciris, which includes containers <code>odict</code> and <code>objdict</code>. While these are <a href="https://sciris.readthedocs.io/en/latest/_autosummary/sciris.sc_odict.odict.html#sciris.sc_odict.odict">documented elsewhere</a>, a couple examples will serve to illustrate how they work.</p>
 <p>An <code>odict</code> is just an ordered dict that you can refer to by <em>position</em> as well as by key. For example:</p>
-<div id="fa2d6d6c" class="cell" data-execution_count="10">
+<div id="fa2d6d6c" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mydict <span class="op">=</span> sc.odict(foo<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>], bar<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>]) <span class="co"># Assignment is the same as ordinary dictionaries</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Entry foo:'</span>, mydict[<span class="st">'foo'</span>])</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Entry 0:'</span>,    mydict[<span class="dv">0</span>]) <span class="co"># Access by key or by index</span></span>
@@ -770,7 +770,7 @@ Item 1 is named bar and has value [4, 5, 6]</code></pre>
 </div>
 </div>
 <p>An <code>objdict</code> is exactly the same as an odict except it lets you reference keys as if they were attributes:</p>
-<div id="8de8d5a9" class="cell" data-execution_count="11">
+<div id="8de8d5a9" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>myobjdict <span class="op">=</span> sc.objdict(foo<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>], bar<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>])</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Entry foo:'</span>, myobjdict[<span class="st">'foo'</span>])</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Entry 0:'</span>,    myobjdict[<span class="dv">0</span>]) <span class="co"># Access by key or by index</span></span>
@@ -782,7 +782,7 @@ Entry 0: [1, 2, 3]
 </div>
 </div>
 <p>Using this approach, you can get all the power and flexibility of dictionaries, while writing code as succinctly as possible. For example:</p>
-<div id="e49bfa33" class="cell" data-execution_count="12">
+<div id="e49bfa33" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>total_pop <span class="op">=</span> <span class="dv">44_483</span> <span class="co"># This many total people</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>pars<span class="op">=</span> sc.objdict(</span>
@@ -794,7 +794,7 @@ Entry 0: [1, 2, 3]
 </div>
 <p>For example, the <code>results</code> object is an <code>objdict</code>. This means that although you can use e.g.&nbsp;<code>sim.results['new_infections']</code>, you can also use <code>sim.results.new_infections</code>.</p>
 <p>Finally, Sciris also contains a function called <code>mergedicts</code>. This acts very similarly to <a href="https://docs.python.org/3/library/stdtypes.html#dict.update" title="1"><code>dict.update()</code></a>, with the main difference being that it returns the result of merging the two dictionaries. This is especially useful for handling keyword arguments in functions:</p>
-<div id="3431c78c" class="cell" data-execution_count="13">
+<div id="3431c78c" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> myfunc(args<span class="op">=</span><span class="va">None</span>, <span class="op">**</span>kwargs):</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    defaults <span class="op">=</span> <span class="bu">dict</span>(foo<span class="op">=</span>[<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>], bar<span class="op">=</span>[<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>])</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    merged_args <span class="op">=</span> sc.mergedicts(defaults, args, kwargs)</span>

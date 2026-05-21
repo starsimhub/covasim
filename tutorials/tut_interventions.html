@@ -572,7 +572,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="change-beta-and-clip-edges" class="level2">
 <h2 class="anchored" data-anchor-id="change-beta-and-clip-edges">Change beta and clip edges</h2>
 <p>The most basic intervention in Covasim is “change beta”: this changes overall transmission rates on the specified day(s), no questions asked. For example:</p>
-<div id="b77f931f" class="cell" data-execution_count="2">
+<div id="b77f931f" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>cv.options(jupyter<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -620,7 +620,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Overall, it’s best to use <code>change_beta</code> for interventions that reduce per-contact risk (e.g., masks), and <code>clip_edges</code> for interventions that reduce the number of contacts per person. However, in practice, it tends to make relatively little difference to the simulation results. If in doubt, use <code>change_beta</code>.</p>
 </div>
 <p>You can use <code>change_beta</code> to do some gnarly things, like create sinusoidally varying infection probability:</p>
-<div id="cbe4ed1b" class="cell" data-execution_count="3">
+<div id="cbe4ed1b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
@@ -663,7 +663,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Note that test probabilities for <code>test_prob</code> are daily probabilities, not total. If you set <code>symp_prob = 0.3</code>, this means a person has a 30% chance of testing <em>per day of symptoms</em>, meaning that on average they will go to be tested after 2-3 days. Given that symptoms last for up to 8 days, the total probability that they will test at some point during their illness is much higher than the daily probability.</p>
 </div>
 <p>The example below illustrates (a) <code>test_num</code> with data, (b) <code>test_num</code> with a fixed number of tests per day, and (c) <code>test_prob</code>.</p>
-<div id="c3ac77f4" class="cell" data-execution_count="4">
+<div id="c3ac77f4" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the testing interventions</span></span>
@@ -699,7 +699,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="contact-tracing" class="level2">
 <h2 class="anchored" data-anchor-id="contact-tracing">Contact tracing</h2>
 <p>Contact tracing is the process of notifying the contacts of a diagnosed positive COVID case and letting them know that they have been exposed, so they can be tested, go into quarantine, or both. Since contact tracing uses diagnosed people to start with, and since people are only diagnosed if they are tested, you <strong>must</strong> include at least one testing intervention in your sim before including contact tracing. The main option for contact tracing is <code>trace_prob</code>, the probability that a person in each layer will be traced (usually high for households and lower for other layers). For example:</p>
-<div id="b0b02c6b" class="cell" data-execution_count="5">
+<div id="b0b02c6b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the testing and contact tracing interventions</span></span>
@@ -750,7 +750,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="age-targeting-and-other-subtargeting" class="level2">
 <h2 class="anchored" data-anchor-id="age-targeting-and-other-subtargeting">Age targeting and other subtargeting</h2>
 <p>For some interventions, you want them to preferentially apply to some people in the population, e.g.&nbsp;the elderly. For testing and vaccine interventions, this can be done using the <code>subtarget</code> argument. Subtargeting is quite flexible in terms of what it accepts, but the easiest approach is usually to define a function to do it. This function must return a dictionary with keys <code>inds</code> (which people to subtarget) and <code>vals</code> (the values they are subtargeted with). This example shows how to define a 20% transmission-blocking, 94% symptom-blocking vaccine with varying coverage levels by age (for the vaccine intervention, <code>subtarget</code> modifies <code>prob</code>, the probability of a person being vaccinated) applied on day 20:</p>
-<div id="e18df3b4" class="cell" data-execution_count="6">
+<div id="e18df3b4" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -790,7 +790,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="dynamic-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-parameters">Dynamic parameters</h2>
 <p>A slightly more advanced intervention is the dynamic parameters intervention. This is not an intervention the same way the others are; instead, it provides a consistent way to modify parameters dynamically. For example, to change the number of imported infections on day 15 from 0 to 100 (representing, say, resuming international travel), and then change back to 0 on day 30:</p>
-<div id="40236691" class="cell" data-execution_count="7">
+<div id="40236691" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the dynamic parameters</span></span>
@@ -821,7 +821,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>We want to keep track of a few things with this intervention – namely when it toggles on and off, and whether or not it’s active. Since the intervention is just an object, we can add these attributes directly to it.</li>
 <li>Finally, this example shows some of the flexibility in how interventions are plotted – i.e.&nbsp;shown in the legend with a label and with a custom color.</li>
 </ul>
-<div id="618dc28d" class="cell" data-execution_count="8">
+<div id="618dc28d" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> inf_thresh(<span class="va">self</span>, sim, thresh<span class="op">=</span><span class="dv">500</span>):</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' Dynamically define on and off days for a beta change -- use self like it's a method '''</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -870,7 +870,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="custom-interventions">Custom interventions</h2>
 <p>If you’re still standing after the previous example, Covasim also lets you do things that are even <em>more</em> complicated, namely define an arbitrary function or class to act as an intervention instead. If a custom intervention is supplied as a function (as it was in Tutorial 1 as well), then it receives the <code>sim</code> object as its only argument, and is called on each timestep. It can perform arbitrary manipulations to the sim object, such as changing parameters, modifying state, etc.</p>
 <p>This example reimplements the dynamic parameters example above, except using a hard-coded custom intervention:</p>
-<div id="2955e28e" class="cell" data-execution_count="9">
+<div id="2955e28e" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dynamic_imports(sim):</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.t <span class="op">==</span> <span class="dv">15</span>:</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        sim[<span class="st">'n_imports'</span>] <span class="op">=</span> <span class="dv">100</span></span>
@@ -882,7 +882,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>However, function-based interventions only take you so far.</p>
 <p>We saw in Tutorial 1 how you could define a simple “protect the elderly” intervention with just a few lines of code:</p>
-<div id="2c7ff930" class="cell" data-execution_count="10">
+<div id="2c7ff930" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> protect_elderly(sim):</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.t <span class="op">==</span> sim.day(<span class="st">'2020-04-01'</span>):</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        elderly <span class="op">=</span> sim.people.age<span class="op">&gt;</span><span class="dv">70</span></span>
@@ -892,7 +892,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="alert alert-warning">
 <p>You must include the line <code>super().__init__(**kwargs)</code> in the <code>self.__init__()</code> method, or else the intervention won’t work. You must also include <code>super().initialize()</code> in the <code>self.initialize()</code> method.</p>
 </div>
-<div id="577f1ee3" class="cell" data-execution_count="11">
+<div id="577f1ee3" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pylab <span class="im">as</span> pl</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
@@ -946,7 +946,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><code>plot()</code> is a custom method that shows a plot of the data gathered during the sim. Again, it’s usually better to use analyzers for this, but for something simple like this it’s fine to double-dip and use an intervention.</li>
 </ul>
 <p>Here is what this custom intervention looks like in action. Note how it automatically shows when the intervention starts and stops (with vertical dashed lines).</p>
-<div id="12724033" class="cell" data-execution_count="12">
+<div id="12724033" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define and run the baseline simulation</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="op">=</span> <span class="fl">50e3</span>,</span>
@@ -972,7 +972,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Because we collected information in the intervention itself, we can also plot that:</p>
-<div id="97d91f03" class="cell" data-execution_count="13">
+<div id="97d91f03" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot intervention</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>protect <span class="op">=</span> msim.sims[<span class="dv">1</span>].get_intervention(protect_elderly) <span class="co"># Find intervention by type</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>protect.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>

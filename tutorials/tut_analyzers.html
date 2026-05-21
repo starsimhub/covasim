@@ -567,7 +567,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="age-histograms-and-snapshots" class="level2">
 <h2 class="anchored" data-anchor-id="age-histograms-and-snapshots">Age histograms and snapshots</h2>
 <p>Age histograms and snapshots both take “pictures” of the <code>sim.people</code> object at specified points in time. This is because while most of the information from <code>sim.people</code> is retrievable at the end of the sim from the stored events, it’s much easier to see what’s going on at the time. While the snapshot literally just makes a copy of the people object, the age histogram calculates results for different age bins:</p>
-<div id="da231e55" class="cell" data-execution_count="2">
+<div id="da231e55" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>cv.options(jupyter<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -590,7 +590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="transmission-trees" class="level2">
 <h2 class="anchored" data-anchor-id="transmission-trees">Transmission trees</h2>
 <p>Another useful analysis to perform on the simulation is to calculate the <em>transmission tree</em> – i.e., who infected whom. Since all this information is stored in the sim, it doesn’t have to be inserted at run time; it can be added to an already finished simulation:</p>
-<div id="e3d18287" class="cell" data-execution_count="3">
+<div id="e3d18287" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tt <span class="op">=</span> sim.make_transtree()</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>fig1 <span class="op">=</span> tt.plot()</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>fig2 <span class="op">=</span> tt.plot_histograms()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -613,7 +613,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="custom-analyzers" class="level2">
 <h2 class="anchored" data-anchor-id="custom-analyzers">Custom analyzers</h2>
 <p>Analyzers don’t have to be complicated. While analyzers can derive from the <a href="../api/analysis.html#covasim.analysis.Analyzer" title="0"><code>cv.Analyzer</code></a> class, they can also just be simple functions, unless they need to keep track of or update internal state. Here’s an example of an analyzer that does keep track of internal state, namely by storing and plotting the S, E, I, and R compartments over time.</p>
-<div id="bd25e253" class="cell" data-execution_count="4">
+<div id="bd25e253" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pylab <span class="im">as</span> pl</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
@@ -664,7 +664,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>And here’s an example of an analyzer that doesn’t need any internal state, so it can just be a function: it simply reports if anyone aged 88 is currently infected.</p>
-<div id="c857c9c8" class="cell" data-execution_count="5">
+<div id="c857c9c8" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_88(sim):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    people_who_are_88 <span class="op">=</span> sim.people.age.<span class="bu">round</span>() <span class="op">==</span> <span class="dv">88</span> <span class="co"># Find everyone who's aged 88 (to the nearest year)</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    people_exposed <span class="op">=</span> sim.people.exposed <span class="co"># Find everyone who's infected with COVID</span></span>

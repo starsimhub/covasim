@@ -573,7 +573,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="using-waning-immunity" class="level2">
 <h2 class="anchored" data-anchor-id="using-waning-immunity">Using waning immunity</h2>
 <p>By default, immunity is assumed to grow and then wane over time according to a two-part exponential decay of neutralizing antibodies. This can be changed by setting <code>use_waning=False</code>, such that infection is assumed to confer lifelong perfect immunity, meaning that people who have been infected cannot be infected again. When <code>use_waning</code> is set to True, agents in the simulation are assigned a peak level of neutralizing antibodies upon infection or vaccination, drawn from a distribution defined in the parameter dictionary. This level grows to its peak and then decays over time, leading to declines in the efficacy of protection against infection, symptoms, and severe symptoms. The following example creates simulations without waning immunity, and compares it to simulations with different speeds of immunity waning.</p>
-<div id="fe366851" class="cell" data-execution_count="2">
+<div id="fe366851" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pylab <span class="im">as</span> pl</span>
@@ -608,7 +608,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="multi-variant-modeling" class="level2">
 <h2 class="anchored" data-anchor-id="multi-variant-modeling">Multi-variant modeling</h2>
 <p>The next examples show how to introduce new variants into a simulation. These can either be known variants of concern, or custom new variants. New variants may have differing levels of transmissibility, symptomaticity, severity, and mortality. When introducing new variants, <code>use_waning</code> must be set to <a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a>. The model includes known information about the levels of cross-immunity between different variants. Cross-immunity can also be manually adjusted.</p>
-<div id="b8c5e441" class="cell" data-execution_count="3">
+<div id="b8c5e441" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define three new variants: B117, B1351, and a custom-defined variant</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>alpha  <span class="op">=</span> cv.variant(<span class="st">'alpha'</span>, days<span class="op">=</span><span class="dv">0</span>, n_imports<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>beta   <span class="op">=</span> cv.variant(<span class="st">'beta'</span>, days<span class="op">=</span><span class="dv">0</span>, n_imports<span class="op">=</span><span class="dv">10</span>)</span>
@@ -640,7 +640,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="probability-based-vaccination" class="level3">
 <h3 class="anchored" data-anchor-id="probability-based-vaccination">Probability-based vaccination</h3>
 <p>The intervention <a href="../api/interventions.html#covasim.interventions.vaccinate_prob" title="0"><code>cv.vaccinate_prob()</code></a> allows you specify the daily probability that each individual gets vaccinated. The following example illustrates how to use the <a href="../api/interventions.html#covasim.interventions.vaccinate_prob" title="0"><code>cv.vaccinate_prob()</code></a> intervention.</p>
-<div id="6976af0d" class="cell" data-execution_count="4">
+<div id="6976af0d" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create some base parameters</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    beta   <span class="op">=</span> <span class="fl">0.015</span>,</span>
@@ -666,7 +666,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="sequence-based-vaccination" class="level3">
 <h3 class="anchored" data-anchor-id="sequence-based-vaccination">Sequence-based vaccination</h3>
 <p>To use <a href="../api/interventions.html#covasim.interventions.vaccinate_num" title="0"><code>cv.vaccinate_num</code></a>, it is necessary to specify the vaccine prioritization - for example, this may involve defining priority groups like 1A, 1B etc. depending on the setting. The vaccine prioritization is specified as an ordered sequence of people to vaccinate, so in almost all cases, a function can be defined that takes in a <a href="../api/people.html#covasim.people.People" title="0"><code>cv.People</code></a> instance, and returns an array of indices specifying the order in which people get vaccinated. This function could also incorporate steps such as randomizing the order of people within priority groups, or removing some people from the sequence to account for vaccine hesitancy and peak coverage not reaching 100%. A simple example of a prioritization function would be to simply sort by age in descending order i.e.</p>
-<div id="40af71f5" class="cell" data-execution_count="5">
+<div id="40af71f5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> prioritize_by_age(people):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.argsort(<span class="op">-</span>people.age)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -675,7 +675,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>This function can be passed to <a href="../api/interventions.html#covasim.interventions.vaccinate_num" title="0"><code>cv.vaccinate_num</code></a> where it will be evaluated during initialization, and therefore will run after the population has been generated. In cases where the <a href="../api/people.html#covasim.people.People" title="0"><code>cv.People</code></a> have been generated offline and are being loaded instead of generated, it’s possible to pass a pre-computed sequence of indices to <a href="../api/interventions.html#covasim.interventions.vaccinate_num" title="0"><code>cv.vaccinate_num</code></a> rather than a prioritization function that returns the sequence.</p>
 <p>The example below also shows how to use a simple <code>Analyzer</code> to capture additional information about the vaccine state each timestep.</p>
-<div id="9d9ec99d" class="cell" data-execution_count="6">
+<div id="9d9ec99d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Record the number of doses each person has received each day so</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># that we can plot the rollout in this example. Without a custom </span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># analyzer, only the total number of doses will be recorded</span></span>
@@ -705,7 +705,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Notice how second doses are prioritized, so after 21 days, there is a backlog of people requiring second doses, so the first doses are suspended until all of the second doses have been delivered. In reality, the pace of vaccination typically increases following the commencement of vaccination, so capacity increases over time. The <code>num_doses</code> argument allows this increase to be captured. There are several ways to specify a time-varying number of doses, including a date-based dictionary to facilitate calibration when the number of doses each day is known. A simple option is to use a function that returns the number of doses to distribute based on the <a href="../api/sim.html#covasim.sim.Sim" title="0"><code>cv.Sim</code></a> - for example:</p>
-<div id="17f04fd0" class="cell" data-execution_count="7">
+<div id="17f04fd0" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> num_doses(sim):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.t <span class="op">&lt;</span> <span class="dv">50</span>:</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> sim.t<span class="op">*</span><span class="dv">10</span></span>
@@ -713,7 +713,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="dv">500</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This function corresponds to the vaccination rate increasing linearly for the first 50 days, before then stabilizing. The function can be passed directly into the <a href="../api/interventions.html#covasim.interventions.vaccinate_num" title="0"><code>cv.vaccinate_num</code></a> intervention:</p>
-<div id="a44378ae" class="cell" data-execution_count="8">
+<div id="a44378ae" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>n_doses <span class="op">=</span> []</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>pfizer <span class="op">=</span> cv.vaccinate_num(vaccine<span class="op">=</span><span class="st">'pfizer'</span>, sequence<span class="op">=</span>prioritize_by_age, num_doses<span class="op">=</span>num_doses)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(</span>
@@ -742,7 +742,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="boosters" class="level3">
 <h3 class="anchored" data-anchor-id="boosters">Boosters</h3>
 <p>By default, the vaccination interventions in Covasim are targeted towards unvaccinated people. If you want to include boosters in your simulation, you can use the <code>booster=True</code> argument when calling <a href="../api/interventions.html#covasim.interventions.vaccinate" title="0"><code>cv.vaccinate</code></a>. You also need to use the <code>subtarget</code> argument so that we know who is going to receive a booster shot:</p>
-<div id="cd178947" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;pycharm&quot;,&quot;value&quot;:{&quot;name&quot;:&quot;#%%\n&quot;}}" data-execution_count="9">
+<div id="cd178947" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;pycharm&quot;,&quot;value&quot;:{&quot;name&quot;:&quot;#%%\n&quot;}}" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the number of boosters</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> num_boosters(sim):</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.t <span class="op">&lt;</span> <span class="dv">50</span>: <span class="co"># None over the first 50 days</span></span>
@@ -798,7 +798,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="prior-immunity-methods" class="level3">
 <h3 class="anchored" data-anchor-id="prior-immunity-methods">Prior immunity methods</h3>
 <p>The longer that the COVID-19 pandemic persists, the less feasible/desirable it becomes to simulate the entire ~2 year history of the epidemic. However, starting simulations 1-2 years into the pandemic is also not ideal, as this will fail to capture the pre-existing immunity profile of the population. A good alternative is to use the <a href="../api/interventions.html#covasim.interventions.prior_immunity" title="0"><code>cv.prior_immunity</code></a> method. The following example starts a simulation in which 50% of the population are assumed to be vaccinated with the Pfizer vaccine 360 days before the simulation begins:</p>
-<div id="da95f319" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;pycharm&quot;,&quot;value&quot;:{&quot;name&quot;:&quot;#%%\n&quot;}}" data-execution_count="10">
+<div id="da95f319" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;pycharm&quot;,&quot;value&quot;:{&quot;name&quot;:&quot;#%%\n&quot;}}" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pfizer <span class="op">=</span> cv.historical_vaccinate_prob(vaccine<span class="op">=</span><span class="st">'pfizer'</span>, days<span class="op">=</span>[<span class="op">-</span><span class="dv">360</span>], prob<span class="op">=</span><span class="fl">0.5</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    n_days<span class="op">=</span><span class="dv">1</span>, </span>
@@ -818,7 +818,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The histogram of neutralizing antibody levels after 1 day of simulation shows that there are already significant levels of immunity in the population.</p>
 <p>This next example will initialize the population with immunity levels corresponding to a prior wave of infections peaking 120 days before the simulation starts, with 5% of the population having been infected:</p>
-<div id="ea9322d0" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;pycharm&quot;,&quot;value&quot;:{&quot;name&quot;:&quot;#%%\n&quot;}}" data-execution_count="11">
+<div id="ea9322d0" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;pycharm&quot;,&quot;value&quot;:{&quot;name&quot;:&quot;#%%\n&quot;}}" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>intv <span class="op">=</span> cv.prior_immunity(<span class="dv">120</span>, <span class="fl">0.05</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cv.Sim(interventions<span class="op">=</span>intv).run().plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
