@@ -15,7 +15,7 @@ on_rtd = os.environ.get('READTHEDOCS') == 'True'
 # -- Project information -----------------------------------------------------
 
 project = 'Covasim'
-copyright = f'2020 - {sc.now().year}, Bill & Melinda Gates Foundation. All rights reserved.\nThese docs were built for Covasim version {cv.__version__}.\n'
+copyright = f'2020 - {sc.now().year}, Gates Foundation. All rights reserved.\nThese docs were built for Covasim version {cv.__version__}.\n'
 author = 'Institute for Disease Modeling'
 
 # The short X.Y version
