@@ -2,12 +2,6 @@
 
 This document contains answers to frequently (and some not so frequently) asked questions. If there are others you'd like to see included, please email us at <info@covasim.org>.
 
-<div class="contents" local="" depth="2">
-
-**Contents**
-
-</div>
-
 ## Usage questions
 
 ### What are the system requirements for Covasim?
