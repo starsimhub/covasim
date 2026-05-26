@@ -11,7 +11,7 @@ project:
 
 website:
   title: "Covasim"
-  image: /assets/covasim-logo.png
+  image: /assets/covasim-logo-light.png
   favicon: /assets/favicon.ico
 
   repo-url: https://github.com/starsimhub/covasim
@@ -32,7 +32,7 @@ website:
         href: https://covasim.org/
 
   navbar:
-    logo: /assets/covasim-logo.png
+    logo: /assets/covasim-logo-light.png
     title: false
     collapse-below: lg
 
