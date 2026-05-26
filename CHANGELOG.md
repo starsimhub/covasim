@@ -2,10 +2,9 @@
 
 All notable changes to the codebase are documented in this file. Changes that may result in differences in model output, or are required in order to run an old parameter set with the current version, are flagged with the term "Regression information".
 
-
 ## Coming soon
 
-Covasim is currently in maintenance phase, and there are no further major releases planned. If there is a specific bugfix or feature you would like to see, please [create an issue](https://github.com/InstituteforDiseaseModeling/covasim/issues/new/choose).
+Covasim is currently being ported to [Starsim](https://starsim.org), but otherwise there are no further major releases planned. If there is a specific bugfix or feature you would like to see, please [create an issue](https://github.com/starsimhub/covasim/issues/new/choose).
 
 ## Latest versions (3.1.x)
 
