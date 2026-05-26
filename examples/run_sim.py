@@ -19,7 +19,7 @@ pars = sc.objdict(
     pop_type     = 'hybrid', # Population to use -- "hybrid" is random with household, school,and work structure
 )
 
-# Optionally add an intervention
+#Optionally add an intervention
 if interv:
     pars.interventions = cv.change_beta(days=45, changes=0.5)
 
