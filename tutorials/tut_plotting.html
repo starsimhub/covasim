@@ -82,9 +82,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-acf12a64177840b8d86f2d4f01b2e9fb.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-aafc68b2255684af78b035618dac2a51.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-fec5a1fa81bfd162096066a3ebc5bcc8.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-b057db1ef6d37d07b072bbb02abd23cf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-3ce770ef2b696fd4891b1829608d8386.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-b057db1ef6d37d07b072bbb02abd23cf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -286,8 +286,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo light-content">
-    <img src="../assets/covasim-logo.png" alt="" class="navbar-logo dark-content">
+    <img src="../assets/covasim-logo-light.png" alt="" class="navbar-logo light-content">
+    <img src="../assets/covasim-logo-light.png" alt="" class="navbar-logo dark-content">
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -619,7 +619,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="8160d931" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sim.disp()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;covasim.sim.Sim at 0x71bad3120d70&gt;
+<pre><code>&lt;covasim.sim.Sim at 0x787a026ccd70&gt;
 [&lt;class 'covasim.sim.Sim'&gt;, &lt;class 'covasim.base.BaseSim'&gt;, &lt;class 'covasim.base.ParsObj'&gt;, &lt;class 'covasim.base.FlexPretty'&gt;, &lt;class 'sciris.sc_printing.prettyobj'&gt;]
 ————————————————————————————————————————————————————————————————————————
 Methods:
@@ -652,11 +652,11 @@ Properties:
 _legacy_trans: False
    _orig_pars: {'interventions': [], 'analyzers': []}
      complete: True
-      created: datetime.datetime(2026, 5, 21, 12, 7, 49, 751868)
+      created: datetime.datetime(2026, 5, 26, 9, 3, 24, 438894)
          data: None
      datafile: None
-     git_info: {'covasim': {'version': '3.1.7', 'branch': 'quarto-
-               docs', 'hash': ' [...]
+     git_info: {'covasim': {'version': '3.1.7', 'branch': 'main',
+               'hash': '48b323e [...]
   initialized: True
         label: None
          pars: {'pop_size': 20000, 'pop_infected': 20, 'pop_type':
@@ -667,7 +667,7 @@ _legacy_trans: False
   rescale_vec: array([1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
                1., 1., 1.,  [...]
       results: #0. 'cum_infections':
-               &lt;covasim.base.Result at 0x71bad2e3dd30&gt;
+               &lt;covasim.base.Result at 0x787a023d5d30&gt;
                [&lt;cla [...]
 results_ready: True
       simfile: 'covasim.sim'
@@ -743,15 +743,15 @@ results_ready: True
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cv.get_png_metadata(<span class="st">'my-fig.png'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Covasim version: 3.1.7
-Covasim branch: quarto-docs
-Covasim hash: da3c0ab
-Covasim date: 2026-05-21 16:05:17 UTC
-Covasim caller branch: quarto-docs
-Covasim caller hash: da3c0ab
-Covasim caller date: 2026-05-21 16:05:17 UTC
+Covasim branch: main
+Covasim hash: 48b323e
+Covasim date: 2026-05-26 13:01:58 UTC
+Covasim caller branch: main
+Covasim caller hash: 48b323e
+Covasim caller date: 2026-05-26 13:01:58 UTC
 Covasim caller filename: /home/cliffk/idm/covasim/covasim/misc.py
-Covasim current time: 2026-May-21 12:07:54
-Covasim calling file: /tmp/ipykernel_1256674/1033588508.py</code></pre>
+Covasim current time: 2026-May-26 09:03:26
+Covasim calling file: /tmp/ipykernel_435743/1033588508.py</code></pre>
 </div>
 </div>
 </section>
