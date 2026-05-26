@@ -1,0 +1,29 @@
+#!/bin/bash
+# Delete all temporary and build files
+
+# Exit on error
+set -e
+
+start=$SECONDS
+
+# Tidy up
+echo "Tidying tutorials..."
+python clean_outputs.py
+
+echo "Removing build files..."
+rm -rvf .quarto
+rm -rvf api
+
+rm -rvf _site
+rm -rvf _freeze
+rm -rvf .jupyter_cache/
+rm -rvf .virtual_documents/
+rm -rvf __pycache__/
+rm -rvf tutorials/.ipynb_checkpoints/
+rm -rvf tutorials/.jupyter_cache/
+rm -rvf tutorials/.virtual_documents/
+rm -vf objects.json
+rm -vf objects.inv
+
+duration=$(( SECONDS - start ))
+echo "Cleaned after $duration seconds."

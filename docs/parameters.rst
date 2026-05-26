@@ -1,1 +1,0 @@
-.. include:: ../covasim/README.rst

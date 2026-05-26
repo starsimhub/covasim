@@ -1,0 +1,44 @@
+# Runs manually or on version tags.
+
+name: Publish Covasim docs
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Quarto
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Covasim and doc dependencies
+        run: |
+          pip install -e .[full]
+          pip install -r docs/requirements.txt
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Install Quarto interlinks extension
+        working-directory: ./docs
+        run: quarto add machow/quartodoc --no-prompt
+
+      - name: Publish docs to GitHub Pages
+        working-directory: ./docs
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
+          ./publish

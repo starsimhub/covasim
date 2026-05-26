@@ -1,15 +1,10 @@
-pandoc
-pypandoc
-sphinx
-sphinx-autodoc-typehints
-pydata-sphinx-theme
-sphinx-design
-readthedocs-sphinx-search
-ipykernel # For tutorials
-nbconvert==7.13.0 # For tutorials; >=7.14 does not work
-nbsphinx # For tutorials
-plantweb
-ipykernel
-nbsphinx
+quartodoc
+sphobjinv
+jupyter
+jupyter-cache
+jupytext
+nbconvert
+nbformat
 optuna
 seaborn
+pandoc

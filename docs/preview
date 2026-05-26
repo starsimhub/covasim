@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Preview site with live reloading
+set -euo pipefail # Fail fast if needed
+
+quarto preview

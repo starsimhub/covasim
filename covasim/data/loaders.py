@@ -177,7 +177,7 @@ def get_household_size(location=None):
     Load household size distribution for a given country or countries.
 
     Args:
-        location (str or list): name of the country or countries to load the age distribution for
+        location (str or list): name of the country or countries to load the household size distribution for
 
     Returns:
         house_size (float): Size of household, or dict if multiple locations
