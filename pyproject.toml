@@ -9,14 +9,13 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-    {name = "Cliff Kerr"},
+    {name = "Cliff Kerr", email = "info@covasim.org"},
     {name = "Robyn Stuart"},
     {name = "Romesh Abeysuriya"},
     {name = "Dina Mistry"},
     {name = "Jamie Cohen"},
     {name = "Lauren George"},
     {name = "Daniel Klein"},
-    {name = "IDM COVID-19 Response Team", email = "info@covasim.org"},
 ]
 keywords = ["COVID", "COVID-19", "coronavirus", "SARS-CoV-2", "stochastic", "agent-based model", "interventions", "epidemiology"]
 requires-python = ">=3.9"

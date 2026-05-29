@@ -43,10 +43,12 @@ We also recommend, but do not require, installing Covasim in a virtual environme
 
 Install with `pip install covasim`. If everything is working, the following Python commands should bring up a plot:
 
-    import covasim as cv
-    sim = cv.Sim()
-    sim.run()
-    sim.plot()
+```py
+import covasim as cv
+sim = cv.Sim()
+sim.run()
+sim.plot()
+```
 
 ## Full installation instructions
 
