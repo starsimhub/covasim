@@ -21,6 +21,8 @@ This validation layers on top of Covasim's existing regression machinery rather 
 
 Settled with the project owner (Cliff Kerr). Each bullet is a feature name + disposition.
 
+**Backwards compatibility is the overriding constraint.** The target is **>99% backwards-compatible**: every public Covasim name keeps its name, call signature, and behavior — `cv.Sim`, `cv.People`, `cv.MultiSim`, `cv.Scenarios`, `cv.Result`, `cv.Layer`, `cv.Contacts`, `cv.options`, `cv.Intervention`, `cv.Analyzer`, every intervention/analyzer (`cv.test_num`, `cv.contact_tracing`, `cv.vaccinate_prob`, `cv.simple_vaccine`, `cv.snapshot`, `cv.TransTree`, …), `cv.variant`, `cv.Fit`, `cv.Calibration`, and the module-level helpers (`cv.get_prognoses`, `cv.get_cross_immunity`, `cv.get_variant_pars`, `cv.sample`, `cv.parallel`, `cv.multi_run`, …). **Nothing is renamed for the sake of renaming.** New names are introduced *only* where Covasim has no class at all (the disease module, the per-layer network, and the immunity connector — see the *New classes* note under Architecture mapping); each is flagged for Cliff's sign-off. If preserving a specific name turns out to be genuinely untenable, it is raised explicitly, never changed silently.
+
 - **Multi-variant / strains** (`cv.variant`, alpha/beta/gamma/delta/wild): **Port.**
 - **Waning immunity + neutralizing antibodies (NAbs):** **Port.** See the explicit divergence note below.
 - **Cross-immunity matrix** (the `n_variants × n_variants` `immunity` matrix): **Port.**
@@ -47,35 +49,45 @@ This is a local effort. There is no GitHub RACI table and no GitHub issues/PRs a
 
 ## Architecture mapping
 
-| Covasim v3.1.8 (`main`) | Covasim v4.0 (`starsim-port`) |
+All existing `cv.*` names are **preserved** (see Backwards compatibility above). The right column shows the Starsim base each one sits on; **bold "NEW"** marks the only three constructs with no Covasim original (provisional names — see the *New classes* note below the table).
+
+| Covasim v3.1.8 (`main`) | Covasim v4.0 (`starsim-port`) — original names preserved |
 |---|---|
-| `cv.Sim` / `BaseSim` (`sim.py`, `base.py`) | `cv.Sim(ss.Sim)` — thin wrapper assembling the module stack |
+| `cv.Sim` / `cv.BaseSim` / `cv.ParsObj` (`sim.py`, `base.py`) | `cv.Sim(ss.Sim)` — same public name; thin wrapper assembling the module stack (`cv.BaseSim`/`cv.ParsObj` kept) |
 | `Sim.step` integration loop (`sim.py`) | Starsim `Loop` + module `step()`/`step_state()` ordering |
-| `People` / `BasePeople` (`people.py`, `base.py`) | stock `ss.People` (+ per-module disease states); optional thin `cv.People` |
-| Health-state machine + transitions (`people.py:164-586`) | `cv.COVID(ss.Infection)` with the exposed→infectious→asymp/mild/severe/critical→recovered/dead chain; states as `ss.BoolState`/`ss.FloatArr`; date-scheduled transitions via `ss.dur` timers |
-| Prognoses, age-banded (`parameters.py:get_prognoses`, `people.py:set_prognoses`) | age-dependent `ss.bernoulli`/lookup in `cv.COVID.set_prognoses` |
-| `Contacts` / `Layer` (h/s/w/c/a/l) (`base.py:1509/1610`) | `cv.Network(ss.Network)` instances per layer (`ss.RandomNet`-style + custom household/school/work) |
-| Population build (`population.py:make_randpop/make_hybrid_contacts`) | `ss.People` + age distribution + `cv.Network` constructors (random + hybrid backends) |
-| `compute_infections` / `compute_trans_sus` kernels (`utils.py:88/99`) | `ss.Network` + `ss.Infection.infect()`; CRN-safe `ss.multi_random('source','target')` |
-| Variants (`cv.variant`, `immunity.py:18`) | one `cv.COVID(ss.Infection)` instance per variant + variant-introduction `ss.Intervention` |
-| Cross-immunity matrix (`immunity.py:269`, `parameters.py:get_cross_immunity`) | `cv.CrossImmunity(ss.Connector)` |
-| NAb waning + `calc_VE` + boosting + `check_immunity` (`immunity.py:138-350`) | `cv.Immunity(ss.Connector)` (or dedicated `ss.Module`) — live per-step NAb kinetics; **ported from scratch, no Starsim analog** |
-| `Intervention` base (`interventions.py:223`) | `ss.Intervention` subclass |
-| `test_num` / `test_prob` (`interventions.py:713/858`) | `cv.test_num` / `cv.test_prob` (`ss.Intervention`) |
-| `contact_tracing` + quarantine/isolation (`interventions.py:984`, `people.py:check_quar/check_enter_iso`) | `cv.contact_tracing(ss.Intervention)` + host-state quarantine/isolation machine |
-| `vaccinate_prob` / `vaccinate_num` / `BaseVaccination` (`interventions.py:1251-1789`) | `cv.vaccinate_prob` / `cv.vaccinate_num` (`ss.Intervention`); products via `ss.Vx`-style classes |
-| `dynamic_pars` / `sequence` / `change_beta` / `clip_edges` (`interventions.py:413-589`) | `ss.Intervention` subclasses; `dynamic_pars` via dotted-path resolution into `sim.diseases`/`sim.interventions`/`sim.pars` |
-| `Analyzer` base (`analysis.py:23`) | `ss.Analyzer` subclass |
-| `snapshot` / `age_histogram` / `daily_age_stats` / `nab_histogram` (`analysis.py`) | `cv.*(ss.Analyzer)` subclasses |
-| `Fit` / `Calibration` (`analysis.py:991/1358`) | Starsim Optuna-based calibration + `compute_gof`/likelihood components |
-| `TransTree` (`analysis.py:1772`) | custom `ss.Analyzer` over the infection log |
-| `MultiSim` / `multi_run` / `parallel` (`run.py:36/1406/1522`) | `ss.MultiSim` / `ss.parallel` |
-| `Scenarios` (`run.py:861`) | `cv.Scenarios` adapted onto `ss.MultiSim` over parameter sets |
-| `Result` (`base.py:117`) | `ss.Result` |
-| `cv.options` (`settings.py:626`) | `ss.options` |
-| `sample` + prob/index helpers (`utils.py:161-674`) | `ss.distributions` (CRN) + `ss.uids`/`BoolArr` ops |
-| dynamic rescaling (`pop_scale`, `rescale`, `make_naive`) (`sim.py:535`) | `ss.Sim` `total_pop`/`pop_scale` (absolute agent counts; dynamic rescaling likely dropped — see M2 notes) |
-| `bin/covasim` CLI wrapper | **Dropped** |
+| `cv.People` / `cv.Person` / `cv.BasePeople` (`people.py`, `base.py`) | `cv.People(ss.People)` — same public name; `cv.Person`/`cv.BasePeople` kept |
+| Health-state machine + transitions (`people.py:164-586`) | **NEW** disease module on `ss.Infection` — Covasim has no disease class today (provisional `cv.COVID`; see *New classes*). Exposed→infectious→asymp/mild/severe/critical→recovered/dead; states as `ss.BoolState`/`ss.FloatArr`; date-scheduled transitions via `ss.dur` timers |
+| Prognoses, age-banded (`cv.get_prognoses`, `people.set_prognoses`) | `cv.get_prognoses` kept; `set_prognoses` on the disease module via age-dependent `ss.bernoulli`/lookup |
+| `cv.Contacts` / `cv.Layer` (h/s/w/c/a/l) (`base.py:1509/1610`) | `cv.Contacts`/`cv.Layer` kept as the edge containers; a **NEW** `ss.Network` subclass per layer wraps them (provisional `cv.Network`) |
+| Population build (`cv.make_randpop`/`cv.make_hybrid_contacts`/`cv.make_synthpop`) | same functions + names kept, now returning the network module(s) (random + hybrid + synthpops backends) |
+| `compute_infections`/`compute_trans_sus` kernels (`utils.py:88/99`) | `ss.Infection.infect()` + CRN-safe `ss.multi_random('source','target')`; `cv.utils` helpers kept where still used |
+| Variants (`cv.variant`, `cv.get_variant_pars`) (`immunity.py:18`) | `cv.variant`/`cv.get_variant_pars` kept; one disease-module instance per variant + a variant-introduction intervention |
+| Cross-immunity matrix (`cv.get_cross_immunity`) (`immunity.py:269`) | `cv.get_cross_immunity` kept; a **NEW** `ss.Connector` applies it each step (provisional `cv.CrossImmunity`) |
+| NAb waning + `calc_VE` + boosting + `check_immunity` (`immunity.py:138-350`) | **NEW** `ss.Connector`/module — live per-step NAb kinetics, **ported from scratch, no Starsim analog** (provisional `cv.Immunity`) |
+| `cv.Intervention` base (`interventions.py:223`) | `cv.Intervention(ss.Intervention)` — same name |
+| `cv.test_num` / `cv.test_prob` (`interventions.py:713/858`) | same names, on `ss.Intervention` |
+| `cv.contact_tracing` + quarantine/isolation (`interventions.py:984`, `people.check_quar/check_enter_iso`) | `cv.contact_tracing` kept + host-state quarantine/isolation machine |
+| `cv.vaccinate_prob`/`cv.vaccinate_num`/`cv.vaccinate`/`cv.BaseVaccination`/`cv.simple_vaccine`/`cv.historical_vaccinate_prob` (`interventions.py`) | all names kept (`ss.Intervention`); products via `ss.Vx`-style classes |
+| `cv.dynamic_pars`/`cv.sequence`/`cv.change_beta`/`cv.clip_edges`/`cv.historical_wave`/`cv.prior_immunity` (`interventions.py:413-589`) | all names kept (`ss.Intervention`); `dynamic_pars` via dotted-path resolution into `sim.diseases`/`sim.interventions`/`sim.pars` |
+| `cv.Analyzer` base (`analysis.py:23`) | `cv.Analyzer(ss.Analyzer)` — same name |
+| `cv.snapshot`/`cv.age_histogram`/`cv.daily_age_stats`/`cv.daily_stats`/`cv.nab_histogram` (`analysis.py`) | all names kept, on `ss.Analyzer` |
+| `cv.Fit` / `cv.Calibration` / `cv.compute_gof` (`analysis.py:991/1358`) | names kept; `cv.Calibration` runs on Starsim's Optuna calibration under the hood |
+| `cv.TransTree` (`analysis.py:1772`) | `cv.TransTree` kept; built over the infection log |
+| `cv.MultiSim`/`cv.parallel`/`cv.multi_run`/`cv.single_run` (`run.py:36/1406/1522`) | all names kept; wrap `ss.MultiSim` / `ss.parallel` |
+| `cv.Scenarios` (`run.py:861`) | `cv.Scenarios` kept; adapted onto `ss.MultiSim` over parameter sets |
+| `cv.Result` (`base.py:117`) | `cv.Result` kept (subclass/alias of `ss.Result`) |
+| `cv.options` / `cv.Options` (`settings.py:626`) | `cv.options` kept (backed by `ss.options` where sensible) |
+| `cv.sample` + `cv.true`/`cv.false`/index helpers (`utils.py:161-674`) | names kept; internally use `ss.Dist` (CRN) + `ss.uids`/`BoolArr` ops |
+| dynamic rescaling (`pop_scale`, `rescale`, `make_naive`) (`sim.py:535`) | **ported in a later milestone** (no direct Starsim analog); M2 starts with absolute counts (`total_pop`/`pop_scale`) — kept, not dropped |
+| `bin/covasim` CLI wrapper | **Dropped** (the only dropped subsystem) |
+
+### New classes (no Covasim original — names need your sign-off)
+
+Backwards compatibility means keeping every existing `cv.*` name (above). Only three constructs have **no** Covasim original, because Covasim packs that logic into `People`/`Sim`/`immunity.py` *functions* rather than dedicated classes. Starsim is module-based, so the port needs a class for each. Provisional names below are flagged for approval; nothing else is renamed:
+
+1. **The disease module** (`ss.Infection` subclass holding the COVID natural-history chain). Provisional `cv.COVID`. Alternatives: `cv.SARSCoV2`, `cv.Covid`, `cv.Disease`, or keeping the chain inside `cv.People`. Users never instantiated a disease object in v3, so any choice is *additive*, not breaking.
+2. **The per-layer network** (`ss.Network` subclass wrapping `cv.Layer`/`cv.Contacts`). Provisional `cv.Network`. Users build populations via `pop_type=`, not by instantiating a network, so this too is additive.
+3. **The immunity / cross-immunity connector(s)** (`ss.Connector` running NAb kinetics + the cross-immunity matrix each step). Provisional `cv.Immunity` (optionally split into `cv.CrossImmunity`).
 
 ## Milestones
 
@@ -94,7 +106,7 @@ Each milestone produces a user-visible demo and must meet its acceptance test be
 - Reuse Covasim's existing baseline machinery: the harness layers the v3↔v4 drift comparison *on top of* `tests/baseline.json` / `test_baselines.py` / `tests/update_baseline` / `covasim/regression/` rather than replacing them.
 - Set up the `_v2_legacy` quarantine scaffold (`covasim/_v2_legacy/` with a pure-docstring `__init__.py`, no imports) and `tests/_legacy/`; no migration code lands in M0, so nothing is quarantined yet.
 - Gitignore the generated baselines: add `tests/regression/v3_seeds_n*.json` and `tests/regression/v4_seeds*.json` to `.gitignore`.
-- Write the M0 plan (`docs/superpowers/plans/`) and design spec (`docs/superpowers/specs/`); add a pointer from `tests/README.md` to `tests/regression/README.md`.
+- Write the M0 plan (`migration_plan/plans/`) and design spec (`migration_plan/specs/`); add a pointer from `tests/README.md` to `tests/regression/README.md`.
 
 The pinned anchor scenario for M0 is a representative-but-clean vanilla sim (isolates core-dynamics drift, not intervention-port bugs): `pop_size=20_000`, `pop_infected=100`, `pop_type='hybrid'`, `n_days=120`, `use_waning=True`, `rand_seed=0` (the sweep overrides 0..N−1), `verbose=0`, no interventions, no analyzers. The pinned summary set is drawn from `sim.summary` — cumulative burden (`cum_infections`, `cum_reinfections`, `cum_symptomatic`, `cum_severe`, `cum_critical`, `cum_deaths`), epidemic shape (peak `prevalence`, peak `n_infectious`, computed from `sim.results`), and derived (`prevalence`, `incidence`); bookkeeping keys (`n_alive`, `_seed`, `_total_pop`) are written but skipped by the gate. `r_eff` is treated as a soft/optional metric (Covasim's own `test_regression.py` skips it as version-sensitive).
 
@@ -121,7 +133,7 @@ The pinned anchor scenario for M0 is a representative-but-clean vanilla sim (iso
 - Port the full single-variant progression into `cv.COVID(ss.Infection)`: add `symptomatic`/`severe`/`critical`/`dead`/`recovered` states and the `infect()` decision tree (symptomatic? severe? critical? death?), with outcome dates pre-drawn from the `dur` distributions and scheduled as `ss.dur` timers (this preserves Covasim's date-driven transitions; per the porting risks, do **not** convert them to per-step rate checks).
 - Port age-based prognoses (`get_prognoses`, the age-banded `symp_prob`/`severe_prob`/`crit_prob`/`death_prob`, comorbidity and OR scalers) into `cv.COVID.set_prognoses` using age-dependent `ss.bernoulli`/lookup.
 - Port the severity scalers and health-system feedbacks (`rel_symp_prob`/`rel_severe_prob`/`rel_crit_prob`/`rel_death_prob`, `no_hosp_factor`/`no_icu_factor`, hospital/ICU bed caps).
-- Port population scaling (`pop_scale`/`total_pop`) onto `ss.Sim`'s absolute-agent-count model. Note: Covasim's *dynamic* rescaling (`rescale`, `make_naive`/`make_nonnaive`) has no direct Starsim analog and is a candidate to drop in favor of absolute counts — confirm with Cliff before dropping; if dropped, document it as expected feature-misalignment in the drift report.
+- Port population scaling (`pop_scale`/`total_pop`) onto `ss.Sim`'s absolute-agent-count model. Covasim's *dynamic* rescaling (`rescale`, `make_naive`/`make_nonnaive`) has no direct Starsim analog; M2 starts with absolute agent counts, and dynamic rescaling **is ported in a later milestone** (kept, not dropped) — see the scope-items table.
 - Add tests: cumulative infections/symptomatic/severe/critical/deaths match a v3.1.8 single-variant baseline within tolerance.
 
 ### M3: Multi-variant + cross-immunity
@@ -176,7 +188,7 @@ The pinned anchor scenario for M0 is a representative-but-clean vanilla sim (iso
 - Port `cv.vaccinate_prob` and `cv.vaccinate_num` (and the `cv.vaccinate` wrapper) as `ss.Intervention` subclasses, plus the `BaseVaccination` shared logic (vaccine-par parsing, dose scheduling by `interval`, second-dose prioritization, booster support).
 - Port the NAb-based vaccine products and their per-variant efficacy tables (`get_vaccine_pars`, `get_vaccine_variant_pars`, `get_vaccine_dose_pars`, predefined pfizer/moderna/etc.), and the `target_eff` back-calculation into `nab_init`/`nab_boost`.
 - Wire the vaccine→NAb interaction: vaccination calls the M4 immunity module's boost function (the `update_peak_nab` analog), setting `vaccinated`/`vaccine_source`/`doses`. Keep vaccine immunity flowing through the M4 NAb→protection pipeline (vaccine and natural NAbs share one efficacy curve).
-- Decide the fate of `simple_vaccine` (the non-NAb, `use_waning=False` path): port or note as low-priority since the NAb path is primary.
+- Port `cv.simple_vaccine` (the non-NAb, `use_waning=False` path), preserving its public API; it shares the M6 vaccination scaffolding but applies a direct efficacy rather than going through the NAb pipeline.
 - Add tests: vaccination-impact trajectory matches a v3.1.8 vaccination baseline.
 
 ### M7: Calibration + Fit
@@ -236,8 +248,8 @@ The pinned anchor scenario for M0 is a representative-but-clean vanilla sim (iso
 | Item | Suggested home | Notes |
 |---|---|---|
 | Population scaling (`pop_scale` / `total_pop`) | M2 | Required for long-horizon and large-population runs |
-| Dynamic rescaling (`rescale`, `make_naive`/`make_nonnaive`) | M2 or drop | No direct Starsim analog; candidate to drop in favor of absolute agent counts — confirm with Cliff |
-| `simple_vaccine` (non-NAb path) | M6 or Unscheduled | Low priority; the NAb vaccine path is primary |
+| Dynamic rescaling (`rescale`, `make_naive`/`make_nonnaive`) | Later milestone (ported, not dropped) | No direct Starsim analog; M2 uses absolute agent counts, dynamic rescaling is ported afterward |
+| `simple_vaccine` (non-NAb path) | M6 | Ported alongside the other vaccination paths (preserves the `use_waning=False` direct-efficacy behavior) |
 | Historical/prior immunity (`historical_vaccinate_prob`, `historical_wave`, `prior_immunity`) | M6 | Pre-t=0 NAb imprinting; depends on the M4 immunity engine |
 | `sequence` intervention | M5 or opportunistic | Generic intervention scheduler; small |
 | Save/load | M10 or opportunistic | Not capability-blocking |
@@ -279,5 +291,5 @@ These conventions apply to every milestone; contributors should align on them fr
 
 ## Linked documents
 
-- [`docs/superpowers/plans/2026-05-29-covasim-m0-foundation.md`](./docs/superpowers/plans/2026-05-29-covasim-m0-foundation.md) — M0 foundation implementation plan (task-by-task, agent-executable: CI adaptation, the `tests/regression/` harness, the `_v2_legacy` quarantine scaffold).
-- [`docs/superpowers/specs/2026-05-29-covasim-m0-foundation-design.md`](./docs/superpowers/specs/2026-05-29-covasim-m0-foundation-design.md) — M0 foundation design spec (the pinned anchor scenario, file layout, comparison/parity rules, CI integration, out-of-scope).
+- [`plans/2026-05-29-covasim-m0-foundation.md`](./plans/2026-05-29-covasim-m0-foundation.md) — M0 foundation implementation plan (task-by-task: CI adaptation, the `tests/regression/` harness, the `_v2_legacy` quarantine scaffold).
+- [`specs/2026-05-29-covasim-m0-foundation-design.md`](./specs/2026-05-29-covasim-m0-foundation-design.md) — M0 foundation design spec (the pinned anchor scenario, file layout, comparison/parity rules, CI integration, out-of-scope).

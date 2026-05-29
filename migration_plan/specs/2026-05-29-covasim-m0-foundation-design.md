@@ -14,7 +14,7 @@ The deliverables are:
 6. The `_v2_legacy` quarantine scaffold (`covasim/_v2_legacy/` + `tests/_legacy/`), empty in M0.
 7. A stub `cv.Sim(ss.Sim)` that runs, satisfying the continuous-runnability invariant on the Starsim base.
 8. Gitignore entries for the generated (large, env-specific) baseline sweeps.
-9. Documentation: `tests/regression/README.md`, a pointer from `tests/README.md`, and the M0 plan + this spec under `docs/superpowers/`.
+9. Documentation: `tests/regression/README.md`, a pointer from `tests/README.md`, and the M0 plan + this spec under `migration_plan/`.
 
 ## Problem statement
 
@@ -176,7 +176,7 @@ This is a local effort with no GitHub RACI table and no issues/PRs as gates. The
 
 ## Linked documents
 
-- [`MIGRATION_PLAN.md`](../../../MIGRATION_PLAN.md) — overall migration plan, of which this is the M0 deliverable spec.
-- [`docs/superpowers/plans/2026-05-29-covasim-m0-foundation.md`](../plans/2026-05-29-covasim-m0-foundation.md) — the task-by-task M0 implementation plan behind this spec.
-- [`tests/baseline.json`](../../../tests/baseline.json) + [`tests/test_baselines.py`](../../../tests/test_baselines.py) — the existing v4-internal bit-for-bit self-consistency gate (reused, not replaced).
-- [`covasim/regression/README.md`](../../../covasim/regression/README.md) — the forensic per-version default-parameter snapshots (`pars_v*.json`); `pars_v3.1.8.json` to be added opportunistically.
+- [`MIGRATION_PLAN.md`](../MIGRATION_PLAN.md) — overall migration plan, of which this is the M0 deliverable spec.
+- [`plans/2026-05-29-covasim-m0-foundation.md`](../plans/2026-05-29-covasim-m0-foundation.md) — the task-by-task M0 implementation plan behind this spec.
+- [`tests/baseline.json`](../../tests/baseline.json) + [`tests/test_baselines.py`](../../tests/test_baselines.py) — the existing v4-internal bit-for-bit self-consistency gate (reused, not replaced).
+- [`covasim/regression/README.md`](../../covasim/regression/README.md) — the forensic per-version default-parameter snapshots (`pars_v*.json`); `pars_v3.1.8.json` to be added opportunistically.

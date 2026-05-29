@@ -1,6 +1,6 @@
 # Covasim v4.0 — M0 Foundation Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** Implement this plan task-by-task; steps use checkbox (`- [ ]`) syntax for tracking. No special plugin or sub-skill is required.
 >
 > **CRITICAL — commit discipline.** This is a local effort with a **pause-for-review-and-commit** cadence. The assistant (Claude) **prepares and stages** each piece of work and then **pauses for Cliff Kerr (the Covasim author) to review and commit**. **The assistant NEVER runs `git commit` and NEVER runs `git push`.** Where this plan reaches a check-in boundary it says **PAUSE FOR CLIFF** and lists what to stage; it does not contain `git commit` commands. Check-ins happen 2–5 times across M0 (the five boundaries below).
 
@@ -10,7 +10,7 @@
 
 **Tech Stack:** Python 3.9–3.13, pytest + pytest-xdist, covasim (v3.1.8 on `starsim-port`), starsim 3.3.x, sciris, GitHub Actions.
 
-**Authority:** the M0 section of `MIGRATION_PLAN.md` (Demo, Acceptance test, Sub-tasks, and the pinned anchor + summary set in its final paragraph). This plan implements exactly that scope. The design rationale is in `docs/superpowers/specs/2026-05-29-covasim-m0-foundation-design.md`.
+**Authority:** the M0 section of `MIGRATION_PLAN.md` (Demo, Acceptance test, Sub-tasks, and the pinned anchor + summary set in its final paragraph). This plan implements exactly that scope. The design rationale is in `migration_plan/specs/2026-05-29-covasim-m0-foundation-design.md`.
 
 ---
 
@@ -35,7 +35,7 @@
 | `tests/test_v4_stub.py` | Create | Fast test: `cv.v4.Sim().run()` returns results |
 | `.gitignore` | Modify | Add `tests/regression/v3_seeds_n*.json` and `tests/regression/v4_seeds*.json` |
 | `.github/workflows/tests.yaml` | Modify | Add a no-baseline `compare.py` smoke step after the pytest step |
-| `pyproject.toml`/`setup.py` | Verify | Confirm `starsim` is a dependency (add if missing — escalate, don't guess version) |
+| `pyproject.toml`/`setup.py` | Modify | Add `starsim` as a dependency (unpinned) if not already declared |
 
 The generated sweep JSON (`tests/regression/v3_seeds_n*.json`, `v4_seeds*.json`) is gitignored and stays local-only.
 
@@ -53,7 +53,7 @@ git -C /home/cliffk/idm/covasim branch --show-current
 git -C /home/cliffk/idm/covasim rev-parse --short HEAD
 ```
 
-Expected: on `starsim-port` (the branch Cliff created off `main`). Record the HEAD short SHA for the report. The tree already carries the uncommitted planning docs (`MIGRATION_PLAN.md`, `docs/superpowers/`) awaiting Cliff's review.
+Expected: on `starsim-port` (the branch Cliff created off `main`). Record the HEAD short SHA for the report. The `migration_plan/` planning docs are already committed.
 
 - [ ] **Step 2: Confirm the existing `starsim-port` branch is checked out**
 
@@ -925,7 +925,7 @@ python -c "import starsim as ss; print('starsim', ss.__version__)"
 grep -n "starsim" /home/cliffk/idm/covasim/pyproject.toml /home/cliffk/idm/covasim/setup.py 2>/dev/null
 ```
 
-Expected: `starsim 3.3.x` prints. If `starsim` is not a declared dependency, add it to the install requirements (pin to `starsim>=3.3,<3.4` to match the migration target) — but **flag this as a change for Cliff to confirm**, do not guess a version beyond 3.3.x.
+Expected: `starsim 3.3.x` prints. If `starsim` is not a declared dependency, add it to the install requirements **unpinned** (just `starsim`, no version cap).
 
 - [ ] **Step 2: Create `covasim/_v4.py` — a trivial runnable stub**
 
@@ -1242,21 +1242,22 @@ replacing them.
 
 ## Task 9: Confirm the plan/spec docs are present (CHECK-IN 5)
 
-**Files:** (already written by the planning step that produced this document)
-- `docs/superpowers/plans/2026-05-29-covasim-m0-foundation.md` (this file)
-- `docs/superpowers/specs/2026-05-29-covasim-m0-foundation-design.md`
+**Files:** (already written and committed during planning)
+- `migration_plan/plans/2026-05-29-covasim-m0-foundation.md` (this file)
+- `migration_plan/specs/2026-05-29-covasim-m0-foundation-design.md`
+- `migration_plan/MIGRATION_PLAN.md`
 
-- [ ] **Step 1: Confirm both docs exist and are linked from `MIGRATION_PLAN.md`**
+- [ ] **Step 1: Confirm the docs exist and are linked from `MIGRATION_PLAN.md`**
 
 ```bash
-ls -l /home/cliffk/idm/covasim/docs/superpowers/plans/2026-05-29-covasim-m0-foundation.md \
-      /home/cliffk/idm/covasim/docs/superpowers/specs/2026-05-29-covasim-m0-foundation-design.md
-grep -n "2026-05-29-covasim-m0-foundation" /home/cliffk/idm/covasim/MIGRATION_PLAN.md
+ls -l /home/cliffk/idm/covasim/migration_plan/plans/2026-05-29-covasim-m0-foundation.md \
+      /home/cliffk/idm/covasim/migration_plan/specs/2026-05-29-covasim-m0-foundation-design.md
+grep -n "2026-05-29-covasim-m0-foundation" /home/cliffk/idm/covasim/migration_plan/MIGRATION_PLAN.md
 ```
 
-Expected: both files present; `MIGRATION_PLAN.md`'s "Linked documents" already references both paths (it does — lines ~284–285).
+Expected: both files present; `MIGRATION_PLAN.md`'s "Linked documents" references both. The `migration_plan/` folder was already committed during planning, so there is nothing new to stage here.
 
-- [ ] **PAUSE FOR CLIFF (check-in 5).** Report the plan + spec docs. Suggested staging: `git add docs/superpowers/plans/2026-05-29-covasim-m0-foundation.md docs/superpowers/specs/2026-05-29-covasim-m0-foundation-design.md`. Do NOT commit. Wait for Cliff.
+- [ ] **PAUSE FOR CLIFF (check-in 5).** The plan + spec docs are already committed; this is a confirmation checkpoint only — nothing to stage.
 
 ---
 
@@ -1308,7 +1309,7 @@ Summarize: the branch, the five check-in boundaries and what was staged at each,
 
 ## Self-review checklist
 
-After completing all tasks, verify against `MIGRATION_PLAN.md` §M0 and the spec at `docs/superpowers/specs/2026-05-29-covasim-m0-foundation-design.md`:
+After completing all tasks, verify against `MIGRATION_PLAN.md` §M0 and the spec at `migration_plan/specs/2026-05-29-covasim-m0-foundation-design.md`:
 
 | Requirement | Implementing task |
 |---|---|
@@ -1331,7 +1332,7 @@ After completing all tasks, verify against `MIGRATION_PLAN.md` §M0 and the spec
 | stub exposed without disturbing the v3.1.8 `cv.Sim` | Task 6 |
 | Gitignore `tests/regression/v3_seeds_n*.json` + `v4_seeds*.json` | Task 0 |
 | Doc pointers: `tests/regression/README.md` + `tests/README.md` pointer | Task 8 |
-| M0 plan + design spec under `docs/superpowers/` | Task 9 |
+| M0 plan + design spec under `migration_plan/` | Task 9 |
 | Acceptance: pytest passes + no-baseline CLI smoke exits clean + local parity workflow works | Task 10 |
 | Assistant never commits / never pushes; 5 PAUSE-FOR-CLIFF check-ins | Tasks 0,3,6,8,9 boundaries |
 | No real migration code in `covasim/` (only the trivial stub) | Spec "Out of scope"; only `covasim/_v4.py` + one `__init__.py` line added |
