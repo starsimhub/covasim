@@ -19,10 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: x64
       - name: Install Covasim
-        run: pip install -e .
-      - name: Install tests
-        working-directory: ./tests
-        run: pip install -r requirements_test.txt
+        run: pip install -e .[test]
       - name: Run integration tests
         working-directory: ./tests
         run: pytest -v test_*.py unittests/test_*.py -n auto --durations=0 --junitxml=test-results.xml
