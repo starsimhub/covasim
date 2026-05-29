@@ -74,7 +74,7 @@ Homepage = "https://covasim.org"
 Documentation = "https://docs.covasim.org"
 Repository = "https://github.com/starsimhub/covasim"
 Issues = "https://github.com/starsimhub/covasim/issues"
-Changelog = "https://github.com/starsimhub/covasim/blob/master/CHANGELOG.md"
+Changelog = "https://github.com/starsimhub/covasim/blob/main/CHANGELOG.md"
 
 [tool.setuptools.dynamic]
 version = {attr = "covasim.version.__version__"}
