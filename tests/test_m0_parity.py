@@ -38,6 +38,7 @@ def _run_v4_seeds(n, start_seed=0):
 
 
 @pytest.mark.slow
+@pytest.mark.skip(reason='M0 anchor (hybrid + waning) needs M2+ features; superseded by anchor_m1 in M1.')
 def test_m0_anchor_parity():
     if not BASELINE_PATH.exists():
         pytest.skip(

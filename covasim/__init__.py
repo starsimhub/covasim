@@ -3,6 +3,13 @@ Initialize Covasim by importing all the modules
 
 Convention is to use "import covasim as cv", and then to use all functions and
 classes directly, e.g. cv.Sim() rather than cv.sim.Sim().
+
+v4.0 Starsim port -- M1 (basic transmission) surface. Active modules: settings,
+version, defaults, misc, parameters, utils, base (cv.Layer / cv.Contacts /
+cv.Result / cv.ParsObj kept; BaseSim / BasePeople dormant), the population
+builders, and the new Starsim-based cv.Network, cv.COVID, cv.People, cv.Sim.
+Quarantined under covasim/_v2_legacy/ and restored over M2-M10: analysis,
+immunity, interventions, run, plotting, and the v3 sim / people engines.
 '''
 
 # Check that requirements are met and set options
@@ -14,23 +21,14 @@ from .version import __version__, __versiondate__, __license__
 if settings.options.verbose:
     print(__license__)
 
-# Import the actual model
+# Import the actual model (M1 surface; see module docstring)
 from .defaults      import * # Depends on settings
 from .misc          import * # Depends on version
 from .parameters    import * # Depends on settings, misc
 from .utils         import * # Depends on defaults
-from .plotting      import * # Depends on defaults, misc
-from .base          import * # Depends on version, misc, defaults, parameters, utils
-from .people        import * # Depends on utils, defaults, base, plotting
-from .population    import * # Depends on people et al.
-from .interventions import * # Depends on defaults, utils, base
-from .immunity      import * # Depends on utils, parameters, defaults
-from .analysis      import * # Depends on utils, misc, interventions
-from .sim           import * # Depends on almost everything
-from .run           import * # Depends on sim
-
-# Covasim v4.0 (Starsim port) stub: adds the cv.v4 namespace (cv.v4.Sim).
-# This does NOT rebind the v3.1.8 cv.Sim; it is removed once the port lands in cv.Sim itself.
-from . import _v4 as v4
-
-
+from .base          import * # cv.Layer / cv.Contacts / cv.Result / cv.ParsObj (BaseSim/BasePeople dormant)
+from .population    import * # cv.make_randpop / cv.make_hybrid_contacts / ... (ported in M1 Task 1)
+from .network       import * # cv.Network(ss.Network)  -- M1
+from .covid         import * # cv.COVID(ss.Infection)  -- M1
+from .people        import * # cv.People(ss.People)    -- M1
+from .sim           import * # cv.Sim(ss.Sim)          -- M1

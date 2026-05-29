@@ -37,6 +37,7 @@ def make_sim(do_save=False, **kwargs):
     return sim
 
 
+@pytest.mark.skip(reason='v3.1.8 pickle/engine regression; cv.Sim is the Starsim port now. Restored at M10.')
 def test_regression():
     sc.heading('Testing regression...')
 
@@ -54,6 +55,7 @@ def test_regression():
     return sim1, sim2
 
 
+@pytest.mark.skip(reason='Exercises quarantined cv.MultiSim/cv.Scenarios/cv.migrate; restored at M8/M10.')
 def test_migration():
     sc.heading('Testing migration...')
 

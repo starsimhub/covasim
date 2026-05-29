@@ -11,6 +11,8 @@ The heavy multi-seed z-score release gate lives in tests/test_m0_parity.py.
 import sys
 from pathlib import Path
 
+import pytest
+
 # tests/ is on sys.path when pytest runs from tests/, but be robust:
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -22,6 +24,7 @@ from regression.compare import compute_drift  # noqa: E402
 
 # --- Anchor smoke test --------------------------------------------------------
 
+@pytest.mark.skip(reason='M0 anchor (hybrid + waning) needs M2+ features; superseded by anchor_m1 in M1.')
 def test_anchor_runs():
     short = run_and_summarize()
     missing = set(METRIC_KEYS) - set(short.keys())

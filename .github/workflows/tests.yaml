@@ -22,7 +22,7 @@ jobs:
         run: pip install -e .[test]
       - name: Run integration tests
         working-directory: ./tests
-        run: pytest -v test_*.py unittests/test_*.py -n auto --durations=0 --junitxml=test-results.xml
+        run: pytest -v test_*.py -n auto --durations=0 --junitxml=test-results.xml
       - name: Smoke-check regression compare CLI (no-baseline mode)
         working-directory: ./tests
         run: python regression/compare.py --baseline /tmp/no_baseline.json

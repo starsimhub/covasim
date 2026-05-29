@@ -146,3 +146,9 @@ node_modules
 tests/regression/v3_seeds_n*.json
 tests/regression/v4_seeds*.json
 tests/regression/anchor_snapshot.json
+
+# M1 single-variant regression baselines (regenerate from a v3.1.8 env via multi_seed_v3.py against anchor_m1)
+tests/regression/v3_m1_*seeds*.json
+tests/regression/v4_m1_*seeds*.json
+tests/regression/v3_m1_contacts*.json
+tests/regression/anchor_m1_snapshot.json

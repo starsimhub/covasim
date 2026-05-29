@@ -5,7 +5,13 @@ the baseline results.
 
 import numpy as np
 import sciris as sc
+import pytest
 import covasim as cv
+
+# v4.0 Starsim port: the v3.1.8 bit-for-bit baseline/benchmark tests are skipped while
+# cv.Sim is the Starsim port (these reference the quarantined v3 engine + interventions).
+# They are regenerated/restored at M10 (MIGRATION_PLAN Open question G).
+_V4_SKIP = 'v3.1.8 bit-for-bit baseline; cv.Sim is the Starsim port now. Restored/regenerated at M10.'
 
 do_plot = 1
 do_save = 0
@@ -78,6 +84,7 @@ def save_baseline():
     return
 
 
+@pytest.mark.skip(reason=_V4_SKIP)
 def test_baseline():
     ''' Compare the current default sim against the saved baseline '''
 
@@ -95,6 +102,7 @@ def test_baseline():
     return new
 
 
+@pytest.mark.skip(reason=_V4_SKIP)
 def test_benchmark(do_save=do_save, repeats=1, verbose=True):
     ''' Compare benchmark performance '''
 
