@@ -141,3 +141,7 @@ dmypy.json
 
 # Node.js and NPM
 node_modules
+
+# Covasim v4.0 regression baselines (regenerate from a v3.1.8 env via tests/regression/multi_seed_v3.py)
+tests/regression/v3_seeds_n*.json
+tests/regression/v4_seeds*.json
