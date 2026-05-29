@@ -73,6 +73,10 @@ class Network(ss.Network):
             base = 0
         return np.random.default_rng(base*100 + _LAYER_SEED.get(self.layer, 0))
 
+    def step(self):
+        """No-op: Covasim's M1 layers are static (dynam_layer=0), so edges never change after creation."""
+        pass
+
     def add_pairs(self):
         """Build this layer's static edgelist from the ported population.py builders."""
         people = self.sim.people
