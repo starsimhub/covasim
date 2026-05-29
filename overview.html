@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -539,12 +574,12 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <p>Covasim’s immunity module (including vaccines and variants) is described here:</p>
 <blockquote class="blockquote">
-<p><strong>Mechanistic modeling of SARS-CoV-2 immune memory, variants, and vaccines</strong>. Cohen JA, Stuart RM, Núñez RC, Wagner B, Chang ST, Rosenfeld K, Kerr CC, Famulare M, Klein DJ (under review; posted 2021-06-01). <em>medRxiv</em> 2021.05.31.21258018; doi: <a href="https://doi.org/10.1101/2021.05.31.21258018" class="uri">https://doi.org/10.1101/2021.05.31.21258018</a>.</p>
+<p><strong>Mechanistic modeling of SARS-CoV-2 immune memory, variants, and vaccines</strong>. Cohen JA, Stuart RM, Núñez RC, Wagner B, Chang ST, Rosenfeld K, Kerr CC, Famulare M, Klein DJ (2021). <em>medRxiv</em> 2021.05.31.21258018; doi: <a href="https://doi.org/10.1101/2021.05.31.21258018" class="uri">https://doi.org/10.1101/2021.05.31.21258018</a>.</p>
 </blockquote>
-<p>The Covasim webapp is available at <a href="https://app.covasim.org" class="uri">https://app.covasim.org</a>, and the repository for it is available <a href="https://github.com/institutefordiseasemodeling/covasim_webapp">here</a>.</p>
+<p>The Covasim webapp is available at <a href="https://app.covasim.org" class="uri">https://app.covasim.org</a>, and the repository for it is available <a href="https://github.com/covasim/covasim_webapp">here</a>.</p>
 <p>Covasim was developed by the <a href="https://idmod.org/">Institute for Disease Modeling</a>, with additional contributions from the <a href="https://www.math.ku.dk/english">University of Copenhagen</a>, the <a href="https://www.burnet.edu.au/">Burnet Institute</a>, <a href="https://github.com/">GitHub</a>, and <a href="https://www.microsoft.com/en-us/ai/ai-for-health-covid-data">Microsoft</a>.</p>
-<p>Questions or comments can be directed to <a href="mailto:info@covasim.org" class="email">info@covasim.org</a>, or on this project’s <a href="https://github.com/institutefordiseasemodeling/covasim">GitHub</a> page. Full information about Covasim is provided in the <a href="https://docs.covasim.org">documentation</a>.</p>
-<p><strong>Note:</strong> Covasim is no longer actively maintained. Please see <a href="https://github.com/starsimhub/starsim">Starsim</a> for our current work on agent-based disease modeling.</p>
+<p>Questions or comments can be directed to <a href="mailto:info@covasim.org" class="email">info@covasim.org</a>, or on this project’s <a href="https://github.com/starsimhub/covasim">GitHub</a> page. Full information about Covasim is provided in the <a href="https://docs.covasim.org">documentation</a>.</p>
+<p><strong>Note:</strong> Covasim is now part of the Starsim framework; please see <a href="https://starsim.org">starsim.org</a> for our current work on agent-based disease modeling.</p>
 </section>
 <section id="background" class="level2">
 <h2 class="anchored" data-anchor-id="background">Background</h2>
@@ -554,21 +589,21 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>Determining the optimal strategy for reopening schools, the impact of test and trace interventions, and the risk of occurrence of a second COVID-19 epidemic wave in the UK: a modelling study</strong>. Panovska-Griffiths J, Kerr CC, Stuart RM, Mistry D, Klein DJ, Viner R, Bonnell C (2020-08-03). <em>Lancet Child and Adolescent Health</em> S2352-4642(20) 30250-9. doi: <a href="https://doi.org/10.1016/S2352-4642(20)30250-9" class="uri">https://doi.org/10.1016/S2352-4642(20)30250-9</a>.</li>
 <li><strong>Estimating and mitigating the risk of COVID-19 epidemic rebound associated with reopening of international borders in Vietnam: a modelling study</strong>. Pham QD, Stuart RM, Nguyen TV, Luong QC, Tran DQ, Phan LT, Dang TQ, Tran DN, Mistry D, Klein DJ, Abeysuriya RG, Oron AP, Kerr CC (2021-04-12). <em>Lancet Global Health</em> S2214-109X(21) 00103-0; doi: <a href="https://doi.org/10.1016/S2214-109X(21)00103-0" class="uri">https://doi.org/10.1016/S2214-109X(21)00103-0</a>.</li>
 </ol>
-<p>A more complete list of papers is given in the <a href="./papers.html">papers</a> page.</p>
+<p>A more complete list of papers is given in <a href="./papers.html">papers.md</a>.</p>
 <p>If you’ve written a paper or report using Covasim, we’d love to know about it! Please write to us <a href="mailto:info@covasim.org">here</a>.</p>
 </section>
 <section id="requirements" class="level2">
 <h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
-<p>Python 3.9-3.11 (64-bit). (Note: Python 2.7 and Python 3.12 are not supported, the latter being due to <a href="https://numba.pydata.org/">Numba</a> not supporting Python 3.12 at the time of writing.)</p>
+<p>Python 3.9-3.13 (64-bit).</p>
 <p>We also recommend, but do not require, installing Covasim in a virtual environment. For more information, see documentation for e.g.&nbsp;<a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">Anaconda</a>.</p>
 </section>
 <section id="quick-start-guide" class="level2">
 <h2 class="anchored" data-anchor-id="quick-start-guide">Quick start guide</h2>
 <p>Install with <code>pip install covasim</code>. If everything is working, the following Python commands should bring up a plot:</p>
-<pre><code>import covasim as cv
-sim = cv.Sim()
-sim.run()
-sim.plot()</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode py code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim()</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="full-installation-instructions" class="level2">
 <h2 class="anchored" data-anchor-id="full-installation-instructions">Full installation instructions</h2>
@@ -582,6 +617,8 @@ sim.plot()</code></pre>
 <pre><code>pip install -e .</code></pre></li>
 <li><p>To install Covasim and optional dependencies (be aware this may fail since it relies on nonstandard packages):</p>
 <pre><code>pip install -e .[full]</code></pre></li>
+<li><p>For development, additional extras are available: <code>.[test]</code> (test dependencies), <code>.[docs]</code> (documentation build), or <code>.[dev]</code> (both):</p>
+<pre><code>pip install -e .[dev]</code></pre></li>
 </ul>
 <p>The module should then be importable via <code>import covasim as cv</code>.</p></li>
 </ol>
@@ -1096,7 +1133,7 @@ sim.plot()</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v3.1.7 (2026-02-18).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v3.1.8 (2026-05-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

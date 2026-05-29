@@ -569,7 +569,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>Modeling without data is like riding a bicycle while blindfolded – rarely dull, but often you don’t get to where you want to go. This tutorial shows how to use data with Covasim, and gives a brief introduction to people, populations, and contact layers.</p>
 <div class="alert alert-info">
-<p>Click <a href="https://mybinder.org/v2/gh/institutefordiseasemodeling/covasim/HEAD?urlpath=lab%2Ftree%2Fdocs%2Ftutorials%2Ftut_people.ipynb">here</a> to open an interactive version of this notebook.</p>
+<p>Click <a href="https://mybinder.org/v2/gh/starsimhub/covasim/HEAD?urlpath=lab%2Ftree%2Fdocs%2Ftutorials%2Ftut_people.ipynb">here</a> to open an interactive version of this notebook.</p>
 </div>
 <section id="data-requirements" class="level2">
 <h2 class="anchored" data-anchor-id="data-requirements">Data requirements</h2>
@@ -668,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>sim.plot([<span class="st">'cum_tests'</span>, <span class="st">'cum_diagnoses'</span>, <span class="st">'cum_deaths'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim 3.1.7 (2026-02-18) — © 2020-2026 by IDM</code></pre>
+<pre><code>Covasim 3.1.8 (2026-05-29) — © 2020-2026 by IDM</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -710,7 +710,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="alert alert-info">
-<p><strong>Note:</strong> For an explanation of population size, total population, and dynamic rescaling, please see the <a href="https://docs.idmod.org/projects/covasim/en/latest/faq.html#what-are-the-relationships-between-population-size-number-of-agents-population-scaling-and-total-population">FAQ</a>.</p>
+<p><strong>Note:</strong> For an explanation of population size, total population, and dynamic rescaling, please see the <a href="https://docs.covasim.org/faq.html">FAQ</a>.</p>
 </div>
 </section>
 <section id="saving-and-loading-people" class="level3">
@@ -729,8 +729,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> sc.timer(<span class="st">'loading'</span>):</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    sim2 <span class="op">=</span> cv.Sim(pars, popfile<span class="op">=</span><span class="st">'my-people.ppl'</span>).init_people()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>creating: 0.281 s
-loading: 46.4 ms</code></pre>
+<pre><code>creating: 0.276 s
+loading: 44.9 ms</code></pre>
 </div>
 </div>
 <p>It’s about twice as fast to load a population than create one, but whether this will actually matter to you depends on the population size and the length of the simulation.</p>
@@ -1172,7 +1172,7 @@ loading: 46.4 ms</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v3.1.7 (2026-02-18).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v3.1.8 (2026-05-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

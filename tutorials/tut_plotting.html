@@ -564,7 +564,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>This tutorial provides a brief overview of options for plotting results, printing objects, and saving results.</p>
 <div class="alert alert-info">
-<p>Click <a href="https://mybinder.org/v2/gh/institutefordiseasemodeling/covasim/HEAD?urlpath=lab%2Ftree%2Fdocs%2Ftutorials%2Ftut_plotting.ipynb">here</a> to open an interactive version of this notebook.</p>
+<p>Click <a href="https://mybinder.org/v2/gh/starsimhub/covasim/HEAD?urlpath=lab%2Ftree%2Fdocs%2Ftutorials%2Ftut_plotting.ipynb">here</a> to open an interactive version of this notebook.</p>
 </div>
 <section id="global-plotting-configuration" class="level2">
 <h2 class="anchored" data-anchor-id="global-plotting-configuration">Global plotting configuration</h2>
@@ -576,7 +576,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim()</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim 3.1.7 (2026-02-18) — © 2020-2026 by IDM</code></pre>
+<pre><code>Covasim 3.1.8 (2026-05-29) — © 2020-2026 by IDM</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Sim(&lt;no label&gt;; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 12730⚙, 14☠)</code></pre>
@@ -619,7 +619,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="8160d931" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sim.disp()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;covasim.sim.Sim at 0x787a026ccd70&gt;
+<pre><code>&lt;covasim.sim.Sim at 0x7878fb72cd70&gt;
 [&lt;class 'covasim.sim.Sim'&gt;, &lt;class 'covasim.base.BaseSim'&gt;, &lt;class 'covasim.base.ParsObj'&gt;, &lt;class 'covasim.base.FlexPretty'&gt;, &lt;class 'sciris.sc_printing.prettyobj'&gt;]
 ————————————————————————————————————————————————————————————————————————
 Methods:
@@ -652,11 +652,11 @@ Properties:
 _legacy_trans: False
    _orig_pars: {'interventions': [], 'analyzers': []}
      complete: True
-      created: datetime.datetime(2026, 5, 26, 9, 3, 24, 438894)
+      created: datetime.datetime(2026, 5, 29, 9, 12, 10, 169116)
          data: None
      datafile: None
-     git_info: {'covasim': {'version': '3.1.7', 'branch': 'main',
-               'hash': '48b323e [...]
+     git_info: {'covasim': {'version': '3.1.8', 'branch': 'rc3.1.8',
+               'hash': '7cf3 [...]
   initialized: True
         label: None
          pars: {'pop_size': 20000, 'pop_infected': 20, 'pop_type':
@@ -667,14 +667,14 @@ _legacy_trans: False
   rescale_vec: array([1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
                1., 1., 1.,  [...]
       results: #0. 'cum_infections':
-               &lt;covasim.base.Result at 0x787a023d5d30&gt;
+               &lt;covasim.base.Result at 0x7878fb441d30&gt;
                [&lt;cla [...]
 results_ready: True
       simfile: 'covasim.sim'
       summary: #0. 'cum_infections':      12730.0
                #1. 'cum_reinfections':    596.0 [...]
             t: 60
-      version: '3.1.7'
+      version: '3.1.8'
 ————————————————————————————————————————————————————————————————————————
 </code></pre>
 </div>
@@ -742,16 +742,16 @@ results_ready: True
 <div id="bd4712dc" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cv.get_png_metadata(<span class="st">'my-fig.png'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim version: 3.1.7
-Covasim branch: main
-Covasim hash: 48b323e
-Covasim date: 2026-05-26 13:01:58 UTC
-Covasim caller branch: main
-Covasim caller hash: 48b323e
-Covasim caller date: 2026-05-26 13:01:58 UTC
+<pre><code>Covasim version: 3.1.8
+Covasim branch: rc3.1.8
+Covasim hash: 7cf36f8
+Covasim date: 2026-05-29 13:10:48 UTC
+Covasim caller branch: rc3.1.8
+Covasim caller hash: 7cf36f8
+Covasim caller date: 2026-05-29 13:10:48 UTC
 Covasim caller filename: /home/cliffk/idm/covasim/covasim/misc.py
-Covasim current time: 2026-May-26 09:03:26
-Covasim calling file: /tmp/ipykernel_435743/1033588508.py</code></pre>
+Covasim current time: 2026-May-29 09:12:12
+Covasim calling file: /tmp/ipykernel_1385521/1033588508.py</code></pre>
 </div>
 </div>
 </section>
@@ -1343,7 +1343,7 @@ Covasim calling file: /tmp/ipykernel_435743/1033588508.py</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v3.1.7 (2026-02-18).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v3.1.8 (2026-05-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
