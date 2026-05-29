@@ -29,4 +29,8 @@ from .analysis      import * # Depends on utils, misc, interventions
 from .sim           import * # Depends on almost everything
 from .run           import * # Depends on sim
 
+# Covasim v4.0 (Starsim port) stub: adds the cv.v4 namespace (cv.v4.Sim).
+# This does NOT rebind the v3.1.8 cv.Sim; it is removed once the port lands in cv.Sim itself.
+from . import _v4 as v4
+
 

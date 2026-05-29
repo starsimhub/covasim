@@ -3,7 +3,7 @@
 Fast unit + smoke tests for the harness machinery:
   - anchor smoke test
   - parity_gate unit tests
-  - compute_drift unit tests (added with compare.py in a later M0 check-in)
+  - compute_drift unit tests
 
 The heavy multi-seed z-score release gate lives in tests/test_m0_parity.py.
 """
@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from regression.anchor import run_and_summarize  # noqa: E402
 from regression.short_summary import METRIC_KEYS  # noqa: E402
 from regression.parity import parity_gate  # noqa: E402
+from regression.compare import compute_drift  # noqa: E402
 
 
 # --- Anchor smoke test --------------------------------------------------------
@@ -74,3 +75,34 @@ def test_parity_gate_skips_bookkeeping_keys():
     v3 = _rows(x=[1.0, 1.0], _seed=[0.0, 1.0])
     v4 = _rows(x=[1.0, 1.0], _seed=[100.0, 200.0])  # _seed differs wildly but is skipped
     assert parity_gate(v4, v3, skip_keys=skip) == []
+
+
+# --- Unit tests for tests/regression/compare.py:compute_drift -----------------
+
+def test_compute_drift_within_threshold():
+    baseline = {'a': 100.0, 'b': 50.0}
+    current  = {'a': 105.0, 'b': 49.0}
+    rows = compute_drift(baseline, current, threshold=0.10)
+    by_key = {r['key']: r for r in rows}
+    assert by_key['a']['rel_diff'] == 0.05
+    assert by_key['a']['over_threshold'] is False
+    assert by_key['b']['rel_diff'] == -0.02
+    assert by_key['b']['over_threshold'] is False
+
+
+def test_compute_drift_over_threshold():
+    rows = compute_drift({'a': 100.0}, {'a': 120.0}, threshold=0.10)
+    assert rows[0]['rel_diff'] == 0.20
+    assert rows[0]['over_threshold'] is True
+
+
+def test_compute_drift_zero_baseline_flagged():
+    rows = compute_drift({'a': 0.0}, {'a': 1.0}, threshold=0.10)
+    assert rows[0]['rel_diff'] is None
+    assert rows[0]['abs_diff'] == 1.0
+    assert rows[0]['over_threshold'] is True
+
+
+def test_compute_drift_skips_keys_missing_from_current():
+    rows = compute_drift({'a': 1.0, 'b': 2.0}, {'a': 1.05})  # 'b' missing
+    assert [r['key'] for r in rows] == ['a']
