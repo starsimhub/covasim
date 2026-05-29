@@ -10,15 +10,15 @@ The original scientific paper describing Covasim is available at <http://paper.c
 
 Covasim's immunity module (including vaccines and variants) is described here:
 
-> **Mechanistic modeling of SARS-CoV-2 immune memory, variants, and vaccines**. Cohen JA, Stuart RM, Núñez RC, Wagner B, Chang ST, Rosenfeld K, Kerr CC, Famulare M, Klein DJ (under review; posted 2021-06-01). *medRxiv* 2021.05.31.21258018; doi: <https://doi.org/10.1101/2021.05.31.21258018>.
+> **Mechanistic modeling of SARS-CoV-2 immune memory, variants, and vaccines**. Cohen JA, Stuart RM, Núñez RC, Wagner B, Chang ST, Rosenfeld K, Kerr CC, Famulare M, Klein DJ (2021). *medRxiv* 2021.05.31.21258018; doi: <https://doi.org/10.1101/2021.05.31.21258018>.
 
-The Covasim webapp is available at <https://app.covasim.org>, and the repository for it is available [here](https://github.com/institutefordiseasemodeling/covasim_webapp).
+The Covasim webapp is available at <https://app.covasim.org>, and the repository for it is available [here](https://github.com/covasim/covasim_webapp).
 
 Covasim was developed by the [Institute for Disease Modeling](https://idmod.org/), with additional contributions from the [University of Copenhagen](https://www.math.ku.dk/english), the [Burnet Institute](https://www.burnet.edu.au/), [GitHub](https://github.com/), and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-health-covid-data).
 
-Questions or comments can be directed to <info@covasim.org>, or on this project's [GitHub](https://github.com/institutefordiseasemodeling/covasim) page. Full information about Covasim is provided in the [documentation](https://docs.covasim.org).
+Questions or comments can be directed to <info@covasim.org>, or on this project's [GitHub](https://github.com/starsimhub/covasim) page. Full information about Covasim is provided in the [documentation](https://docs.covasim.org).
 
-**Note:** Covasim is no longer actively maintained. Please see [Starsim](https://github.com/starsimhub/starsim) for our current work on agent-based disease modeling.
+**Note:** Covasim is now part of the Starsim framework; please see [starsim.org](https://starsim.org) for our current work on agent-based disease modeling.
 
 
 ## Background
@@ -35,7 +35,7 @@ If you've written a paper or report using Covasim, we'd love to know about it! P
 
 ## Requirements
 
-Python 3.9-3.11 (64-bit). (Note: Python 2.7 and Python 3.12 are not supported, the latter being due to [Numba](https://numba.pydata.org/) not supporting Python 3.12 at the time of writing.)
+Python 3.9-3.13 (64-bit).
 
 We also recommend, but do not require, installing Covasim in a virtual environment. For more information, see documentation for e.g. [Anaconda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html).
 
@@ -65,6 +65,10 @@ If you would rather download the source code rather than using the `pip` package
     - To install Covasim and optional dependencies (be aware this may fail since it relies on nonstandard packages):
 
           pip install -e .[full]
+
+    - For development, additional extras are available: `.[test]` (test dependencies), `.[docs]` (documentation build), or `.[dev]` (both):
+
+          pip install -e .[dev]
 
     The module should then be importable via `import covasim as cv`.
 

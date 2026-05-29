@@ -7,8 +7,7 @@ Published site: https://docs.covasim.org
 1. Install Covasim and doc dependencies:
 
 ```sh
-pip install -e .
-pip install -r docs/requirements.txt
+pip install -e .[docs]
 ```
 
 2. Install [Quarto](https://quarto.org/docs/get-started/) and the interlinks extension:
