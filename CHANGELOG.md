@@ -8,9 +8,17 @@ Covasim is currently being ported to [Starsim](https://starsim.org), but otherwi
 
 ## Latest versions (3.1.x)
 
+### Version 3.1.8 (2026-05-29)
+
+- Viral load is now guaranteed to be zero for individuals before and after the infection window. (Thanks to [Maryam Ahmadi](https://github.com/mariaelf97) for this fix.)
+- Updated build from `setup.py` to `pyproject.toml`.
+- Switched documentation from Sphinx to Quarto.
+- Moved the repository from [InstituteforDiseaseModeling](https://github.com/institutefordiseasemodeling) to [StarsimHub](https://github.com/starsimhub).
+- *GitHub info*: PR [443](https://github.com/starsimhub/covasim/pull/443)
+
 ### Version 3.1.7 (2026-02-18)
 
-- Fixed a deprecation in NumPy 2.4 that affcted interventions.
+- Fixed a deprecation in NumPy 2.4 that affected interventions.
 - *GitHub info*: PR [1452](https://github.com/amath-idm/covasim/pull/1452)
 
 ### Version 3.1.6 (2024-01-28)
