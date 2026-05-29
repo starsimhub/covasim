@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "covasim"
+description = "COVID-19 Agent-based Simulator"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    {name = "Cliff Kerr", email = "info@covasim.org"},
+    {name = "Robyn Stuart"},
+    {name = "Romesh Abeysuriya"},
+    {name = "Dina Mistry"},
+    {name = "Jamie Cohen"},
+    {name = "Lauren George"},
+    {name = "Daniel Klein"},
+]
+keywords = ["COVID", "COVID-19", "coronavirus", "SARS-CoV-2", "stochastic", "agent-based model", "interventions", "epidemiology"]
+requires-python = ">=3.9"
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "numpy",
+    "numba",
+    "pandas",
+    "scipy<1.16.0",
+    "statsmodels",
+    "matplotlib",
+    "sciris>=2.0.4",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+full = [
+    "plotly",
+    "fire",
+    "optuna",
+    "synthpops",
+    "parestlib",
+]
+test = [
+    "pytest>=7.3",
+    "pytest-cov",
+    "pytest-env",
+    "pytest-xdist",
+    "optuna",
+]
+docs = [
+    "quartodoc",
+    "sphobjinv",
+    "jupyter",
+    "jupyter-cache",
+    "jupytext",
+    "nbconvert",
+    "nbformat",
+    "optuna",
+    "seaborn",
+    "pandoc",
+]
+dev = ["covasim[test,docs]"]
+
+[project.urls]
+Homepage = "https://covasim.org"
+Documentation = "https://docs.covasim.org"
+Repository = "https://github.com/starsimhub/covasim"
+Issues = "https://github.com/starsimhub/covasim/issues"
+Changelog = "https://github.com/starsimhub/covasim/blob/main/CHANGELOG.md"
+
+[tool.setuptools.dynamic]
+version = {attr = "covasim.version.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["covasim*"]
+
+[tool.setuptools.package-data]
+covasim = ["*.json", "*.ttf"]

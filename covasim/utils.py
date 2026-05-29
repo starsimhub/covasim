@@ -75,6 +75,11 @@ def compute_viral_load(t,     time_start, time_recovered, time_dead,  frac_time,
     load = np.ones(n, dtype=cvd.default_float) # allocate an array of ones with the correct dtype
     early = (t-time_start)/infect_days_total < trans_point # are we in the early or late phase
     load = (load_ratio * early + load * ~early)/(load+frac_time*(load_ratio-load)) # calculate load
+    
+    # Set to zero if not infectious
+    dt = t - time_start
+    invalid = (dt < 0) | (dt >= infect_days_total) | np.isnan(time_start)
+    load[invalid] = 0
 
     return load
 

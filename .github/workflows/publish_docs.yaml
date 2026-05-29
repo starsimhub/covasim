@@ -25,9 +25,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Covasim and doc dependencies
-        run: |
-          pip install -e .[full]
-          pip install -r docs/requirements.txt
+        run: pip install -e .[full,docs]
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
