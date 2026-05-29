@@ -6,15 +6,15 @@ Please see the guidelines below to provide feedback or contribute to Covasim cod
 
 ## Getting started
 
-Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the project's open source [license](https://github.com/InstituteforDiseaseModeling/covasim/blob/master/LICENSE).
+Contributions to this project are [released](https://help.github.com/articles/github-terms-of-service/#6-contributions-under-repository-license) to the public under the project's open source [license](https://github.com/starsimhub/covasim/blob/main/LICENSE).
 
-Note that this project is released with a [Contributor Code of Conduct](https://github.com/InstituteforDiseaseModeling/covasim/blob/master/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
+Note that this project is released with a [Contributor Code of Conduct](https://github.com/starsimhub/covasim/blob/main/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-Review the [documentation](https://institutefordiseasemodeling.github.io/covasim-docs) before you begin. Additionally, this content is also included in the following README files:
+Review the [documentation](https://docs.covasim.org) before you begin. Additionally, this content is also included in the following README files:
 
-> - [Project README](https://github.com/InstituteforDiseaseModeling/covasim/blob/master/README.md): Setup and project overview.
-> - [Covasim README](https://github.com/InstituteforDiseaseModeling/covasim/blob/master/covasim/README.md): Simulation parameters. application. docker setup.
-> - [Tests README](https://github.com/InstituteforDiseaseModeling/covasim/blob/master/tests/README.md): Running tests locally.
+> - [Project README](https://github.com/starsimhub/covasim/blob/main/README.md): Setup and project overview.
+> - [Covasim README](https://github.com/starsimhub/covasim/blob/main/covasim/README.md): Simulation parameters. application. docker setup.
+> - [Tests README](https://github.com/starsimhub/covasim/blob/main/tests/README.md): Running tests locally.
 
 ## Contribution types
 
@@ -29,8 +29,8 @@ This is a fast-moving project with many opportunities to contribute across the p
 
     > - Tests reproducing an issue.
     > - Bug fixes.
-    > - Code to resolve [open approved issues](https://github.com/InstituteforDiseaseModeling/covasim/issues?q=is%3Aopen+is%3Aissue+label%3Aapproved).
-    > - Documentation improvements in the [docs](https://github.com/InstituteforDiseaseModeling/covasim/tree/master/docs) folder.
+    > - Code to resolve [open approved issues](https://github.com/starsimhub/covasim/issues?q=is%3Aopen+is%3Aissue+label%3Aapproved).
+    > - Documentation improvements in the [docs](https://github.com/starsimhub/covasim/tree/main/docs) folder.
 
 All external communication about these contribution efforts is currently occurring on GitHub.
 
@@ -38,8 +38,8 @@ All external communication about these contribution efforts is currently occurri
 
 If you notice unexpected behavior or a limitation in Covasim, follow the steps below before requesting a new feature or reporting a bug.
 
-1.  First, review the Covasim [documentation](https://institutefordiseasemodeling.github.io/covasim-docs) to see if there is already functionality that supports what you want to do. In particular, check `parameters` or [this README](https://github.com/InstituteforDiseaseModeling/covasim/blob/master/covasim/README.md) to see if the behavior you observed might be expected and if configuration options are available to provide you with the desired behavior.
-2.  Search the existing [issues](https://github.com/InstituteforDiseaseModeling/covasim/issues) to see if there is already one that contains your feedback. If there is, **add a thumbs up reaction** to convey your interest in the issue being addressed. This helps the team gauge interest without the noise of comments, which trigger notifications to all watchers. Comments should be used only if you have new and useful information to share.
+1.  First, review the Covasim [documentation](https://docs.covasim.org) to see if there is already functionality that supports what you want to do. In particular, check `parameters` or [this README](https://github.com/starsimhub/covasim/blob/main/covasim/README.md) to see if the behavior you observed might be expected and if configuration options are available to provide you with the desired behavior.
+2.  Search the existing [issues](https://github.com/starsimhub/covasim/issues) to see if there is already one that contains your feedback. If there is, **add a thumbs up reaction** to convey your interest in the issue being addressed. This helps the team gauge interest without the noise of comments, which trigger notifications to all watchers. Comments should be used only if you have new and useful information to share.
 
 ### Open a feature request
 
@@ -62,7 +62,7 @@ To contribute directly to Covasim code, do the following:
 
 1.  Fork and clone the Covasim repository.
 
-2.  Install Covasim on your machine. See the [project README](https://github.com/InstituteforDiseaseModeling/covasim/blob/master/README.md).
+2.  Install Covasim on your machine. See the [project README](https://github.com/starsimhub/covasim/blob/main/README.md).
 
 3.  Create a new branch:
 
@@ -74,7 +74,7 @@ To contribute directly to Covasim code, do the following:
 
 Although we make no guarantees that a submitted pull request will be accepted, PRs that meet the following criteria are more likely to be merged:
 
-- Up-to-date with master with no merge conflicts
+- Up-to-date with main with no merge conflicts
 - Self-contained
 - Fix a demonstrable limitation of bug
 - Follow the current code style
