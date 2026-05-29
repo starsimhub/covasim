@@ -74,8 +74,22 @@ def format_table(rows, threshold=THRESHOLD):
     return '\n'.join(out)
 
 
+def _resolve_run(anchor):
+    """Return a zero-arg callable that runs the chosen anchor and returns its summary dict."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    if anchor == 'm0':
+        from anchor import run_and_summarize  # noqa: E402
+        return run_and_summarize
+    if anchor.startswith('m1_'):
+        pop_type = anchor.split('_', 1)[1]
+        from anchor_m1 import run_and_summarize as run_m1  # noqa: E402
+        return lambda: run_m1(pop_type=pop_type)
+    raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_random, m1_hybrid.")
+
+
 def main(argv=None):
     p = argparse.ArgumentParser(description='Compare anchor run vs. v3.1.8 snapshot.')
+    p.add_argument('--anchor', default='m0', help='Anchor: m0 | m1_random | m1_hybrid (default m0).')
     p.add_argument('--baseline', type=Path, default=DEFAULT_BASELINE,
                    help=f'One-seed snapshot JSON (default: {DEFAULT_BASELINE}).')
     p.add_argument('--threshold', type=float, default=THRESHOLD,
@@ -88,8 +102,8 @@ def main(argv=None):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 
     if args.save_snapshot:
-        from anchor import run_and_summarize  # noqa: E402
-        snapshot = {k: float(v) for k, v in run_and_summarize().items()}
+        run = _resolve_run(args.anchor)
+        snapshot = {k: float(v) for k, v in run().items()}
         args.baseline.parent.mkdir(parents=True, exist_ok=True)
         with open(args.baseline, 'w') as f:
             json.dump({'summary': snapshot}, f, indent=2)
@@ -102,10 +116,10 @@ def main(argv=None):
               'python tests/regression/compare.py --save-snapshot')
         return 0
 
-    from anchor import run_and_summarize  # noqa: E402
+    run = _resolve_run(args.anchor)
     with open(args.baseline) as f:
         baseline_summary = json.load(f)['summary']
-    current_summary = {k: float(v) for k, v in run_and_summarize().items()}
+    current_summary = {k: float(v) for k, v in run().items()}
     print(format_table(compute_drift(baseline_summary, current_summary,
                                      threshold=args.threshold), threshold=args.threshold))
     return 0

@@ -67,3 +67,48 @@ def build_summary(sim):
         'n_alive':           float(summary['n_alive']),
     }
     return out
+
+
+# --- M1 (basic transmission) summary -----------------------------------------
+# M1's gated metrics are the basic-transmission outcomes (no symptomatic/severe/
+# critical/death burden -- those are identically zero in M1 and re-enter at M2).
+METRIC_KEYS_M1 = ('cum_infections', 'peak_prevalence', 'peak_n_infectious')
+
+
+def build_summary_m1(sim):
+    """Return the M1 short summary, working under BOTH v3.1.8 and v4 (Starsim) Covasim.
+
+    The two engines are distinguished by duck-typing (the v4 Starsim Sim has a
+    ``diseases`` collection; the v3.1.8 Sim does not), so this avoids importing
+    starsim (which is absent from a frozen v3.1.8 environment).
+
+    Cross-version-comparable definitions:
+      - cum_infections: total ever infected INCLUDING the initial seed. v3.1.8's
+        ``summary['cum_infections']`` already counts the seed; for v4 we use
+        currently-infected + recovered at the final step (equivalent, since M1 has
+        no deaths and no waning, so everyone ever infected is either infected or recovered).
+      - peak_prevalence / peak_n_infectious: max over the run of the prevalence and
+        infectious-count time series.
+
+    Args:
+        sim: a run Covasim sim (v3.1.8 ``cv.Sim`` or v4 ``cv.Sim``).
+
+    Returns:
+        dict of {metric_name: float} over METRIC_KEYS_M1.
+    """
+    if hasattr(sim, 'diseases'):  # v4 (Starsim-based)
+        disease = list(sim.diseases.values())[0]
+        res = disease.results
+        cum_infections = float(int(disease.infected.sum()) + int(disease.recovered.sum()))
+        peak_prevalence = float(np.asarray(res['prevalence']).max())
+        peak_n_infectious = float(np.asarray(res['n_infectious']).max())
+    else:  # v3.1.8
+        summary = sim.summary
+        cum_infections = float(summary['cum_infections'])
+        peak_prevalence = float(_series_max(sim, 'prevalence'))
+        peak_n_infectious = float(_series_max(sim, 'n_infectious'))
+    return {
+        'cum_infections':    cum_infections,
+        'peak_prevalence':   peak_prevalence,
+        'peak_n_infectious': peak_n_infectious,
+    }

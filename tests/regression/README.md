@@ -109,3 +109,24 @@ CI runs the pytest suite (which collects the harness unit tests + anchor smoke
 test + the skipped slow gate) plus `python regression/compare.py` in no-baseline
 mode (CLI-integrity only). Neither fails on drift. The heavy multi-seed sweep
 runs only locally or in a future nightly job, never in the 5-minute PR job.
+
+## M1 anchors (basic transmission)
+
+`anchor_m1.py` adds the M1 single-variant basic-transmission anchor for the
+`random` and `hybrid` backends. The same file runs under v3.1.8 (configured to a
+transmission+recovery-only SEIR: `use_waning=False`, all-asymptomatic prognoses,
+`asymp_factor=1.0`) and under v4 (`cv.Sim`), so one anchor serves both the baseline
+and the gate. `build_summary_m1` (in `short_summary.py`) extracts the M1 metrics
+(`cum_infections`, `peak_prevalence`, `peak_n_infectious`) from either engine.
+
+Generate the gitignored v3.1.8 M1 baselines from a frozen v3.1.8 env:
+
+```bash
+python tests/regression/multi_seed_v3.py --anchor m1_random --n 30
+python tests/regression/multi_seed_v3.py --anchor m1_hybrid --n 30
+```
+
+Then the release gate `../test_m1_parity.py` (slow, `|z| < 3`, per backend) compares
+v4 to those baselines; it skips cleanly when they are absent. The contact-structure
+equivalence half (per-layer degree + age-mixing) lives in `../test_network.py` and
+consumes a `v3_m1_contacts.json` baseline (also v3.1.8-env-generated).

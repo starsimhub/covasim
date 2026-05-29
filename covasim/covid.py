@@ -109,3 +109,31 @@ class COVID(ss.Infection):
         super().update_results()
         self.results.n_infectious[self.ti] = int(np.count_nonzero(self.infectious))
         return
+
+    def init_post(self):
+        """Seed initial infections.
+
+        Covasim seeds an *exact* count of initial infections (``pop_infected``), not a
+        per-agent probability. If ``init_prev`` is an integer, seed exactly that many
+        agents (chosen deterministically from the sim seed); otherwise defer to
+        ``ss.Infection`` (an ``ss.bernoulli`` fraction, or ``None``).
+        """
+        exact = self.pars.init_prev if isinstance(self.pars.init_prev, (int, np.integer)) else None
+        if exact is None:
+            return super().init_post()  # ss.bernoulli / None: stock seeding
+
+        # Exact-count path: run the base setup (with no stock seeding), then seed exactly `exact` agents.
+        self.pars.init_prev = None      # suppress the stock bernoulli seeding in ss.Infection.init_post
+        super().init_post()             # runs the required Module/Disease init_post setup
+        self.pars.init_prev = exact     # restore for the record
+        auids = self.sim.people.auids
+        n = min(int(exact), len(auids))
+        try:
+            base = int(self.sim.pars.rand_seed)
+        except Exception:
+            base = 0
+        rng = np.random.default_rng(base*100 + 50)  # distinct stream from the network layers (offsets 0-4)
+        chosen = ss.uids(np.sort(rng.choice(np.asarray(auids), size=n, replace=False)))
+        self.set_prognoses(chosen, sources=-1)
+        self.pars._n_initial_cases = len(chosen)
+        return chosen
