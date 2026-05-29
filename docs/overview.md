@@ -12,11 +12,11 @@ Covasim's immunity module (including vaccines and variants) is described here:
 
 > **Mechanistic modeling of SARS-CoV-2 immune memory, variants, and vaccines**. Cohen JA, Stuart RM, Núñez RC, Wagner B, Chang ST, Rosenfeld K, Kerr CC, Famulare M, Klein DJ (under review; posted 2021-06-01). *medRxiv* 2021.05.31.21258018; doi: <https://doi.org/10.1101/2021.05.31.21258018>.
 
-The Covasim webapp is available at <https://app.covasim.org>, and the repository for it is available [here](https://github.com/institutefordiseasemodeling/covasim_webapp).
+The Covasim webapp is available at <https://app.covasim.org>, and the repository for it is available [here](https://github.com/covasim/covasim_webapp).
 
 Covasim was developed by the [Institute for Disease Modeling](https://idmod.org/), with additional contributions from the [University of Copenhagen](https://www.math.ku.dk/english), the [Burnet Institute](https://www.burnet.edu.au/), [GitHub](https://github.com/), and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-health-covid-data).
 
-Questions or comments can be directed to <info@covasim.org>, or on this project's [GitHub](https://github.com/institutefordiseasemodeling/covasim) page. Full information about Covasim is provided in the [documentation](https://docs.covasim.org).
+Questions or comments can be directed to <info@covasim.org>, or on this project's [GitHub](https://github.com/starsimhub/covasim) page. Full information about Covasim is provided in the [documentation](https://docs.covasim.org).
 
 **Note:** Covasim is no longer actively maintained. Please see [Starsim](https://github.com/starsimhub/starsim) for our current work on agent-based disease modeling.
 

@@ -81,7 +81,7 @@ Although we make no guarantees that a submitted pull request will be accepted, P
 - If the PR introduces a new feature, it has complete [Google style docstrings](https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html) and comments, and a test demonstrating its functionality
 - Otherwise, sample code demonstrating old and new behavior (this can be in the PR comment on GitHub, not necessarily committed in the repo)
 
-If you have additional questions or comments, contact <covasim@idmod.org>.
+If you have additional questions or comments, contact <info@covasim.org>.
 
 ## Resources
 
