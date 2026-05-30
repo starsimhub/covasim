@@ -87,9 +87,13 @@ class COVID(ss.Infection):
                                 beta_symp_inf=0.038, alpha_sev_symp=-0.014, beta_sev_symp=0.079),  # NAb->efficacy
             rel_imm_symp = dict(asymp=0.85, mild=1.0, severe=1.5),  # natural-immunity scaling by symptom severity
             trans_redux  = 0.59,                                 # transmissibility reduction for breakthrough infections
-            # Testing / quarantine (M5; parameters.py:106-108). The iso/quar beta factors are wired in
-            # M5 Task 3; quar_period is used by schedule_quarantine.
-            quar_period  = 14,                                   # days an agent quarantines
+            # Testing / quarantine (M5; parameters.py:106-108). iso_factor/quar_factor reduce the
+            # transmissibility of isolated/quarantined agents (scalar M5 approximation of v3's per-layer
+            # factors -- the random-layer values; see the M5 spec Open Q A). They are inert until a
+            # testing/tracing intervention puts agents into isolation/quarantine, so M1-M4 are unchanged.
+            quar_period  = 14,    # days an agent quarantines
+            iso_factor   = 0.2,   # transmissibility multiplier for isolated (diagnosed) agents
+            quar_factor  = 0.3,   # transmissibility multiplier for quarantined agents
         )
         self.update_pars(pars, **kwargs)
 
@@ -703,6 +707,14 @@ class COVID(ss.Infection):
             vl = np.where(early, self._vl_high, self._vl_low)
             f_asymp = np.where(np.asarray(self.symptomatic[inf]), 1.0, self.pars.asymp_factor)
             self.rel_trans[inf] = self.rel_trans_base[inf] * vl * f_asymp
+            # M5: isolated/quarantined agents transmit less (scalar approx of v3's per-layer iso/quar
+            # factors). Inert with no testing intervention (no agent is isolated/quarantined => no-op).
+            iso = self.isolated.uids
+            if len(iso):
+                self.rel_trans[iso] = self.rel_trans[iso] * self.pars.iso_factor
+            quar = (self.quarantined & ~self.isolated).uids
+            if len(quar):
+                self.rel_trans[quar] = self.rel_trans[quar] * self.pars.quar_factor
         return
 
     def step_die(self, uids):

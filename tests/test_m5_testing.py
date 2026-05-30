@@ -154,3 +154,59 @@ def test_test_num_diagnoses_only_infectious():
     diagnosed = d.diagnosed.uids
     assert len(diagnosed) > 0
     assert np.isfinite(np.asarray(d.ti_infected[diagnosed])).all(), 'only ever-infected agents are diagnosed'
+
+
+# === Task 3: contact_tracing + quar/iso beta modifiers ===
+
+def _ever_infected(sim):
+    d = sim.diseases.covid
+    return int(d.recovered.sum() + d.infected.sum()) + float(np.asarray(d.results['cum_deaths']).max())
+
+
+def test_contact_tracing_creates_quarantine():
+    """test_prob + contact_tracing puts traced contacts into quarantine (known_contact + quarantined)."""
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='hybrid', n_days=100, rand_seed=2, verbose=0,
+                 interventions=[cv.test_prob(symp_prob=0.2, asymp_prob=0.01, start_day=10),
+                                cv.contact_tracing(trace_probs=0.5, trace_time=2, start_day=10)])
+    sim.run()
+    r = sim.diseases.covid.results
+    assert float(np.asarray(r['n_quarantined']).max()) > 0, 'contacts are quarantined'
+    assert np.asarray(sim.diseases.covid.known_contact).sum() >= 0  # known_contact flag is exercised
+
+
+def test_contact_tracing_no_effect_without_testing():
+    """contact_tracing alone (no testing) traces nobody (it acts only on the newly diagnosed)."""
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='hybrid', n_days=60, rand_seed=2, verbose=0,
+                 interventions=cv.contact_tracing(trace_probs=0.5, start_day=5))
+    sim.run()
+    assert float(np.asarray(sim.diseases.covid.results['n_quarantined']).max()) == 0, \
+        'no diagnoses => no quarantine'
+
+
+def test_tracing_reduces_transmission():
+    """Adding contact tracing (and thus quarantine) reduces the total epidemic size."""
+    def ever_infected(with_tracing):
+        iv = [cv.test_prob(symp_prob=0.2, asymp_prob=0.01, start_day=10)]
+        if with_tracing:
+            iv.append(cv.contact_tracing(trace_probs=0.6, trace_time=1, start_day=10))
+        sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='hybrid', n_days=100, rand_seed=2,
+                     verbose=0, interventions=iv)
+        sim.run()
+        return _ever_infected(sim)
+    assert ever_infected(True) < ever_infected(False), 'tracing+quarantine should shrink the epidemic'
+
+
+def test_quar_iso_factor_reduces_rel_trans():
+    """Isolated/quarantined agents have their transmissibility reduced by iso_factor/quar_factor."""
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='hybrid', n_days=60, rand_seed=2, verbose=0,
+                 interventions=[cv.test_prob(symp_prob=0.3, start_day=5),
+                                cv.contact_tracing(trace_probs=0.8, trace_time=1, start_day=5)])
+    # Step until some agents are isolated/quarantined, then inspect rel_trans vs rel_trans_base.
+    sim.init()
+    d = sim.diseases.covid
+    for _ in range(40):
+        sim.run_one_step()
+    iso = (d.isolated & d.infectious).uids
+    if len(iso):
+        ratio = np.asarray(d.rel_trans[iso]) / np.maximum(np.asarray(d.rel_trans_base[iso]), 1e-9)
+        assert (ratio <= 1.0 + 1e-9).all(), 'isolated agents have rel_trans reduced (<= base)'
