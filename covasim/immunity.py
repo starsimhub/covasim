@@ -160,3 +160,114 @@ def build_immunity_matrix(variant_map, override=None):
             if label_t in cross and label_s in cross[label_t]:
                 matrix[ti, si] = cross[label_t][label_s]
     return matrix
+
+
+# %% Neutralizing-antibody (NAb) waning engine (M4) -- ported from _v2_legacy/immunity.py.
+# These are the dormant functions wired in M4; until then they are importable but unused (the
+# M3-sanctioned landing zone). cvu.true(x) -> np.nonzero(x)[0]; default int/float -> numpy defaults.
+
+def calc_VE(nab, ax, pars):
+    """Map effective NAb levels to a per-axis immune-protection factor (v3 ``calc_VE``).
+
+    Inverse-logit form from https://doi.org/10.1101/2021.03.09.21252641:
+    ``exp(alpha)·nab**beta / (1 + exp(alpha)·nab**beta)``, with ``(alpha, beta)`` selected per axis
+    from ``nab_eff``. ``ax`` is 'sus' (infection), 'symp' (symptoms), or 'sev' (severe disease).
+    ``calc_VE(0) == 0`` (since ``0**beta == 0`` for the positive betas used).
+    """
+    choices = ('sus', 'symp', 'sev')
+    if ax == 'sus':
+        alpha, beta = pars['alpha_inf'], pars['beta_inf']
+    elif ax == 'symp':
+        alpha, beta = pars['alpha_symp_inf'], pars['beta_symp_inf']
+    elif ax == 'sev':
+        alpha, beta = pars['alpha_sev_symp'], pars['beta_sev_symp']
+    else:
+        raise ValueError(f'Axis {ax!r} not in {choices}')
+    nab = np.asarray(nab, dtype=float)
+    exp_lo = np.exp(alpha) * nab ** beta
+    return exp_lo / (1 + exp_lo)  # inverse logit
+
+
+def precompute_waning(length, pars=None):
+    """Precompute the per-timestep NAb waning kernel (v3 ``precompute_waning``).
+
+    Dispatches on ``pars['form']``: 'nab_growth_decay' (default), 'nab_decay', 'exp_decay', or a
+    callable. Returns an array of length ``length`` giving the per-step NAb increment relative to peak.
+    """
+    pars = sc.dcp(pars)
+    form = pars.pop('form')
+    if form is None or form == 'nab_growth_decay':
+        return nab_growth_decay(length, **pars)
+    elif form == 'nab_decay':
+        return nab_decay(length, **pars)
+    elif form == 'exp_decay':
+        if pars['half_life'] is None:
+            pars['half_life'] = np.nan
+        return exp_decay(length, **pars)
+    elif callable(form):
+        return form(length, **pars)
+    errormsg = f"Functional form {form!r} not implemented; choices: nab_growth_decay, nab_decay, exp_decay."
+    raise NotImplementedError(errormsg)
+
+
+def nab_growth_decay(length, growth_time, decay_rate1, decay_time1, decay_rate2, decay_time2):
+    """Linear NAb growth then two-phase exponential decay (v3 default kernel).
+
+    Based on Khoury et al. (https://www.nature.com/articles/s41591-021-01377-8): linear growth over
+    ``growth_time`` days, then exponential decay whose rate decays linearly from ``decay_rate1`` to
+    ``decay_rate2`` between ``decay_time1`` and ``decay_time2``.
+    """
+    if decay_time2 < decay_time1:
+        raise ValueError(f'decay_time2 ({decay_time2}) must be >= decay_time1 ({decay_time1}).')
+
+    def f1(t):
+        return (1.0 / growth_time) * t  # linear growth
+
+    def f2(t):
+        decayRate = np.full(len(t), fill_value=decay_rate1, dtype=float)
+        decayRate[np.nonzero(t > decay_time2)[0]] = decay_rate2
+        slowing = (1.0 / (decay_time2 - decay_time1)) * (decay_rate1 - decay_rate2)
+        mid = np.nonzero((t > decay_time1) * (t <= decay_time2))[0]
+        decayRate[mid] = decay_rate1 - slowing * np.arange(len(mid), dtype=int)
+        titre = np.zeros(len(t))
+        for i in range(1, len(t)):
+            titre[i] = titre[i - 1] + decayRate[i]
+        return np.exp(-titre)
+
+    length = length + 1
+    t1 = np.arange(growth_time, dtype=int)
+    t2 = np.arange(length - growth_time, dtype=int)
+    y = np.concatenate([f1(t1), f2(t2)])
+    return np.diff(y)[0:length]
+
+
+def nab_decay(length, decay_rate1, decay_time1, decay_rate2):
+    """Exponential NAb decay whose rate itself decays after ``decay_time1`` (v3 ``nab_decay``)."""
+    def f1(t):
+        return np.exp(-t * decay_rate1)
+
+    def f2(t):
+        return np.exp(-t * (decay_rate1 * np.exp(-(t - decay_time1) * decay_rate2)))
+
+    t = np.arange(length, dtype=int)
+    y1 = f1(t[np.nonzero(t <= decay_time1)[0]])
+    y2 = f2(t[np.nonzero(t > decay_time1)[0]])
+    y = np.concatenate([[-np.inf], y1, y2])
+    y = np.diff(y)[0:length]
+    y[0] = 1
+    return y
+
+
+def exp_decay(length, init_val, half_life, delay=None):
+    """Simple exponential NAb decay with an optional linear-growth ``delay`` (v3 ``exp_decay``)."""
+    length = length + 1
+    decay_rate = np.log(2) / half_life if not np.isnan(half_life) else 0.0
+    if delay is not None:
+        t = np.arange(length - delay, dtype=int)
+        growth = (init_val / delay) * np.ones(delay)
+        decay = init_val * np.exp(-decay_rate * t)
+        result = np.concatenate([growth, decay], axis=None)
+    else:
+        t = np.arange(length, dtype=int)
+        result = init_val * np.exp(-decay_rate * t)
+    return np.diff(result)
