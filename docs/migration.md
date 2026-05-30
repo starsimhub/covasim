@@ -68,12 +68,23 @@ NumPy/Numba stream. As a result, **v4 results are not bit-for-bit identical to v
 This is expected. Equivalence is validated statistically: the migration ships multi-seed z-score
 *parity gates* that confirm v4 and v3.1.8 agree within sampling noise on the headline metrics.
 
-### 2.3 `sim.init()` (with `sim.initialize()` retained)
+### 2.3 `use_waning` now defaults to `False`
+
+In v3, `use_waning` defaulted to `True`. In v4 it defaults to **`False`**. This matters because the
+vaccination interventions (`cv.vaccinate_prob`/`vaccinate_num`) require the NAb/waning engine — under
+the v4 default they raise, directing you to either pass `use_waning=True` or use `cv.simple_vaccine`.
+If you want v3-like behaviour, set `use_waning=True` explicitly:
+
+```python
+sim = cv.Sim(use_waning=True, interventions=cv.vaccinate_prob('pfizer', days=30, prob=0.1))
+```
+
+### 2.4 `sim.init()` (with `sim.initialize()` retained)
 
 Starsim's initializer is `sim.init()`. The v3 name `sim.initialize()` is retained as an alias, so
 existing calls keep working. (`sim.run()` still initializes automatically if needed.)
 
-### 2.4 Inputs are deep-copied
+### 2.5 Inputs are deep-copied
 
 As in v3, `cv.Sim` deep-copies the interventions / analyzers / diseases you pass in. The *live*
 objects after a run are on the sim:
@@ -85,7 +96,7 @@ sim.run()
 snap_live = sim.analyzers['snapshot']   # NOT the `snap` you constructed
 ```
 
-### 2.5 Parameter access
+### 2.6 Parameter access
 
 Parameters are stored on `sim.pars` (sim-level), `sim.diseases.covid.pars` (disease), and the network
 objects. Broad v3-style `sim['beta']` item access is **not** fully supported in v4.0 — read from the

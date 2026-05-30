@@ -41,6 +41,9 @@ class MultiSim(sc.prettyobj):
     """
 
     def __init__(self, sim=None, sims=None, n_runs=4, label=None, **kwargs):
+        # Accept a list of sims passed positionally (v3 ``cv.MultiSim([s1, s2, ...])``).
+        if sims is None and isinstance(sim, (list, tuple)):
+            sims, sim = list(sim), None
         if sims is not None:
             self.base_sim = None
             self.sims = list(sims)
@@ -54,14 +57,18 @@ class MultiSim(sc.prettyobj):
         self.results = None
         return
 
-    def run(self, parallel=False, **kwargs):
+    def run(self, parallel=False, n_runs=None, **kwargs):
         """Run the seeds (or the explicit sims).
 
         ``parallel=False`` (default): run serially -- for a base sim, deep-copy it and run ``n_runs``
         consecutive seeds (``rand_seed + i``); for explicit sims, run each. Deterministic and emits no
         multiprocess fork warning. ``parallel=True``: dispatch via ``ss.MultiSim`` (faster for large N,
         but may emit a benign multiprocess ``DeprecationWarning`` on fork-based platforms).
+
+        ``n_runs`` may be passed here (v3 ``msim.run(n_runs=N)``) to override the construction value.
         """
+        if n_runs is not None and self.base_sim is not None:
+            self.n_runs = int(n_runs)
         if parallel:
             if self.base_sim is not None:
                 msim = ss.MultiSim(base_sim=self.base_sim, n_runs=self.n_runs, **self.kwargs)
@@ -115,16 +122,57 @@ class MultiSim(sc.prettyobj):
         """Reduce using the median trajectory."""
         return self.reduce(use_mean=False, **kwargs)
 
+    def combine(self, **kwargs):
+        """Combine the per-seed runs into a single summed trajectory (v3 ``cv.MultiSim.combine``).
+
+        Treats the runs as independent sub-populations and sums each result series; the band is
+        collapsed onto the combined trajectory.
+        """
+        if self.sims is None:
+            raise RuntimeError('Run the MultiSim before combining.')
+        r0 = self._covid_results(self.sims[0])
+        keys = [k for k in r0.keys() if isinstance(r0[k], ss.Result) and np.ndim(np.asarray(r0[k])) == 1]
+        red = sc.objdict()
+        for k in keys:
+            stack = np.array([np.asarray(self._covid_results(s)[k]) for s in self.sims])
+            summed = stack.sum(axis=0)
+            red[k] = sc.objdict(best=summed, low=summed, high=summed)
+        self.results = red
+        return self
+
+    @classmethod
+    def merge(cls, *args, base=False):
+        """Merge several MultiSims into one containing all their sims (v3 ``cv.MultiSim.merge``).
+
+        Simplified vs v3: collects every run sim so they can be plotted together; the per-MultiSim
+        identity is not otherwise preserved.
+        """
+        msims = args[0] if len(args) == 1 and isinstance(args[0], (list, tuple)) else args
+        allsims = []
+        for m in msims:
+            if getattr(m, 'sims', None):
+                allsims.extend(m.sims)
+        return cls(sims=allsims)
+
+    def plot_result(self, key, fig=None, **kwargs):
+        """Plot a single result key (median + band) -- v3 ``cv.MultiSim.plot_result``."""
+        return self.plot(keys=[key], fig=fig, **kwargs)
+
     def plot(self, keys=None, fig=None, **kwargs):
         """Plot the median trajectory + quantile band for each key."""
         import matplotlib.pyplot as plt
+        from . import settings as cvset
         if self.results is None:
             self.reduce()
+        if isinstance(keys, str):
+            keys = [keys]
         keys = keys or [k for k in ('n_infectious', 'cum_infections', 'cum_severe', 'cum_deaths')
                         if k in self.results]
         t = np.arange(len(self.results[keys[0]].best))
         if fig is None:
             fig, axes = plt.subplots(1, len(keys), figsize=(4.5 * len(keys), 4))
+        else:
+            axes = fig.axes
         axes = np.atleast_1d(axes)
         for ax, k in zip(axes, keys):
             r = self.results[k]
@@ -132,7 +180,7 @@ class MultiSim(sc.prettyobj):
             ax.fill_between(t, r.low, r.high, alpha=0.25, label='10-90%')
             ax.set_title(k); ax.set_xlabel('Day'); ax.legend()
         fig.tight_layout()
-        return fig
+        return fig if cvset.options.returnfig else None
 
 
 def multi_run(sim, n_runs=4, **kwargs):

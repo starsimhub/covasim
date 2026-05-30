@@ -34,6 +34,26 @@ def _find_contacts(net, trace_uids):
 class Intervention(ss.Intervention):
     """Base class for Covasim interventions (same public name as v3; thin over ``ss.Intervention``)."""
 
+    # v3 cosmetic/plotting kwargs that the Starsim engine does not use; accepted and ignored for
+    # backwards compatibility. (Functional kwargs like ``subtarget`` are NOT swallowed -- silently
+    # dropping them would change results, so they remain errors until ported.)
+    _V3_COSMETIC = ('do_plot', 'show_label', 'line_args')
+
+    def __init__(self, *args, **kwargs):
+        for key in self._V3_COSMETIC:
+            kwargs.pop(key, None)
+        super().__init__(*args, **kwargs)
+        return
+
+    def init_post(self):
+        super().init_post()
+        # v3 accepted date strings (or datetimes) for start_day/end_day; convert them to day indices.
+        for attr in ('start_day', 'end_day'):
+            val = getattr(self, attr, None)
+            if val is not None and not isinstance(val, (int, np.integer, float, np.floating)):
+                setattr(self, attr, self.sim.day(val))
+        return
+
     def _covid(self):
         """Resolve the COVID disease module this intervention acts on."""
         return self.sim.diseases['covid']
@@ -125,6 +145,27 @@ class test_num(Intervention):
         self.test_delay  = test_delay
         self.start_day   = start_day
         self.end_day     = end_day
+        return
+
+    def init_post(self):
+        super().init_post()
+        # v3 ``cv.test_num('data')`` / ``daily_tests='data'``: pull the per-day test counts from the
+        # sim's loaded data (the 'new_tests' column), aligned by date onto the sim time vector.
+        if isinstance(self.daily_tests, str) and self.daily_tests == 'data':
+            data = getattr(self.sim, 'data', None)
+            cols = list(getattr(data, 'columns', []))
+            if data is None or 'new_tests' not in cols:
+                raise ValueError("test_num(daily_tests='data') needs sim data with a 'new_tests' "
+                                 "column; pass cv.Sim(datafile=...).")
+            npts = self.sim.t.npts
+            arr = np.zeros(npts)
+            for idx, val in data['new_tests'].items():
+                di = self.sim.day(str(getattr(idx, 'date', lambda: idx)()))
+                if isinstance(di, list):
+                    di = di[0]
+                if 0 <= di < npts and np.isfinite(val):
+                    arr[int(di)] = val
+            self.daily_tests = arr
         return
 
     def _n_tests(self, ti):
@@ -622,7 +663,13 @@ class change_beta(Intervention):
     def init_post(self):
         super().init_post()
         covid = self._covid()
-        self._map = _day_change_map(self.days, self.changes)
+        if callable(self.days):
+            # v3 dynamic-trigger days (a callable returning days) are not ported; treat as inert
+            # rather than crashing. See NOTES_FOR_CLIFF (tutorial validation) for the v4 approach.
+            self._map = {}
+        else:
+            self.days = self.sim.day(self.days)  # accept date strings / datetimes as well as day indices
+            self._map = _day_change_map(self.days, self.changes)
         beta = covid.pars.beta
         layers = list(beta.keys()) if self.layers is None else sc.tolist(self.layers)
         self._orig = {lk: float(beta[lk]) for lk in layers}
@@ -665,6 +712,7 @@ class clip_edges(Intervention):
 
     def init_post(self):
         super().init_post()
+        self.days = self.sim.day(self.days)  # accept date strings / datetimes as well as day indices
         self._map = _day_change_map(self.days, self.changes)
         nets = self.sim.networks
         self.layers = list(nets.keys()) if self.layers is None else sc.tolist(self.layers)

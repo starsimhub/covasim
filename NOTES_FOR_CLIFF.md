@@ -345,3 +345,111 @@ aren't present in this checkout, the 2 retired v1.7.0-pickle regression tests, a
 superseded M0-anchor placeholders + the network-baseline-conditional test. **synthpops is the only
 feature consciously skipped (per your instruction + it is not installed); there are no dedicated
 synthpops test files -- it was skipped at the feature level.**
+
+---
+
+# Tutorial validation: v3.1.8 vs v4.0.0 (2026-05-30)
+
+**What I did.** Ran all 11 docs/tutorials notebooks under **v3.1.8** (the `/tmp/cov-v3` worktree via
+`PYTHONPATH`) and **v4.0.0**, executing every cell with `--allow-errors` (isolated `NUMBA_CACHE_DIR`
+per run to avoid a numba cache-lock deadlock), exported both executed copies to HTML, and compared
+them cell-by-cell. Everything lives under **`tutorial_validation/`** (git-excluded): `*.v3.ipynb` /
+`*.v4.ipynb` (executed notebooks), `html/` (22 HTML exports), `compare_nb.py` + `compare_all.sh`
+(the comparator), `run_all.sh` (the executor), and `analysis_result.json` (the per-notebook
+classification from a 26-agent analysis workflow).
+
+A deep per-notebook analysis workflow (26 subagents) classified every difference and adversarially
+re-verified each claimed bug. **It found 15 confirmed regressions; I fixed 12 (below) and documented
+the 3 deeper ones.** v4 tutorial-cell errors dropped **56 -> 20** as a result. The full test suite
+stayed green (137 passed, 9 skipped) and byte-identity held through every fix.
+
+## Compat fixes added to v4 (genuine regressions -- now fixed)
+
+All additive / shim-level; none change disease dynamics or existing results, so the parity gates and
+baselines are unaffected.
+
+- **`cv.Sim` constructor**: accepts `end_day=`, `datafile=`, `n_agents=` (alias for `pop_size`), and
+  the v3 dict-pars form; **routes recognised COVID disease pars** (`rel_death_prob`, `nab_decay`,
+  `beta_dist`, durations, ...) from the dict *or* kwargs into the disease module (so
+  `cv.Sim(dict(rel_death_prob=2))` and `cv.Sim(nab_decay=...)` work); defaults `verbose` from
+  `cv.options.verbose` (so `cv.options(verbose=0)` silences runs); sets `sim.version` to Covasim's
+  `4.0.0` (not Starsim's inherited `3.3.4`) and adds `sim.git_info`.
+- **`cv.Sim` methods**: `day()`/`date()`, `get_analyzer(s)`/`get_intervention(s)`, `compute_fit()`,
+  `brief()`, `calibrate()`, `make_transtree()` (informative error if no TransTree analyzer was
+  attached), `initialize()` (alias for `init`, accepts `reset=`), `export_pars()`, `to_excel()`,
+  `plot_result()`. `plot()` accepts a string key, the v3 `to_plot=` alias, the `'variant'` and
+  `'overview'` meta-keys, guards empty key lists, and honours `cv.options.returnfig` (so figures
+  aren't echoed twice in Jupyter).
+- **`sim.results`**: exposes the v3 `date` and `t` time keys (aliases of Starsim's `timevec`).
+- **Interventions**: cosmetic v3 kwargs (`do_plot`/`show_label`/`line_args`) accepted+ignored;
+  **date-string** days (`change_beta`/`clip_edges`) and date-string `start_day`/`end_day` converted
+  to day indices; `test_num('data')` pulls per-day tests from `sim.data['new_tests']`; `change_beta`
+  no longer crashes on callable (dynamic-trigger) days.
+- **Analyzers**: `age_histogram(days=None)` defaults to the final day and has a real `.plot()`.
+- **`cv.MultiSim`**: accepts a list of sims, `run(n_runs=)`, `plot_result`, `combine`, `merge`, and
+  honours `returnfig`.
+- **`cv.Calibration`**: restored the v3 `custom_fn=` hook and `plot_trend`/`plot_sims`/`plot_all`
+  (delegating to the Starsim calibration plotters).
+
+## Confirmed real gaps -- DOCUMENTED for follow-up (not yet fixed)
+
+These are genuine v4 regressions but touch the disease results/dynamics (so they need a baseline
+regeneration and/or a scientific-correctness decision) -- left for a deliberate follow-up:
+
+- **`r_eff` result missing** (tut_interventions): v3 computed `results['r_eff']` (daily method) at
+  finalize; v4's COVID module defines no `r_eff`, but it's still listed in `defaults.overview_plots`.
+  Fix: port v3 `compute_r_eff` into `cv.COVID.finalize_results` as a new `scale=False` Result.
+- **Quarantine result series missing** (tut_interventions): the quarantine *state* exists, but
+  `new_quarantined`/`n_quarantined`/`test_yield` Results are not defined. Fix: add them to
+  `cv.COVID.init_results`/`update_results` (additive; the state is already tracked).
+- **`dynamic_pars(n_imports=...)` is a dead value** (tut_interventions): v4 has no background-import
+  seeding path, so changing `n_imports` mid-run does nothing. Fix: seed imports each step from
+  `pars.n_imports` (this DOES change dynamics, so it needs care + a baseline check).
+- **`sim['beta']` / `sim.start_day` access** (tut_plotting, tut_tips): v4 doesn't route item/attribute
+  access for covasim pars to the disease/sim-config. Read `sim.diseases.covid.pars` /
+  `sim._cv_config` instead, or add a routed `__getitem__`/`__getattr__` (risky on `ss.Sim`).
+- **Re-initialisation** (`sim.initialize(reset=True)`, tut_calibration): re-initialising an
+  already-run sim trips a `total_pop`/`pop_scale` conflict under the Starsim object model. The v4 way
+  is to build a fresh `cv.Sim` with the changed parameter. (No longer crashes with AttributeError.)
+
+## Intentional v4 differences (NOT bugs) -- the v4 way
+
+- **`use_waning` default flipped `True` (v3) -> `False` (v4).** This is the single most impactful
+  difference: the immunity tutorial's "Waning immunity" sim and all `vaccinate_prob`/`vaccinate_num`
+  calls assume v3's default-on waning, so they error/mislead under v4. **Decision for you:** flip the
+  v4 default back to `True` to match v3 (would require regenerating the baselines, which were built
+  with `False`), or keep `False` and update the tutorials to pass `use_waning=True`. I did **not**
+  flip it (it changes every default-sim baseline). See [[m4-waning-nabs]] context.
+- **Disease state lives on the disease module, not `sim.people`.** `sim.people.exposed`/`rel_sus`/
+  `doses`/`susceptible` etc. -> `sim.diseases.covid.exposed` / `.rel_sus` / `.doses`. (Affects the
+  custom-function interventions/analyzers in tut_advanced/tut_analyzers/tut_interventions.)
+- **Bare-function interventions/analyzers** `def f(sim): ...` and custom `cv.Analyzer` with `.apply()`
+  + free instance attributes -> Starsim's `step()` model; `sim.t` is now a `Timeline` (use `sim.ti`
+  for the integer step), and reserved names (`t`, `pars`, ...) are locked on modules.
+- **`sim.summary` keys are namespaced** (`covid_cum_deaths`, ...); results are canonically on
+  `sim.diseases.covid.results` (bridged to `sim.results`).
+- **Per-distribution CRN RNG** -> numeric results differ from v3 for the same seed (validated
+  statistically by the parity gates). All the "stochastic" cell diffs in the comparison are this.
+- **Not ported:** `location=` (country demographics), `cv.Layer`/`people.contacts`/`add_layer`/
+  `reset_layer_pars`/`dynam_layer` (contact internals), precision/numba toggles, custom `nab_decay`
+  *forms* beyond the default, `vaccinate(subtarget=/booster=)`, `historical_vaccinate_prob`,
+  `prior_immunity`, and the v3 people save/load (`.ppl`) workflow.
+
+## Per-notebook result (v4 cells erroring, after fixes)
+
+| notebook | cells | v4 err | nature of remaining errors |
+|---|---|---|---|
+| tut_intro | 7 | 1 | `location=` (intentional) |
+| tut_running | 9 | 0 | clean |
+| tut_plotting | 16 | 1 | `sim.beta` attr access (documented gap) |
+| tut_people | 4 | 2 | `location=`, `sim.people.people` (intentional) |
+| tut_interventions | 12 | 3 | `r_eff` (gap), `subtarget` + fn-intervention (intentional) |
+| tut_analyzers | 4 | 3 | make_transtree-needs-analyzer, custom-Analyzer locked attr, people-state |
+| tut_immunity | 10 | 6 | `use_waning` default x3, subtarget, historical_vaccinate, prior_immunity |
+| tut_calibration | 7 | 1 | re-init conflict (documented gap) |
+| tut_advanced | 4 | 2 | Layer/contacts, dynam_layer (intentional) |
+| tut_tips | 12 | 1 | `sim.start_day` attr access (documented gap) |
+| tut_deployment | 0 | 0 | (markdown only) |
+
+v3 itself errors on only the Optuna calibration cell (a SQLite-storage issue in this headless env,
+present in v4 too); every other v3 cell ran clean, so the comparison baseline is sound.

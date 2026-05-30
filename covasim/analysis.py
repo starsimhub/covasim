@@ -240,12 +240,13 @@ class Calibration(sc.prettyobj):
     """
 
     def __init__(self, sim, calib_pars, data, total_trials=30, n_workers=1, weights=None,
-                 reseed=False, fit_kw=None, **kwargs):
+                 reseed=False, fit_kw=None, custom_fn=None, **kwargs):
         import starsim as ss
         self.sim = sim
         self.data = data
         self.weights = weights
         self.fit_kw = sc.mergedicts(fit_kw)
+        self.custom_fn = custom_fn  # v3 hook: custom_fn(sim, {name: value}) applies the trial's pars
         self.best_pars = None
         self.df = None
 
@@ -306,11 +307,20 @@ class Calibration(sc.prettyobj):
         if not sim.initialized:
             sim.init()
         if calib_pars:
-            for parname, spec in calib_pars.items():
-                if isinstance(spec, dict) and 'value' in spec:
-                    self._apply_par(sim, spec.get('path', parname), spec['value'])
-                elif parname == 'rand_seed':  # reseed adds a raw int
-                    sim.pars.rand_seed = int(spec)
+            if self.custom_fn is not None:
+                # v3 custom_fn hook: the user applies the (flat) trial parameters themselves -- replaces
+                # the default per-path application (e.g. setting an intervention attribute).
+                flat = {name: (spec['value'] if isinstance(spec, dict) and 'value' in spec else spec)
+                        for name, spec in calib_pars.items() if name != 'rand_seed'}
+                self.custom_fn(sim, flat)
+                if 'rand_seed' in calib_pars:
+                    sim.pars.rand_seed = int(calib_pars['rand_seed'])
+            else:
+                for parname, spec in calib_pars.items():
+                    if isinstance(spec, dict) and 'value' in spec:
+                        self._apply_par(sim, spec.get('path', parname), spec['value'])
+                    elif parname == 'rand_seed':  # reseed adds a raw int
+                        sim.pars.rand_seed = int(spec)
         return sim
 
     def _eval_fn(self, sim, **kwargs):
@@ -326,6 +336,32 @@ class Calibration(sc.prettyobj):
         self.best_pars = self._calib.best_pars
         self.df = getattr(self._calib, 'df', None)
         return self
+
+    def _delegate_plot(self, *names, **kwargs):
+        """Call the first available plot method on the underlying ss.Calibration (v3-compat shim)."""
+        for name in names:
+            fn = getattr(self._calib, name, None)
+            if callable(fn):
+                try:
+                    return fn(**kwargs)
+                except Exception as e:
+                    cvm.warn(f'Calibration.{name} plotting failed: {e}')
+                    return None
+        cvm.warn(f'No calibration plot available among {names} on this Starsim version.')
+        return None
+
+    def plot_trend(self, **kwargs):
+        """Plot the optimization trend over trials (v3 ``Calibration.plot_trend``)."""
+        return self._delegate_plot('plot_optuna', 'plot', **kwargs)
+
+    def plot_sims(self, **kwargs):
+        """Plot the calibrated sim(s) vs data (v3 ``Calibration.plot_sims``)."""
+        kwargs.pop('to_plot', None)  # v3 to_plot is not used by the Starsim plotters
+        return self._delegate_plot('plot_final', 'plot', **kwargs)
+
+    def plot_all(self, **kwargs):
+        """Plot everything (v3 ``Calibration.plot_all``); delegates to the Starsim calibration plot."""
+        return self._delegate_plot('plot', 'plot_final', **kwargs)
 
 
 # %% Analyzers (M9) ---------------------------------------------------------------------------------
@@ -412,9 +448,9 @@ class age_histogram(Analyzer):
     ``hists[date][state]`` is the per-age-bin count of agents in ``state``; ``bins`` are the age-bin edges.
     """
 
-    def __init__(self, days, states=None, bins=None, **kwargs):
+    def __init__(self, days=None, states=None, bins=None, **kwargs):
         super().__init__(**kwargs)
-        self.days = sc.tolist(days)
+        self.days = sc.tolist(days) if days is not None else None  # None => the final day (v3 default)
         self.states = states or ['exposed', 'infectious', 'severe', 'critical', 'dead']
         self.bins = np.array(bins) if bins is not None else np.arange(0, 101, 10)
         self._dayset = None
@@ -423,7 +459,8 @@ class age_histogram(Analyzer):
 
     def init_post(self):
         super().init_post()
-        self._dayset = self._resolve_days(self.days)
+        days = self.days if self.days is not None else [self.sim.t.npts - 1]  # default: final day
+        self._dayset = self._resolve_days(days)
         return
 
     def step(self):
@@ -441,6 +478,32 @@ class age_histogram(Analyzer):
             hist[state] = counts
         self.hists[self._datekey(ti)] = hist
         return
+
+    def plot(self, fig=None, **kwargs):
+        """Bar plot of the recorded age histograms (one panel per day); the v3 ``age_histogram.plot``.
+
+        Defined here because Starsim's generic analyzer plot does not handle this analyzer's nested
+        ``hists[date][state]`` layout.
+        """
+        import matplotlib.pyplot as plt
+        days = list(self.hists.keys()) or ['(none)']
+        if fig is None:
+            fig, axes = plt.subplots(len(days), 1, figsize=(8, 3.2 * len(days)), squeeze=False)
+            axes = axes.flatten()
+        else:
+            axes = np.atleast_1d(fig.axes)
+        for ax, day in zip(axes, days):
+            hist = self.hists.get(day, {})
+            bins = np.asarray(hist.get('bins', self.bins))
+            centers = (bins[:-1] + bins[1:]) / 2
+            widths = np.diff(bins) * 0.9
+            for state in self.states:
+                if state in hist:
+                    ax.bar(centers, hist[state], width=widths, alpha=0.5, label=state)
+            ax.set_title(f'Age histogram ({day})'); ax.set_xlabel('Age'); ax.set_ylabel('Count')
+            ax.legend()
+        fig.tight_layout()
+        return fig
 
 
 class nab_histogram(Analyzer):
