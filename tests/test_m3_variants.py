@@ -228,3 +228,110 @@ def test_string_variant_sugar_introduces_at_t0():
     assert d.variant_map == {0: 'wild', 1: 'beta'}
     ci = np.asarray(d.results['variant']['cum_infections_by_variant'])
     assert ci[1, -1] > 0, 'the beta variant (introduced at t0) infects agents'
+
+
+# === Task 3: cv.CrossImmunity connector + reinfection ===
+
+def _multivariant_sim(seed=2, n_days=100):
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='random', n_days=n_days, rand_seed=seed,
+                 verbose=0, variants=cv.variant('beta', days=20, n_imports=30))
+    sim.run()
+    return sim
+
+
+def test_connector_auto_attached_and_flag_set():
+    """A multi-variant cv.Sim auto-attaches cv.CrossImmunity and flips cross_immunity_active on."""
+    sim = _multivariant_sim()
+    assert 'crossimmunity' in sim.connectors, 'CrossImmunity auto-attached when nv>1'
+    assert isinstance(sim.connectors.crossimmunity, cv.CrossImmunity)
+    assert sim.diseases.covid.cross_immunity_active is True
+
+
+def test_nv1_no_connector_permanent_immunity():
+    """At nv==1 no connector is attached, recovered stay immune, and behavior is unchanged."""
+    sim = cv.Sim(pop_size=8000, pop_infected=30, pop_type='random', n_days=80, rand_seed=1, verbose=0)
+    sim.run()
+    assert len(sim.connectors) == 0, 'no connector at nv==1'
+    d = sim.diseases.covid
+    assert d.cross_immunity_active is False
+    rec = (d.recovered & d.susceptible).uids
+    assert len(rec) == 0, 'no recovered agent is susceptible again at nv==1 (permanent immunity)'
+
+
+def test_crossimmunity_matrix_written_to_imm_arrays():
+    """The connector writes sus_imm = matrix[target, recovered_variant] for ever-recovered agents."""
+    sim = _multivariant_sim()
+    d = sim.diseases.covid
+    matrix = sim.connectors.crossimmunity.matrix
+    ti = d.ti
+    rec = (d.ti_recovered <= ti).uids
+    assert len(rec) > 0, 'expected ever-recovered agents'
+    ru = np.asarray(rec)
+    src_v = np.asarray(d.recovered_variant[rec]).astype(int)
+    for v in range(d.nv):
+        expected = matrix[v, src_v]
+        assert np.allclose(d.sus_imm[v, ru], expected), f'sus_imm[{v}] must equal matrix[{v}, recovered_variant]'
+        assert np.allclose(d.symp_imm[v, ru], expected), 'symp_imm written from the same matrix (axis C: all three)'
+        assert np.allclose(d.sev_imm[v, ru], expected), 'sev_imm written from the same matrix'
+
+
+def test_same_variant_reinfection_is_zero():
+    """Same-variant protection is the diagonal (1.0) => same-variant reinfection is exactly 0.
+
+    Documented M3 divergence from v3's NAb numerics (calc_VE(nab*1.0) < 1 permits a tiny same-variant
+    reinfection). The static matrix gives matrix[v,v]==1.0 => rel_sus*(1-1)=0 => no same-variant reinfection.
+    """
+    sim = _multivariant_sim()
+    d = sim.diseases.covid
+    rec = (d.ti_recovered <= d.ti).uids
+    src_v = np.asarray(d.recovered_variant[rec]).astype(int)
+    ru = np.asarray(rec)
+    # The protection against the OWN recovered variant must be exactly 1.0 (full) for every ever-recovered agent.
+    own_imm = d.sus_imm[src_v, ru]
+    assert np.allclose(own_imm, 1.0), 'same-variant sus_imm must be 1.0 (no same-variant reinfection)'
+
+
+def test_reinfection_enabled_under_cross_immunity():
+    """Cross-immunity active => reinfection occurs (total infections can exceed the population)."""
+    sim = _multivariant_sim()
+    d = sim.diseases.covid
+    ci = np.asarray(d.results['variant']['cum_infections_by_variant'])
+    total = ci[:, -1].sum()
+    assert total > 20000, f'reinfection should push total infections above pop_size, got {total}'
+
+
+def test_cross_immunity_reduces_heterologous_reinfection():
+    """The cross-immunity MATRIX gates reinfection: stronger off-diagonal => fewer 2nd-variant cases.
+
+    Isolates cross-immunity from rel_beta by using ONE custom variant (fixed rel_beta) and overriding
+    only the cross-immunity matrix off-diagonal. High off-diagonal (wild-recovered are well protected
+    against the new variant) suppresses the second variant; low off-diagonal lets it escape and spread.
+    """
+    def second_variant_total(offdiag):
+        v = cv.variant({'rel_beta': 1.5, 'label': 'X'}, days=25, n_imports=30)
+        matrix = np.array([[1.0, offdiag], [offdiag, 1.0]])  # matrix[target, source]
+        conn = cv.CrossImmunity(immunity=matrix)
+        sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='random', n_days=100, rand_seed=5,
+                     verbose=0, variants=v, connectors=conn)
+        sim.run()
+        ci = np.asarray(sim.diseases.covid.results['variant']['cum_infections_by_variant'])
+        return ci[1, -1]
+    strong = second_variant_total(0.9)  # strong cross-protection => 2nd variant suppressed
+    weak   = second_variant_total(0.1)  # weak cross-protection  => 2nd variant escapes, spreads
+    assert weak > strong, f'weaker cross-immunity must permit more reinfection: weak={weak}, strong={strong}'
+
+
+def test_host_exclusivity_one_seir_chain():
+    """Each agent runs exactly ONE SEIR chain: infectious agents carry a single, consistent variant tag."""
+    sim = cv.Sim(pop_size=10000, pop_infected=80, pop_type='random', n_days=40, rand_seed=3, verbose=0,
+                 variants=cv.variant('delta', days=5, n_imports=40))
+    sim.run()
+    d = sim.diseases.covid
+    inf = d.infectious.uids
+    if len(inf):
+        ev = np.asarray(d.exposed_variant[inf])
+        iv = np.asarray(d.infectious_variant[inf])
+        # infectious_variant is a single valid index, and equals exposed_variant (one chain, one variant).
+        assert np.isfinite(iv).all(), 'every infectious agent has a single finite infectious_variant'
+        assert np.array_equal(ev, iv), 'exposed_variant == infectious_variant for infectious agents (one chain)'
+        assert set(np.unique(iv)).issubset({0, 1}), 'variant tags are valid indices'

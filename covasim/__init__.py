@@ -31,5 +31,6 @@ from .population    import * # cv.make_randpop / cv.make_hybrid_contacts / ... (
 from .network       import * # cv.Network(ss.Network)  -- M1
 from .covid         import * # cv.COVID(ss.Infection)  -- M1
 from .immunity      import * # cv.variant / build_immunity_matrix -- M3
+from .connectors    import * # cv.CrossImmunity(ss.Connector) -- M3
 from .people        import * # cv.People(ss.People)    -- M1
 from .sim           import * # cv.Sim(ss.Sim)          -- M1

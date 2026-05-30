@@ -15,6 +15,7 @@ import starsim as ss
 from . import people as cvppl
 from . import network as cvnet
 from . import covid as cvcov
+from . import connectors as cvconn
 
 __all__ = ['Sim']
 
@@ -62,6 +63,15 @@ class Sim(ss.Sim):
         if diseases is None:
             betadict = {lk: ss.probperday(base_beta*bl) for lk, bl in _BETA_LAYER[pop_type].items()}
             diseases = cvcov.COVID(beta=betadict, init_prev=int(pop_infected), variants=variants)
+
+        # Auto-attach the cross-immunity connector when more than one variant circulates (M3); it
+        # applies the static cross-immunity matrix each step and enables reinfection. Users can pass
+        # connectors=... to override (e.g. a custom immunity matrix or to disable).
+        connectors = kwargs.pop('connectors', None)
+        if connectors is None and getattr(diseases, 'nv', 1) > 1:
+            connectors = cvconn.CrossImmunity()
+        if connectors is not None:
+            kwargs['connectors'] = connectors
 
         # Absolute population scaling: each agent represents pop_scale real people. Starsim
         # auto-multiplies every scale=True Result by pop_scale at finalize. Pass at most one of
