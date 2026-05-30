@@ -72,8 +72,16 @@ class CrossImmunity(ss.Connector):
         rec = (covid.ti_recovered <= ti).uids   # finite ti_recovered that has passed (NaN <= ti is False)
         if not len(rec):
             return
-        ru = np.asarray(rec)
-        src_v = np.asarray(covid.recovered_variant[rec]).astype(int)  # the variant each recovered from
+        # Defensive: only index the matrix for agents whose recovered_variant is finite. By construction
+        # this is every ever-recovered living agent (death/recovery are exclusive, and reinfection resets
+        # ti_recovered to NaN), but guarding the .astype(int) here keeps it robust if that ever changes
+        # (a NaN->int cast would otherwise produce an out-of-bounds matrix index).
+        src = np.asarray(covid.recovered_variant[rec])
+        finite = np.isfinite(src)
+        if not finite.any():
+            return
+        ru = np.asarray(rec)[finite]
+        src_v = src[finite].astype(int)          # the variant each recovered from
         for v in range(covid.nv):                # target variant v; matrix[v, source] is the protection
             imm = self.matrix[v, src_v]
             covid.sus_imm[v, ru]  = imm

@@ -157,3 +157,8 @@ tests/regression/anchor_m1_snapshot.json
 tests/regression/v3_m2_*seeds*.json
 tests/regression/v4_m2_*seeds*.json
 tests/regression/anchor_m2_snapshot.json
+
+# M3 multi-variant + cross-immunity regression baselines
+tests/regression/v3_m3_*seeds*.json
+tests/regression/v4_m3_*seeds*.json
+tests/regression/anchor_m3_snapshot.json

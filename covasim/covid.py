@@ -378,6 +378,7 @@ class COVID(ss.Infection):
         nv = self.nv
         betamap = self.validate_beta()
         susc = self.susceptible  # the age-OR baseline x susceptible mask (cross-immunity folds in per variant)
+        auids = np.asarray(self.sim.people.auids)  # active UIDs, aligned with the FloatArr active values
         new_cases, sources, networks, case_variant = [], [], [], []
 
         for vi in range(nv):
@@ -385,12 +386,19 @@ class COVID(ss.Infection):
             rel_beta_v = float(self.variant_pars[label]['rel_beta'])
             # Source mask: agents infectious WITH this variant (== full infectious set at nv==1).
             inf_mask = self.infectious if nv == 1 else (self.infectious & (self.infectious_variant == vi))
-            rel_trans = self.rel_trans.asnew(inf_mask * self.rel_trans)
-            if rel_beta_v != 1.0:  # fold the variant's relative beta into rel_trans (== scaling beta)
-                rel_trans.raw[:] = rel_trans.raw * rel_beta_v
-            rel_sus = self.rel_sus.asnew(susc * self.rel_sus)
+            # Fold the variant's relative beta into rel_trans on the ACTIVE values (== scaling beta).
+            # Done here, not on rel_trans.raw, so the uninitialized inactive raw slots from asnew are
+            # never multiplied (a garbage*rel_beta overflow would otherwise trip COVASIM_WARNINGS=error).
+            trans_vals = inf_mask * self.rel_trans
+            if rel_beta_v != 1.0:
+                trans_vals = trans_vals * rel_beta_v
+            rel_trans = self.rel_trans.asnew(trans_vals)
+            sus_vals = susc * self.rel_sus
             if nv > 1:  # reduce susceptibility by this variant's cross-immunity (NaN-free at nv==1)
-                rel_sus.raw[:] = rel_sus.raw * (1.0 - self.sus_imm[vi])
+                # Index sus_imm (raw, by-UID) at the active UIDs so we fold into the active values only
+                # (never the uninitialized inactive raw slots -- avoids spurious over/underflow warnings).
+                sus_vals = sus_vals * (1.0 - self.sus_imm[vi][auids])
+            rel_sus = self.rel_sus.asnew(sus_vals)
 
             for i, (nkey, route) in enumerate(self.sim.networks.items()):
                 nk = ss.standardize_netkey(nkey)
@@ -468,7 +476,13 @@ class COVID(ss.Infection):
             v[:] = 0.0
         self._introduce_variants()  # seed any variant introductions scheduled for this day
         # exposed -> infectious: tag infectious_variant from exposed_variant (v3 check_infectious),
-        # count new_infectious_by_variant, then clear the `exposed` flag.
+        # count new_infectious_by_variant, then clear the `exposed` flag. The gate is `exposed &
+        # (ti_infectious<=ti)` (the agents transitioning THIS step) rather than the full infectious
+        # property `infected & (ti_infectious<=ti)`: the latter would re-count already-infectious
+        # agents every step (over-counting the new_infectious flow). Same-step infectiousness
+        # (dur_exp2inf==0) is tagged in set_prognoses, and those agents are still `exposed` here so
+        # they are counted exactly once. Every infectious agent thus carries a finite infectious_variant,
+        # so the nv>1 source mask `infectious & (infectious_variant==vi)` == the full infectious set.
         new_inf = (self.exposed & (self.ti_infectious <= ti)).uids
         if len(new_inf):
             iv = self.exposed_variant[new_inf]

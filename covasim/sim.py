@@ -10,6 +10,7 @@ by network layer. ``pop_infected`` agents are seeded exactly at t=0.
 Passing ``people=`` / ``networks=`` / ``diseases=`` overrides the corresponding
 default, so tests (and later milestones) can inject their own components.
 """
+import numpy as np
 import starsim as ss
 
 from . import people as cvppl
@@ -86,4 +87,57 @@ class Sim(ss.Sim):
         super().__init__(pars=pars, people=people, networks=networks, diseases=diseases,
                          start=ss.date(start_day), dur=ss.days(n_days), dt=ss.days(1),
                          rand_seed=rand_seed, **scale_kw, **kwargs)
+        return
+
+    # By_variant Result keys that scale with population (counts); the rest (prevalence/incidence) are rates.
+    _BY_VARIANT_SCALE_KEYS = (
+        'new_infections_by_variant', 'cum_infections_by_variant',
+        'new_symptomatic_by_variant', 'cum_symptomatic_by_variant',
+        'new_severe_by_variant', 'cum_severe_by_variant',
+        'new_infectious_by_variant', 'cum_infectious_by_variant',
+        'n_exposed_by_variant', 'n_infectious_by_variant',
+    )
+
+    def finalize(self):
+        """Finalize, then bridge the multi-variant results to the v3 top-level path (M3, Open Q E).
+
+        Starsim namespaces module results under ``sim.results['covid']`` and its auto-scaler does not
+        descend into the nested ``['variant']`` sub-dict, so M3 here (mirroring v3 ``sim.finalize``):
+          - scales the count-type by_variant Results by ``pop_scale``;
+          - adds the initial-wild seed-offset to ``cum_infections_by_variant[0]`` (v3 sim.py:786-787);
+          - recomputes the ``prevalence``/``incidence`` by_variant rates against scaled denominators;
+          - references ``sim.results['variant']`` and ``sim.results['n_imports']`` at the v3 top-level path.
+        Full flat aggregate-results / ``sim.summary`` compat is deferred (Open Q E).
+        """
+        super().finalize()
+        covid = self.diseases.get('covid')
+        if covid is None or 'variant' not in covid.results:
+            return
+        vres = covid.results['variant']
+        pop_scale = float(self.pars.pop_scale)
+
+        # Manually scale the count-type by_variant Results (the auto-scaler skips the nested sub-dict).
+        if pop_scale != 1.0:
+            for key in self._BY_VARIANT_SCALE_KEYS:
+                vres[key].values *= pop_scale
+
+        # Seed-offset: the initial wild seeds enter cum_infections_by_variant[0] (v3 sim.py:786-787).
+        n_seed = int(getattr(covid.pars, '_n_initial_cases', 0) or 0)
+        if n_seed:
+            vres['cum_infections_by_variant'].values[0, :] += n_seed * pop_scale
+
+        # Recompute the by_variant rate denominators against the scaled population (v3-style; the
+        # prevalence_by_variant misnomer = new_infections_by_variant / n_alive is copied verbatim).
+        n_raw = len(covid.rel_sus.raw)                              # initial agent count (no births in M3)
+        cum_deaths = np.asarray(covid.results['cum_deaths'], dtype=float)
+        n_alive = n_raw * pop_scale - cum_deaths
+        n_susc = np.asarray(covid.results['n_susceptible'], dtype=float)
+        new_inf = np.asarray(vres['new_infections_by_variant'], dtype=float)
+        vres['incidence_by_variant'].values[:]  = np.divide(new_inf, n_susc,  out=np.zeros_like(new_inf), where=n_susc > 0)
+        vres['prevalence_by_variant'].values[:] = np.divide(new_inf, n_alive, out=np.zeros_like(new_inf), where=n_alive > 0)
+
+        # Bridge to the v3 top-level path so sim.results['variant'][key] / sim.results['n_imports'] work.
+        self.results['variant'] = vres
+        if 'n_imports' in covid.results:
+            self.results['n_imports'] = covid.results['n_imports']
         return

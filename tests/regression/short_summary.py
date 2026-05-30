@@ -152,3 +152,77 @@ def build_summary_m2(sim):
         'cum_critical':      float(summary['cum_critical']),
         'cum_deaths':        float(summary['cum_deaths']),
     }
+
+
+# --- M3 (multi-variant + cross-immunity) summary -----------------------------
+# Aggregate burden/shape PLUS per-variant counts for wild/alpha/delta. Under reinfection the
+# aggregate cum_infections counts infection EVENTS (= sum over variants of cum_infections_by_variant),
+# matching v3's flow-based definition (NOT unique-ever-infected agents).
+_M3_VARIANTS = ('wild', 'alpha', 'delta')
+METRIC_KEYS_M3 = (
+    'cum_infections', 'cum_deaths', 'peak_n_infectious', 'peak_prevalence',
+) + tuple(f'cum_infections_{v}' for v in _M3_VARIANTS) \
+  + tuple(f'peak_n_infectious_{v}' for v in _M3_VARIANTS)
+
+
+def build_summary_m3(sim):
+    """Return the M3 multi-variant short summary, under v3.1.8 or v4 (duck-typed).
+
+    Aggregate + per-variant (wild/alpha/delta) metrics, defined identically on both engines:
+      - cum_infections: total infection EVENTS = sum over variants of cum_infections_by_variant
+        (seed-inclusive; counts reinfections), matching v3's flow-based cum_infections.
+      - peak_n_infectious / peak_prevalence: peak of the aggregate infectious count and of that
+        count as a fraction of the (scaled) starting population.
+      - cum_infections_<variant> / peak_n_infectious_<variant>: per-variant final cumulative
+        infections and peak concurrent infectious count.
+    """
+    if hasattr(sim, 'diseases'):  # v4 (Starsim-based)
+        d = list(sim.diseases.values())[0]
+        vres = d.results['variant']
+        ci = np.asarray(vres['cum_infections_by_variant'])   # (nv, npts), seed-offset on wild applied
+        ni = np.asarray(vres['n_infectious_by_variant'])     # (nv, npts)
+        vmap = d.variant_map
+        peak_n_inf = float(np.asarray(d.results['n_infectious']).max())
+        cum_deaths = float(np.asarray(d.results['cum_deaths']).max())
+        try:
+            pop_scale = float(sim.pars.pop_scale)
+        except Exception:
+            pop_scale = 1.0
+        total_pop = len(d.rel_sus.raw) * pop_scale
+        out = {
+            'cum_infections':    float(ci[:, -1].sum()),
+            'cum_deaths':        cum_deaths,
+            'peak_n_infectious': peak_n_inf,
+            'peak_prevalence':   peak_n_inf / total_pop if total_pop else 0.0,
+        }
+        label_to_idx = {lab: i for i, lab in vmap.items()}
+        for lab in _M3_VARIANTS:
+            i = label_to_idx.get(lab)
+            out[f'cum_infections_{lab}']    = float(ci[i, -1]) if i is not None else 0.0
+            out[f'peak_n_infectious_{lab}'] = float(ni[i].max()) if i is not None else 0.0
+        return out
+
+    # v3.1.8
+    summary = sim.summary
+    vmap = sim['variant_map']
+    label_to_idx = {lab: i for i, lab in vmap.items()}
+    vr = sim.results['variant']
+    ci = np.asarray(vr['cum_infections_by_variant'])  # (nv, npts)
+    ni = np.asarray(vr['n_infectious_by_variant'])
+    peak_n_inf = float(_series_max(sim, 'n_infectious'))
+    try:
+        pop_scale = float(sim['pop_scale'])
+    except Exception:
+        pop_scale = 1.0
+    total_pop = float(sim['pop_size']) * pop_scale
+    out = {
+        'cum_infections':    float(summary['cum_infections']),
+        'cum_deaths':        float(summary['cum_deaths']),
+        'peak_n_infectious': peak_n_inf,
+        'peak_prevalence':   peak_n_inf / total_pop if total_pop else 0.0,
+    }
+    for lab in _M3_VARIANTS:
+        i = label_to_idx.get(lab)
+        out[f'cum_infections_{lab}']    = float(ci[i, -1]) if i is not None else 0.0
+        out[f'peak_n_infectious_{lab}'] = float(ni[i].max()) if i is not None else 0.0
+    return out

@@ -52,6 +52,14 @@ def _run_seed_m2(seed, pop_type):
     return build_summary_m2(sim)
 
 
+def _run_seed_m3(seed, pop_type):
+    from anchor_m3 import make_sim                 # noqa: E402
+    from short_summary import build_summary_m3     # noqa: E402
+    sim = make_sim(pop_type=pop_type, rand_seed=int(seed))
+    sim.run()
+    return build_summary_m3(sim)
+
+
 # Anchor registry: name -> (per-seed runner, default output filename template).
 def _anchor_runner(anchor):
     if anchor == 'm0':
@@ -66,7 +74,12 @@ def _anchor_runner(anchor):
         if pop_type not in ('random', 'hybrid'):
             raise ValueError(f"Unknown M2 anchor {anchor!r}; use m2_random or m2_hybrid.")
         return (lambda seed: _run_seed_m2(seed, pop_type), f'v3_m2_{pop_type}_seeds_n{{n}}.json')
-    raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_random|hybrid, m2_random|hybrid.")
+    if anchor.startswith('m3_'):
+        pop_type = anchor.split('_', 1)[1]
+        if pop_type not in ('random', 'hybrid'):
+            raise ValueError(f"Unknown M3 anchor {anchor!r}; use m3_random or m3_hybrid.")
+        return (lambda seed: _run_seed_m3(seed, pop_type), f'v3_m3_{pop_type}_seeds_n{{n}}.json')
+    raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_*, m2_*, m3_random|hybrid.")
 
 
 def main(argv=None):

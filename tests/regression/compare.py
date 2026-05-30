@@ -88,7 +88,11 @@ def _resolve_run(anchor):
         pop_type = anchor.split('_', 1)[1]
         from anchor_m2 import run_and_summarize as run_m2  # noqa: E402
         return lambda: run_m2(pop_type=pop_type)
-    raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_random|hybrid, m2_random|hybrid.")
+    if anchor.startswith('m3_'):
+        pop_type = anchor.split('_', 1)[1]
+        from anchor_m3 import run_and_summarize as run_m3  # noqa: E402
+        return lambda: run_m3(pop_type=pop_type)
+    raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_*, m2_*, m3_random|hybrid.")
 
 
 def main(argv=None):

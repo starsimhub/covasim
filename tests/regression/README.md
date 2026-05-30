@@ -156,3 +156,51 @@ numba RNG + per-day viral-load discretization, irreducible without bit-for-bit
 equivalence) still reads as `|z|` up to ~3.5. `|z| < 5` admits that scientifically
 negligible band while still catching genuine regressions; see the rationale block at
 the top of `../test_m2_parity.py`.
+
+## M3 anchors (multi-variant + cross-immunity)
+
+`anchor_m3.py` adds the M3 **multi-variant** anchor for the `random` and `hybrid`
+backends: wild seeded at t0, **alpha introduced at day 10** and **delta at day 30**
+(`n_imports=20` each), `pop_size=20_000`, `n_days=120`. The same file runs under
+v3.1.8 (with **cross-immunity active**, i.e. `use_waning=True` — the realistic
+multi-variant regime, M3 design-spec Open Q D) and under v4 (`cv.Sim(variants=[...])`).
+`build_summary_m3` (in `short_summary.py`) extracts aggregate metrics
+(`cum_infections`, `cum_deaths`, `peak_n_infectious`, `peak_prevalence`) plus the
+per-variant `cum_infections_<v>` / `peak_n_infectious_<v>` for wild/alpha/delta.
+
+Generate the gitignored v3.1.8 M3 baselines from a frozen v3.1.8 env (worktree method):
+
+```bash
+git worktree add /tmp/cov-v3 main
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m3_random --n 30
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m3_hybrid --n 30
+```
+
+(`PYTHONPATH=/tmp/cov-v3` makes `import covasim` resolve to the v3.1.8 worktree, not the
+editable v4 install; the harness duck-types on `cv.COVID` to pick the v3-vs-v4 branch.)
+
+The release gate is `../test_m3_parity.py` (slow, per backend), skipping when the
+baseline is absent.
+
+**Documented static-vs-NAb divergence (the M3 acceptance boundary).** M3 ships a
+*static, NAb-free* cross-immunity: the connector writes `sus_imm = matrix[target, source]`
+directly, whereas v3 weights it by the per-agent neutralizing-antibody titre
+(`sus_imm = calc_VE(nab × matrix)`). Consequently the v4 and v3 trajectories agree where
+the static matrix suffices but diverge where NAb kinetics dominate:
+
+  - **Converges (GATED, `|z| < 5`):** `cum_infections_wild` (≈ `|z| 0`, even with
+    multi-variant reinfection feedback), `peak_n_infectious`, `peak_prevalence`. These
+    validate the core multi-variant machinery (per-variant transmission, host
+    exclusivity, the cross-immunity connector, reinfection).
+  - **Diverges (INFORMATIONAL, not gated):** the per-variant alpha/delta absolute counts
+    and aggregate `cum_infections`. The gap is largest for the **late-introduced escape
+    variant delta** (`matrix[delta, wild]=0.374`, so v4 wild-recovered are only ~37%
+    protected and delta finds a large susceptible pool): v4 has ~7–10× more delta and
+    ~55% more total infections than v3 (`|z|` up to ~46). This is by design; the NAb
+    engine (M4) re-converges these. A related divergence: same-variant reinfection is
+    **exactly 0** in M3 (`matrix[v,v]=1.0`), whereas v3's `calc_VE(nab×1.0) < 1` permits
+    a small amount.
+
+The gate therefore hard-gates only the convergent subset and prints the full per-metric
+table (`[GATE]`/`[info]`) for diagnostics; see the rationale block at the top of
+`../test_m3_parity.py` and the demo in `NOTES_FOR_CLIFF.md`.
