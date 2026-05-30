@@ -43,7 +43,7 @@ class Sim(ss.Sim):
 
     def __init__(self, pars=None, people=None, pop_size=20_000, pop_infected=20,
                  pop_type='random', n_days=60, start_day='2020-03-01', rand_seed=1,
-                 beta=None, pop_scale=None, total_pop=None, **kwargs):
+                 beta=None, pop_scale=None, total_pop=None, variants=None, **kwargs):
         if pop_type not in _BETA_LAYER:
             raise ValueError(f"pop_type {pop_type!r} not supported in M1 (choices: 'random', 'hybrid').")
         base_beta = _BASE_BETA if beta is None else beta
@@ -55,10 +55,13 @@ class Sim(ss.Sim):
         if networks is None:
             networks = cvnet.make_networks(pop_type)
 
+        # Additional co-circulating variants (M3): a cv.variant, a list, or string/dict sugar. They are
+        # registered into the single cv.COVID module (growing its variant axis) before state allocation.
+        # variants empty => nv==1 => byte-identical to M2.
         diseases = kwargs.pop('diseases', None)
         if diseases is None:
             betadict = {lk: ss.probperday(base_beta*bl) for lk, bl in _BETA_LAYER[pop_type].items()}
-            diseases = cvcov.COVID(beta=betadict, init_prev=int(pop_infected))
+            diseases = cvcov.COVID(beta=betadict, init_prev=int(pop_infected), variants=variants)
 
         # Absolute population scaling: each agent represents pop_scale real people. Starsim
         # auto-multiplies every scale=True Result by pop_scale at finalize. Pass at most one of

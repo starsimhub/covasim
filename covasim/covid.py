@@ -45,7 +45,7 @@ class COVID(ss.Infection):
             (default no constraint; the factors are inert unless beds are set).
     """
 
-    def __init__(self, pars=None, **kwargs):
+    def __init__(self, pars=None, variants=None, **kwargs):
         super().__init__()
         self.define_pars(
             beta         = ss.probperday(0.016),                                # Covasim pars['beta'] (parameters.py:62)
@@ -130,6 +130,19 @@ class COVID(ss.Infection):
         self.nv = 1
         self.variant_map  = {0: 'wild'}                       # index -> label (wild always 0)
         self.variant_pars = {'wild': dict(cvpar.get_variant_pars(variant='wild'))}  # 5 keys, all 1.0
+        # Register any additional variants (cv.variant objects, or string/dict sugar) into the single
+        # module's variant axis NOW, before init_post allocates the nv-shaped immunity arrays. Each
+        # grows nv / variant_map / variant_pars and gets a stable .index; wild stays index 0.
+        self._variant_objs = []
+        if variants is not None:
+            from . import immunity as cvimm
+            if isinstance(variants, (str, dict, cvimm.variant)):
+                variants = [variants]
+            for v in variants:
+                if not isinstance(v, cvimm.variant):
+                    v = cvimm.variant(v, days=0)  # bare name/dict => introduce at t0
+                v.initialize(self)
+                self._variant_objs.append(v)
         # 2D per-variant immunity arrays sus_imm/symp_imm/sev_imm, shape (nv, n_raw), allocated in
         # init_post once n_agents is known (plain ndarrays indexed by raw UID -- NOT growth-aware,
         # so M3 forbids births; see init_post). All-zero at nv==1 => no effect (M2 byte-identity).
@@ -137,8 +150,9 @@ class COVID(ss.Infection):
         # Per-target variant of THIS step's new cases, keyed by UID (set in the M3 infect() override;
         # read by set_prognoses). Empty => the stock single-variant path (everyone wild).
         self._new_case_variant = {}
-        # Cross-immunity / reinfection switch (auto-True when nv>1; M3 Task 3). When False (the M2
-        # path) recovered agents stay susceptible=False (permanent immunity), preserving M2 exactly.
+        # Cross-immunity / reinfection switch. False (the M2 path) => recovered agents stay
+        # susceptible=False (permanent immunity), preserving M2 byte-identically. cv.CrossImmunity
+        # (M3 Task 3) flips this on when attached (nv>1), enabling reinfection + static cross-immunity.
         self.cross_immunity_active = False
         return
 
@@ -279,6 +293,12 @@ class COVID(ss.Infection):
         self.ti_infected[uids] = ti
         self.ti_exposed[uids]  = ti
         self.ti_infectious[uids] = ti + self._dur(p.dur_exp2inf, uids)
+        # Edge case: if dur_exp2inf rounds to 0 the agent is infectious-by-property THIS step, after
+        # step_state already ran -- tag infectious_variant now so the by_variant stock stays exact
+        # (step_state still clears `exposed` and counts the new_infectious flow next step).
+        imm = uids[np.asarray(self.ti_infectious[uids]) <= ti]
+        if len(imm):
+            self.infectious_variant[imm] = self.exposed_variant[imm]
         # Reset all downstream dates (defensive; matches v3 "reset all other dates")
         for arr in (self.ti_symptomatic, self.ti_severe, self.ti_critical, self.ti_recovered, self.ti_dead):
             arr[uids] = np.nan
@@ -335,14 +355,118 @@ class COVID(ss.Infection):
         self.ti_vl_switch[uids] = self.ti_infectious[uids] + trans_point * infect_days
         return
 
+    def infect(self):
+        """Per-variant transmission (M3): loop variants with per-variant beta + cross-immunity.
+
+        Overrides the single-beta ``ss.Infection.infect()`` (starsim ``diseases.py``), wrapping its
+        network loop in ``for vi in range(nv)`` exactly as v3 ``sim.py:622-649``. Per variant it
+        (a) masks sources by ``infectious_variant==vi``, (b) scales transmissibility by the variant's
+        ``rel_beta``, and (c) folds this variant's cross-immunity ``(1 - sus_imm[vi])`` into ``rel_sus``.
+        The CRN-load-bearing ``self.trans_rng.rvs(src, trg)`` call is preserved verbatim; ``multi_random``
+        auto-jumps per call, so calling it once per variant gives each variant an independent draw.
+
+        Exclusivity at dedup: candidates are appended in ascending ``vi`` order, then
+        ``unique(return_index=True)`` keeps the first occurrence => the lowest-variant-index wins,
+        reproducing v3's sequential-loop tie-break (v3 mutated ``susceptible=False`` inside the loop).
+        The surviving per-target variant is recorded by UID in ``self._new_case_variant`` for
+        ``set_prognoses`` (which runs via ``set_outcomes`` with no variant arg).
+
+        At ``nv==1`` this is byte-identical to the stock single-beta path (one variant, ``rel_beta``
+        1.0, all-zero ``sus_imm``, the same ``trans_rng`` call sequence).
+        """
+        ss_int = ss.dtypes.int
+        nv = self.nv
+        betamap = self.validate_beta()
+        susc = self.susceptible  # the age-OR baseline x susceptible mask (cross-immunity folds in per variant)
+        new_cases, sources, networks, case_variant = [], [], [], []
+
+        for vi in range(nv):
+            label = self.variant_map[vi]
+            rel_beta_v = float(self.variant_pars[label]['rel_beta'])
+            # Source mask: agents infectious WITH this variant (== full infectious set at nv==1).
+            inf_mask = self.infectious if nv == 1 else (self.infectious & (self.infectious_variant == vi))
+            rel_trans = self.rel_trans.asnew(inf_mask * self.rel_trans)
+            if rel_beta_v != 1.0:  # fold the variant's relative beta into rel_trans (== scaling beta)
+                rel_trans.raw[:] = rel_trans.raw * rel_beta_v
+            rel_sus = self.rel_sus.asnew(susc * self.rel_sus)
+            if nv > 1:  # reduce susceptibility by this variant's cross-immunity (NaN-free at nv==1)
+                rel_sus.raw[:] = rel_sus.raw * (1.0 - self.sus_imm[vi])
+
+            for i, (nkey, route) in enumerate(self.sim.networks.items()):
+                nk = ss.standardize_netkey(nkey)
+                if isinstance(route, ss.Network):
+                    if len(route):
+                        edges = route.edges
+                        p1p2b0 = [edges.p1, edges.p2, betamap[nk][0]]
+                        p2p1b1 = [edges.p2, edges.p1, betamap[nk][1]]
+                        for src, trg, beta in [p1p2b0, p2p1b1]:
+                            if beta:
+                                disease_beta = beta.to_prob(self.t.dt) if isinstance(beta, ss.Rate) else beta
+                                beta_per_dt = route.net_beta(disease_beta=disease_beta, disease=self)
+                                randvals = self.trans_rng.rvs(src, trg)  # CRN: preserve verbatim
+                                target_uids, source_uids = self.compute_transmission(
+                                    src, trg, rel_trans, rel_sus, beta_per_dt, randvals)
+                                new_cases.append(target_uids)
+                                sources.append(source_uids)
+                                networks.append(np.full(len(target_uids), dtype=ss_int, fill_value=i))
+                                case_variant.append(np.full(len(target_uids), dtype=ss_int, fill_value=vi))
+                elif isinstance(route, ss.Route):  # mixing pools etc. (unused by Covasim, kept for parity)
+                    disease_beta = betamap[nk][0].to_prob(self.t.dt) if isinstance(betamap[nk][0], ss.Rate) else betamap[nk][0]
+                    target_uids = route.compute_transmission(rel_sus, rel_trans, disease_beta, disease=self)
+                    new_cases.append(target_uids)
+                    sources.append(np.full(len(target_uids), dtype=ss_int, fill_value=ss.dtypes.int_nan))
+                    networks.append(np.full(len(target_uids), dtype=ss_int, fill_value=i))
+                    case_variant.append(np.full(len(target_uids), dtype=ss_int, fill_value=vi))
+                else:
+                    errormsg = f'Cannot compute transmission via route {type(route)}; subclass ss.Route.'
+                    raise TypeError(errormsg)
+
+        # Finalize: dedup keeping the FIRST (lowest-vi) occurrence per target = v3 tie-break.
+        if len(new_cases) and len(sources):
+            new_cases = ss.uids.concatenate(new_cases)
+            new_cases, inds = new_cases.unique(return_index=True)
+            sources = ss.uids.concatenate(sources)[inds]
+            networks = np.concatenate(networks)[inds]
+            case_variant = np.concatenate(case_variant)[inds]
+            # Record per-target variant keyed by UID (survives set_outcomes' congenital/age split).
+            self._new_case_variant = {int(u): int(v) for u, v in zip(np.asarray(new_cases), case_variant)}
+        else:
+            new_cases = ss.uids()
+            sources = ss.uids()
+            networks = np.empty(0, dtype=ss_int)
+            self._new_case_variant = {}
+        return new_cases, sources, networks
+
+    def import_variant(self, uids, variant):
+        """Seed an external introduction of ``variant`` (int index) into ``uids`` (the v3 importation).
+
+        Routes to ``set_prognoses`` with an explicit variant and bumps the ``n_imports`` Result. Used
+        by ``cv.variant.apply()`` for mid-run introductions and for t0 seeding of added variants.
+        """
+        uids = ss.uids(uids)
+        if not len(uids):
+            return uids
+        self.set_prognoses(uids, sources=None, variant=int(variant))
+        if 'n_imports' in self.results:
+            self.results['n_imports'][self.ti] += len(uids)
+        return uids
+
+    def _introduce_variants(self):
+        """Drive mid-run + t0 variant introductions (the v3 ``variant.apply``) on matched days."""
+        for var in self._variant_objs:
+            var.apply(self)
+        return
+
     def step_state(self):
         """Advance the state machine (before transmission); flip flags on ti thresholds, no re-draws."""
         ti = self.ti
         self._ensure_flow_variant()
-        # Reset the per-variant flow accumulators for this step. new_infectious is counted here;
-        # new_{infections,symptomatic,severe} are accumulated later in set_prognoses (during step()).
+        # Reset the per-variant flow accumulators for THIS step first, so the import seeding below and
+        # transmission's set_prognoses later both accumulate into a fresh array. new_infectious is
+        # counted here; new_{infections,symptomatic,severe} are accumulated in set_prognoses.
         for v in self._flow_variant.values():
             v[:] = 0.0
+        self._introduce_variants()  # seed any variant introductions scheduled for this day
         # exposed -> infectious: tag infectious_variant from exposed_variant (v3 check_infectious),
         # count new_infectious_by_variant, then clear the `exposed` flag.
         new_inf = (self.exposed & (self.ti_infectious <= ti)).uids
@@ -436,6 +560,7 @@ class COVID(ss.Infection):
             R('cum_critical',    'Cumulative critical'),
             R('cum_recoveries',  'Cumulative recoveries'),
             R('cum_deaths',      'Cumulative deaths'),
+            R('n_imports',       'Number of imported infections'),  # bumped by import_variant (M3)
         )
         self._flow = dict(symptomatic=0, severe=0, critical=0, recoveries=0, deaths=0)
 
@@ -485,12 +610,14 @@ class COVID(ss.Infection):
         vres['new_infectious_by_variant'][:, ti]  = fv['new_infectious']
         exp_uids = self.exposed.uids
         if len(exp_uids):
-            vres['n_exposed_by_variant'][:, ti] = np.bincount(
-                np.asarray(self.exposed_variant[exp_uids]).astype(int), minlength=self.nv)
+            ev = np.asarray(self.exposed_variant[exp_uids]); fin = np.isfinite(ev)
+            if fin.any():
+                vres['n_exposed_by_variant'][:, ti] = np.bincount(ev[fin].astype(int), minlength=self.nv)
         inf_uids = self.infectious.uids
         if len(inf_uids):
-            vres['n_infectious_by_variant'][:, ti] = np.bincount(
-                np.asarray(self.infectious_variant[inf_uids]).astype(int), minlength=self.nv)
+            iv = np.asarray(self.infectious_variant[inf_uids]); fin = np.isfinite(iv)
+            if fin.any():
+                vres['n_infectious_by_variant'][:, ti] = np.bincount(iv[fin].astype(int), minlength=self.nv)
         return
 
     def finalize_results(self):

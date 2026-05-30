@@ -138,3 +138,93 @@ def test_births_rejected_in_m3():
                  rand_seed=1, verbose=0, copy_inputs=False)
     with pytest.raises(NotImplementedError):
         sim.init()
+
+
+# === Task 2: infect() override + variant-aware set_prognoses + cv.variant ===
+
+def _cum_inf_traj(sim):
+    """The aggregate cum_infections trajectory (state-based, seed-inclusive)."""
+    d = sim.diseases.covid
+    return np.asarray(d.results['cum_infections'])
+
+
+def test_nv1_infect_override_byte_identical_to_stock():
+    """At nv==1 the overridden infect() is byte-identical to stock ss.Infection.infect().
+
+    Compared on the SAME class name ('covid') so the trans_rng CRN seed is unchanged -- any
+    difference would be a genuine divergence in the override (adversary punch-list #1).
+    """
+    saved = cv.COVID.infect
+    try:
+        s_over = cv.Sim(pop_size=20000, pop_infected=50, pop_type='random', n_days=80, rand_seed=3, verbose=0)
+        s_over.run()
+        over = np.asarray(s_over.diseases.covid.results['n_infectious'])
+        cv.COVID.infect = ss.Infection.infect  # restore stock single-beta infect on the same class
+        s_stock = cv.Sim(pop_size=20000, pop_infected=50, pop_type='random', n_days=80, rand_seed=3, verbose=0)
+        s_stock.run()
+        stock = np.asarray(s_stock.diseases.covid.results['n_infectious'])
+    finally:
+        cv.COVID.infect = saved
+    assert np.array_equal(over, stock), 'nv==1 infect() override must equal stock infect byte-for-byte'
+
+
+def test_variant_registration():
+    """cv.variant grows the single module's variant axis with stable indices (wild stays 0)."""
+    sim = cv.Sim(pop_size=4000, pop_infected=20, pop_type='random', n_days=5, rand_seed=1, verbose=0,
+                 variants=[cv.variant('alpha', days=2), cv.variant('delta', days=3)])
+    sim.init()
+    d = sim.diseases.covid
+    assert d.nv == 3
+    assert d.variant_map == {0: 'wild', 1: 'alpha', 2: 'delta'}
+    assert set(d.variant_pars) == {'wild', 'alpha', 'delta'}
+    assert d.sus_imm.shape[0] == 3, '2D immunity arrays sized to nv'
+    # The default alpha rel_beta (1.67) is registered verbatim from get_variant_pars.
+    assert d.variant_pars['alpha']['rel_beta'] == cv.get_variant_pars(variant='alpha')['rel_beta']
+
+
+def test_two_variant_run_independent_draws():
+    """A 2-variant run completes without a DistNotReadyError and both variants infect agents."""
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='hybrid', n_days=70, rand_seed=2, verbose=0,
+                 variants=cv.variant('alpha', days=10, n_imports=30))
+    sim.run()  # no DistNotReadyError
+    d = sim.diseases.covid
+    ci = np.asarray(d.results['variant']['cum_infections_by_variant'])
+    assert ci[0, -1] > 0, 'wild infects'
+    assert ci[1, -1] > 0, 'alpha infects (independent per-variant transmission draws)'
+
+
+def test_per_variant_rel_beta_scales_transmission():
+    """A higher per-variant rel_beta yields a larger epidemic (same seed, t0 introduction)."""
+    def run(rel_beta):
+        v = cv.variant({'rel_beta': rel_beta, 'label': 'test'}, days=0, n_imports=50)
+        sim = cv.Sim(pop_size=20000, pop_infected=0, pop_type='random', n_days=70, rand_seed=1,
+                     verbose=0, variants=v)
+        sim.run()
+        ci = np.asarray(sim.diseases.covid.results['variant']['cum_infections_by_variant'])
+        return ci[1, -1]  # the 'test' variant is index 1 (wild=0, seeded 0)
+    hi = run(2.5)
+    lo = run(0.4)
+    assert hi > lo, f'higher rel_beta must transmit more: rel_beta=2.5 -> {hi}, 0.4 -> {lo}'
+
+
+def test_midrun_import_bumps_n_imports_on_the_right_day():
+    """Mid-run apply() seeds exactly n_imports on the introduction day, recorded in n_imports."""
+    day, n_imp = 20, 25
+    sim = cv.Sim(pop_size=20000, pop_infected=50, pop_type='random', n_days=40, rand_seed=1, verbose=0,
+                 variants=cv.variant('delta', days=day, n_imports=n_imp))
+    sim.run()
+    n_imports = np.asarray(sim.diseases.covid.results['n_imports'])
+    assert n_imports[:day].sum() == 0, 'no imports before the introduction day'
+    assert n_imports[day] == n_imp, f'exactly {n_imp} imports on day {day}, got {n_imports[day]}'
+    assert n_imports.sum() == n_imp, 'no spurious imports on other days'
+
+
+def test_string_variant_sugar_introduces_at_t0():
+    """A bare string/dict variant is introduced at t0 (days=0)."""
+    sim = cv.Sim(pop_size=8000, pop_infected=20, pop_type='random', n_days=30, rand_seed=1, verbose=0,
+                 variants='beta')
+    sim.run()
+    d = sim.diseases.covid
+    assert d.variant_map == {0: 'wild', 1: 'beta'}
+    ci = np.asarray(d.results['variant']['cum_infections_by_variant'])
+    assert ci[1, -1] > 0, 'the beta variant (introduced at t0) infects agents'
