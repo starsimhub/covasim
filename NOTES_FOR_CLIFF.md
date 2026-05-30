@@ -218,3 +218,21 @@ synthpops), M10 (release).
 
 **Session total: M3, M4, M5, M6 fully complete + M7 (Fit + flat bridge) — all validated against
 v3.1.8, complete suite green.**
+
+---
+
+# M7 COMPLETE — cv.Calibration landed (2026-05-30)
+
+Finished M7: cv.Calibration wraps Starsim's Optuna ss.Calibration. `calib_pars=dict(key=[best,low,
+high])` (v3 form) -> ss sampler specs; a build_fn applies each trial's sampled value to the COVID
+module's pars (init-then-apply; the severity scalers are read at set_prognoses runtime); the eval
+returns cv.Fit(sim, data).mismatch (minimised by Optuna). Exposes best_pars + df.
+
+Acceptance met: a small 15-trial calibration of rel_severe_prob to data generated at the true value
+1.6 (starting guess 1.0, range [0.5, 2.5]) converges to ~1.7 -- clearly toward the truth -- and the
+best-fit mismatch beats the starting guess. So **M7 (Fit + Calibration) is complete**; M3-M7 all done.
+
+Note: the build_fn applies pars after init, so only RUNTIME-read pars (severity scalers, etc.)
+calibrate correctly; init-time pars (e.g. per-layer beta as a dict) would need a pre-init hook
+(follow-up). Remaining milestones: M8 (MultiSim/Scenarios), M9 (analyzers/TransTree/synthpops),
+M10 (release).

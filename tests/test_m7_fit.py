@@ -89,3 +89,37 @@ def test_fit_requires_data():
     sim = _run(n_days=20)
     with pytest.raises(RuntimeError):
         cv.Fit(sim)
+
+
+# --- cv.Calibration (Optuna) -------------------------------------------------
+
+def _calib_sim(rel_severe=1.0):
+    import starsim as ss
+    covid = cv.COVID(beta={'a': ss.probperday(0.016)}, init_prev=50, rel_severe_prob=rel_severe)
+    return cv.Sim(pop_size=10000, pop_infected=50, pop_type='random', n_days=60, rand_seed=1,
+                  verbose=0, diseases=covid)
+
+
+@pytest.mark.slow
+def test_calibration_converges():
+    """A small calibration recovers a known parameter: fit rel_severe_prob to data made with 1.6.
+
+    cum_severe increases monotonically with rel_severe_prob (fixed seed), so Optuna should move the
+    starting guess (1.0) toward the truth (1.6) -- we assert it lands clearly above the start.
+    """
+    truth = _calib_sim(rel_severe=1.6); truth.run()
+    dates = [str(d)[:10] for d in np.asarray(truth.t.timevec)]
+    cs = np.asarray(truth.results['cum_severe'])
+    idx = [30, 40, 50, 59]
+    data = pd.DataFrame({'cum_severe': [cs[i] for i in idx]}, index=[dates[i] for i in idx])
+
+    calib = cv.Calibration(_calib_sim(1.0), calib_pars=dict(rel_severe_prob=[1.0, 0.5, 2.5]),
+                           data=data, total_trials=15, n_workers=1, weights={'cum_severe': 1.0})
+    calib.calibrate()
+    best = float(calib.best_pars['rel_severe_prob'])
+    assert 1.2 < best < 2.2, f'calibration should move toward the truth 1.6, got {best:.2f}'
+    assert calib.df is not None and len(calib.df) == 15, 'all trials recorded'
+    # The best-fit mismatch should beat the starting guess (rel_severe_prob=1.0).
+    start_fit = cv.Fit(_calib_sim(1.0).run(), data=data, keys=['cum_severe'])
+    best_fit  = cv.Fit(_calib_sim(best).run(), data=data, keys=['cum_severe'])
+    assert best_fit.mismatch < start_fit.mismatch, 'calibration reduces the mismatch vs the start'

@@ -16,7 +16,7 @@ import sciris as sc
 
 from . import misc as cvm
 
-__all__ = ['Fit']
+__all__ = ['Fit', 'Calibration']
 
 
 def _to_daykey(d):
@@ -192,3 +192,114 @@ class Fit(sc.prettyobj):
         else:
             print('Mismatch not yet computed.')
         return
+
+
+class Calibration(sc.prettyobj):
+    """
+    Calibrate a cv.Sim to data by minimising the cv.Fit mismatch (the v3 ``cv.Calibration``), wrapping
+    Starsim's Optuna-based ``ss.Calibration``.
+
+    Args:
+        sim (cv.Sim): a base (un-run) sim; each trial deep-copies it, applies the trial's parameters,
+            runs it, and scores the fit.
+        calib_pars (dict): parameters to calibrate, ``{key: [best, low, high]}`` (v3 form) -- each is
+            sampled in ``[low, high]`` (initial guess ``best``) and applied to the COVID module's pars
+            (or the sim pars), resolving an optional dotted ``path``.
+        data (DataFrame): the target data passed to ``cv.Fit`` (date/day-indexed, result-key columns).
+        total_trials (int): total Optuna trials (default 30).
+        n_workers (int): parallel workers (default 1).
+        weights (dict): per-key fit weights (passed to cv.Fit).
+        reseed (bool): whether to vary rand_seed across trials (default False -> cleaner convergence).
+        fit_kw (dict): extra kwargs for cv.Fit.
+        kwargs: forwarded to ss.Calibration (e.g. verbose, die).
+
+    After ``calibrate()``: ``best_pars`` (objdict) and ``df`` (per-trial results).
+    """
+
+    def __init__(self, sim, calib_pars, data, total_trials=30, n_workers=1, weights=None,
+                 reseed=False, fit_kw=None, **kwargs):
+        import starsim as ss
+        self.sim = sim
+        self.data = data
+        self.weights = weights
+        self.fit_kw = sc.mergedicts(fit_kw)
+        self.best_pars = None
+        self.df = None
+
+        # Translate v3-style [best, low, high] into ss.Calibration sampler specs (keeping the path).
+        ss_calib_pars = {}
+        for key, spec in calib_pars.items():
+            if isinstance(spec, (list, tuple)) and len(spec) == 3:
+                best, low, high = spec
+                ss_calib_pars[key] = dict(low=float(low), high=float(high), guess=float(best), path=key)
+            else:  # already an ss-style spec dict
+                d = dict(spec)
+                d.setdefault('path', key)
+                ss_calib_pars[key] = d
+
+        kwargs.setdefault('verbose', False)
+        kwargs.setdefault('die', False)
+        self._calib = ss.Calibration(
+            sim, ss_calib_pars, build_fn=self._build_fn, eval_fn=self._eval_fn,
+            total_trials=int(total_trials), n_workers=int(n_workers), reseed=reseed, **kwargs)
+        return
+
+    @staticmethod
+    def _apply_par(sim, path, value):
+        """Apply a calibrated ``value`` to the sim at ``path`` (a COVID/sim par; dotted paths allowed)."""
+        covid = sim.diseases['covid']
+        parts = str(path).split('.')
+        if len(parts) == 1:
+            key = parts[0]
+            if key in covid.pars:
+                covid.pars[key] = value
+            elif key in sim.pars:
+                sim.pars[key] = value
+            else:
+                covid.pars[key] = value  # default to the disease module
+        else:
+            obj = sim
+            for p in parts[:-1]:
+                if p in ('sim',):
+                    obj = sim
+                elif hasattr(obj, 'diseases') and p in obj.diseases:
+                    obj = obj.diseases[p]
+                else:
+                    obj = getattr(obj, p)
+            tgt = parts[-1]
+            if hasattr(obj, 'pars') and tgt in obj.pars:
+                obj.pars[tgt] = value
+            else:
+                setattr(obj, tgt, value)
+        return
+
+    def _build_fn(self, sim, calib_pars=None):
+        """Apply the trial's sampled parameters to a fresh sim copy (ss.Calibration build_fn).
+
+        The base sim copy may be un-initialized; init it so ``sim.diseases`` exists. The calibratable
+        severity scalers (rel_*_prob) are read at set_prognoses runtime, so applying them after init
+        still takes effect. (Init-time pars would need a pre-init hook; out of scope for M7.)
+        """
+        if not sim.initialized:
+            sim.init()
+        if calib_pars:
+            for parname, spec in calib_pars.items():
+                if isinstance(spec, dict) and 'value' in spec:
+                    self._apply_par(sim, spec.get('path', parname), spec['value'])
+                elif parname == 'rand_seed':  # reseed adds a raw int
+                    sim.pars.rand_seed = int(spec)
+        return sim
+
+    def _eval_fn(self, sim, **kwargs):
+        """Score a run sim: the cv.Fit mismatch (minimised by Optuna). None sim -> inf."""
+        if sim is None:
+            return np.inf
+        fit = Fit(sim, data=self.data, weights=self.weights, die=False, **self.fit_kw)
+        return fit.mismatch if fit.mismatch is not None else np.inf
+
+    def calibrate(self, **kwargs):
+        """Run the Optuna calibration; populate ``best_pars`` and ``df``."""
+        self._calib.calibrate(**kwargs)
+        self.best_pars = self._calib.best_pars
+        self.df = getattr(self._calib, 'df', None)
+        return self
