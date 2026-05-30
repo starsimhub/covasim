@@ -54,14 +54,36 @@ class MultiSim(sc.prettyobj):
         self.results = None
         return
 
-    def run(self, **kwargs):
-        """Run the seeds (or the explicit sims) via ``ss.MultiSim``."""
-        if self.base_sim is not None:
-            msim = ss.MultiSim(base_sim=self.base_sim, n_runs=self.n_runs, **self.kwargs)
-        else:
-            msim = ss.MultiSim(sims=self.sims, **self.kwargs)
-        msim.run(**kwargs)
-        self.sims = list(msim.sims)
+    def run(self, parallel=False, **kwargs):
+        """Run the seeds (or the explicit sims).
+
+        ``parallel=False`` (default): run serially -- for a base sim, deep-copy it and run ``n_runs``
+        consecutive seeds (``rand_seed + i``); for explicit sims, run each. Deterministic and emits no
+        multiprocess fork warning. ``parallel=True``: dispatch via ``ss.MultiSim`` (faster for large N,
+        but may emit a benign multiprocess ``DeprecationWarning`` on fork-based platforms).
+        """
+        if parallel:
+            if self.base_sim is not None:
+                msim = ss.MultiSim(base_sim=self.base_sim, n_runs=self.n_runs, **self.kwargs)
+            else:
+                msim = ss.MultiSim(sims=self.sims, **self.kwargs)
+            msim.run(**kwargs)
+            self.sims = list(msim.sims)
+        elif self.base_sim is not None:
+            try:
+                base_seed = int(self.base_sim.pars.rand_seed)
+            except Exception:
+                base_seed = 0
+            sims = []
+            for i in range(self.n_runs):
+                s = sc.dcp(self.base_sim)
+                s.pars.rand_seed = base_seed + i  # consecutive seeds for the replicates
+                s.run(**kwargs)
+                sims.append(s)
+            self.sims = sims
+        else:  # explicit list of (distinct) sims
+            for s in self.sims:
+                s.run(**kwargs)
         return self
 
     @staticmethod
