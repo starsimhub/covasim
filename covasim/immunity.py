@@ -188,6 +188,20 @@ def calc_VE(nab, ax, pars):
     return exp_lo / (1 + exp_lo)  # inverse logit
 
 
+def calc_VE_symp(nab, pars):
+    """Marginal vaccine efficacy against symptomatic disease (v3 ``calc_VE_symp``).
+
+    ``VE_symp = 1 - (1 - VE_inf)·(1 - VE_symp|inf)`` where each factor is an inverse-logit of NAb. Used
+    by the vaccine ``target_eff`` back-calculation (M6) to map a target efficacy onto a peak NAb level.
+    """
+    nab = np.asarray(nab, dtype=float)
+    exp_lo_inf = np.exp(pars['alpha_inf']) * nab ** pars['beta_inf']
+    inv_lo_inf = exp_lo_inf / (1 + exp_lo_inf)
+    exp_lo_symp = np.exp(pars['alpha_symp_inf']) * nab ** pars['beta_symp_inf']
+    inv_lo_symp = exp_lo_symp / (1 + exp_lo_symp)
+    return 1 - ((1 - inv_lo_inf) * (1 - inv_lo_symp))
+
+
 def precompute_waning(length, pars=None):
     """Precompute the per-timestep NAb waning kernel (v3 ``precompute_waning``).
 

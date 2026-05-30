@@ -151,6 +151,13 @@ class COVID(ss.Infection):
             ss.FloatArr('date_quarantined',     label='Date entered quarantine'),
             ss.FloatArr('date_end_quarantine',  label='Date quarantine ends'),
             ss.FloatArr('date_end_isolation',   label='Date isolation ends'),
+            # Vaccination host state (M6; v3 vacc_states). Vaccine immunity flows through the same NAb
+            # pipeline as natural infection. Inert until a vaccination intervention is attached =>
+            # M1-M5 byte-identical with no such intervention.
+            ss.BoolState('vaccinated',     label='Vaccinated'),
+            ss.FloatArr('doses',           default=0.0, label='Number of vaccine doses received'),
+            ss.FloatArr('vaccine_source',               label='Index of the vaccine received'),
+            ss.FloatArr('date_vaccinated',              label='Date last vaccinated'),
             reset = True,
         )
 
@@ -207,6 +214,14 @@ class COVID(ss.Infection):
         # quarantine schedule (start_day -> [(uid, end_day)]) is (re)set in init_post.
         self._test_bern = ss.bernoulli(p=1.0)
         self._pending_quarantine = {}
+
+        # Vaccination (M6). Vaccine registry (label -> pars, index -> label), populated by vaccination
+        # interventions at init. The vaccine NAb-init draw uses its OWN Dist (created last, .set per
+        # vaccine), distinct from the natural _nab_init, so a dose drawn at the intervention slot does
+        # not perturb the natural-infection NAb draw at the transmission slot => M4 stays byte-identical.
+        self.vaccine_pars = {}
+        self.vaccine_map  = {}
+        self._vacc_nab_init = ss.normal(loc=0.0, scale=2.0)
         return
 
     @property
@@ -293,23 +308,36 @@ class COVID(ss.Infection):
             self._flow_variant = {k: np.zeros(self.nv) for k in self._FLOW_VARIANT_KEYS}
         return
 
-    def _update_peak_nab(self, uids, symp_scale):
-        """Set/boost peak NAb at (re)infection (M4; the v3 ``update_peak_nab``).
+    def _update_peak_nab(self, uids, nab_pars=None, symp_scale=None):
+        """Set/boost peak NAb at a NAb-conferring event (M4/M6; the v3 ``update_peak_nab``).
 
         Agents with prior NAbs (``peak_nab>0``) are boosted by ``nab_boost``; the rest draw an initial
-        log2 NAb from ``nab_init``, scaled by symptom severity (``symp_scale`` = the per-UID
-        ``rel_imm_symp`` factor) and normalised onto the vaccine scale by ``1 + alpha_inf_diff``.
+        log2 NAb from ``nab_init``.
+
+        ``nab_pars=None`` (natural infection): use the disease ``nab_init``/``nab_boost``, scale the
+        initial NAb by symptom severity (``symp_scale`` = per-UID ``rel_imm_symp``) and normalise onto
+        the vaccine scale by ``1 + alpha_inf_diff`` (unchanged M4 behaviour, drawn from ``_nab_init``).
+
+        ``nab_pars`` given (a vaccine dose, M6): use the vaccine's ``nab_init``/``nab_boost`` with NO
+        symptom scaling and NO natural normalisation, drawn from the separate ``_vacc_nab_init`` Dist.
         """
         p = self.pars
         prior = np.asarray(self.peak_nab[uids]) > 0
         prior_uids = uids[prior]
         no_prior_uids = uids[~prior]
-        if len(prior_uids):  # boost agents who already had NAbs (reinfection / prior vaccination)
-            self.peak_nab[prior_uids] = self.peak_nab[prior_uids] * p.nab_boost
+        boost = p.nab_boost if nab_pars is None else nab_pars['nab_boost']
+        if len(prior_uids):  # boost agents who already had NAbs (reinfection / prior dose)
+            self.peak_nab[prior_uids] = self.peak_nab[prior_uids] * boost
         if len(no_prior_uids):  # draw an initial NAb for agents with no prior immunity
-            init = np.asarray(self._nab_init.rvs(no_prior_uids))  # log2(NAb)
-            norm = 1.0 + p.nab_eff['alpha_inf_diff']              # normalise natural -> vaccine NAb scale
-            self.peak_nab[no_prior_uids] = (2.0 ** init) * symp_scale[~prior] * norm
+            if nab_pars is None:  # natural infection
+                init = np.asarray(self._nab_init.rvs(no_prior_uids))
+                norm = 1.0 + p.nab_eff['alpha_inf_diff']         # natural -> vaccine NAb-scale normalisation
+                self.peak_nab[no_prior_uids] = (2.0 ** init) * symp_scale[~prior] * norm
+            else:  # a vaccine dose: draw with the vaccine's nab_init (no symptom scaling/normalisation)
+                ni = nab_pars['nab_init']
+                self._vacc_nab_init.set(loc=ni['par1'], scale=ni['par2'])
+                init = np.asarray(self._vacc_nab_init.rvs(no_prior_uids))
+                self.peak_nab[no_prior_uids] = 2.0 ** init
         self.t_nab_event[uids] = self.ti
         return
 
@@ -444,7 +472,7 @@ class COVID(ss.Infection):
                 if len(first):
                     self.rel_trans_base[first] = self.rel_trans_base[first] * p.trans_redux
                 self.n_breakthroughs[prior_bt] = self.n_breakthroughs[prior_bt] + 1
-            self._update_peak_nab(uids, symp_scale)
+            self._update_peak_nab(uids, symp_scale=symp_scale)
         return
 
     def infect(self):
@@ -604,6 +632,27 @@ class COVID(ss.Infection):
             bucket.append((int(u), start_date + period))
         return
 
+    def vaccinate_agents(self, uids, label, index):
+        """Apply a vaccine dose to ``uids`` (M6; the NAb side of the v3 ``BaseVaccination.vaccinate``).
+
+        Sets the vaccination state and confers/boosts peak NAb via the vaccine's ``nab_init``/
+        ``nab_boost`` (the shared M4 NAb pipeline). The intervention is responsible for selecting/
+        de-duplicating ``uids`` (skipping dead / already-fully-dosed); this just applies the dose.
+        ``label``/``index`` identify the vaccine in ``vaccine_pars``/``vaccine_map``.
+        """
+        uids = ss.uids(np.unique(np.asarray(uids)))
+        if not len(uids):
+            return uids
+        prior_vacc = np.asarray(self.vaccinated[uids])  # already vaccinated => not a NEW vaccinee
+        self.vaccinated[uids] = True
+        self.vaccine_source[uids] = index
+        self.doses[uids] = self.doses[uids] + 1
+        self.date_vaccinated[uids] = self.ti
+        self._update_peak_nab(uids, nab_pars=self.vaccine_pars[label])
+        self._vacc_flow['doses'] += len(uids)
+        self._vacc_flow['vaccinated'] += int((~prior_vacc).sum())
+        return uids
+
     def _step_testing(self):
         """Diagnosis / quarantine / isolation state machines (the v3 People.check_* updates).
 
@@ -657,6 +706,10 @@ class COVID(ss.Infection):
             self._test_flow = dict(tests=0, diagnoses=0)
         self._test_flow['tests'] = 0
         self._test_flow['diagnoses'] = 0
+        if not hasattr(self, '_vacc_flow'):
+            self._vacc_flow = dict(doses=0, vaccinated=0)
+        self._vacc_flow['doses'] = 0
+        self._vacc_flow['vaccinated'] = 0
         self._introduce_variants()  # seed any variant introductions scheduled for this day
         # exposed -> infectious: tag infectious_variant from exposed_variant (v3 check_infectious),
         # count new_infectious_by_variant, then clear the `exposed` flag. The gate is `exposed &
@@ -777,6 +830,10 @@ class COVID(ss.Infection):
             R('cum_tests',       'Cumulative tests'),
             R('new_diagnoses',   'New diagnoses'),    # M5: bumped in _step_testing
             R('cum_diagnoses',   'Cumulative diagnoses'),
+            R('new_doses',       'New vaccine doses'),     # M6: bumped by vaccinate_agents
+            R('cum_doses',       'Cumulative vaccine doses'),
+            R('new_vaccinated',  'Newly vaccinated people'),
+            R('cum_vaccinated',  'Cumulative vaccinated people'),
         )
         # M4 immunity summaries (population means -> scale=False). Filled only under use_waning.
         self.define_results(
@@ -785,6 +842,7 @@ class COVID(ss.Infection):
         )
         self._flow = dict(symptomatic=0, severe=0, critical=0, recoveries=0, deaths=0)
         self._test_flow = dict(tests=0, diagnoses=0)  # M5 per-step test/diagnosis flow
+        self._vacc_flow = dict(doses=0, vaccinated=0)  # M6 per-step dose/vaccination flow
 
         # The 12-key 2D by_variant sub-dict (v3 sim.results['variant']), shape (nv, npts), FLOAT dtype
         # (v3 result_float -- avoids truncation). Built as a NESTED ss.Results because define_results
@@ -824,6 +882,8 @@ class COVID(ss.Infection):
         res.new_deaths[ti]      = self._flow['deaths']
         res.new_tests[ti]       = self._test_flow['tests']      # M5 testing flows
         res.new_diagnoses[ti]   = self._test_flow['diagnoses']
+        res.new_doses[ti]       = self._vacc_flow['doses']      # M6 vaccination flows
+        res.new_vaccinated[ti]  = self._vacc_flow['vaccinated']
 
         # By-variant flows (accumulated this step) + stocks (counted from the live tags).
         vres = res['variant']
@@ -862,6 +922,8 @@ class COVID(ss.Infection):
         res.cum_deaths[:]      = np.cumsum(res.new_deaths[:])
         res.cum_tests[:]       = np.cumsum(res.new_tests[:])       # M5
         res.cum_diagnoses[:]   = np.cumsum(res.new_diagnoses[:])
+        res.cum_doses[:]       = np.cumsum(res.new_doses[:])       # M6
+        res.cum_vaccinated[:]  = np.cumsum(res.new_vaccinated[:])
 
         # By-variant cumulatives (cumsum along the time axis). The pop_scale scaling, the wild
         # cum_infections seed-offset, and the prevalence/incidence denominators are applied at the

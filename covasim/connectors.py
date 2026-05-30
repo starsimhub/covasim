@@ -77,43 +77,66 @@ class CrossImmunity(ss.Connector):
         return
 
     def step(self):
-        """Write per-variant protection for every ever-recovered agent (the v3 check_immunity slot).
+        """Write per-variant protection (the v3 ``check_immunity`` slot). Two regimes:
 
-        Keyed off the **ever-recovered** mask (finite ``ti_recovered ≤ ti`` -- v3's
-        ``was_inf = t >= date_recovered``), NOT the transient ``recovered`` BoolState. Two regimes:
-          - ``use_waning=False`` (M2/M3): static, NAb-free -- ``imm = matrix[target, source]``.
-          - ``use_waning=True`` (M4): advance NAb kinetics, then ``imm = calc_VE(nab × matrix, axis)``
-            per axis (sus/symp/sev), so protection rises then wanes with the agent's NAb titre.
+          - ``use_waning=False`` (M2/M3): static, NAb-free -- ``imm = matrix[target, source]`` for every
+            ever-recovered agent (finite ``ti_recovered ≤ ti`` -- v3's ``was_inf = t >= date_recovered``).
+          - ``use_waning=True`` (M4/M6): advance NAb kinetics, then for each agent take
+            ``imm = max(natural_cross_immunity, vaccine_efficacy)`` per variant and set
+            ``sus_imm/symp_imm/sev_imm = calc_VE(nab × imm, axis)`` -- so natural + vaccine immunity share
+            one NAb-weighted efficacy curve. With no vaccine registered the vaccine term is 0, so this is
+            byte-identical to M4 (only ever-recovered agents get nonzero protection).
         """
         covid = self._covid()
         ti = covid.ti
-        waning = bool(covid.pars.use_waning)
-        if waning:
-            self._advance_nab(covid, ti)
-        rec = (covid.ti_recovered <= ti).uids   # finite ti_recovered that has passed
-        if not len(rec):
-            return
-        # Defensive: only index the matrix for agents whose recovered_variant is finite (guards the
-        # .astype(int); by construction every ever-recovered living agent qualifies).
-        src = np.asarray(covid.recovered_variant[rec])
-        finite = np.isfinite(src)
-        if not finite.any():
-            return
-        rec_f = rec[finite]
-        ru = np.asarray(rec_f)
-        src_v = src[finite].astype(int)          # the variant each recovered from
-        if waning:
-            nab_eff = covid.pars.nab_eff
-            nab_vals = np.asarray(covid.nab[rec_f])   # current NAb titre of the ever-recovered agents
-            for v in range(covid.nv):                 # effective NAbs = nab × cross-immunity weight
-                eff = nab_vals * self.matrix[v, src_v]
-                covid.sus_imm[v, ru]  = cvimm.calc_VE(eff, 'sus',  nab_eff)
-                covid.symp_imm[v, ru] = cvimm.calc_VE(eff, 'symp', nab_eff)
-                covid.sev_imm[v, ru]  = cvimm.calc_VE(eff, 'sev',  nab_eff)
-        else:
-            for v in range(covid.nv):                 # target variant v; matrix[v, source] is the protection
+        if not bool(covid.pars.use_waning):
+            # M3 static path: matrix protection for ever-recovered agents only.
+            rec = (covid.ti_recovered <= ti).uids
+            if not len(rec):
+                return
+            src = np.asarray(covid.recovered_variant[rec])
+            finite = np.isfinite(src)
+            if not finite.any():
+                return
+            ru = np.asarray(rec[finite])
+            src_v = src[finite].astype(int)
+            for v in range(covid.nv):
                 imm = self.matrix[v, src_v]
                 covid.sus_imm[v, ru]  = imm
                 covid.symp_imm[v, ru] = imm
                 covid.sev_imm[v, ru]  = imm
+            return
+
+        # M4/M6 NAb-weighted path. Advance NAb kinetics, then compute protection over ALL active agents
+        # (v3 check_immunity): natural cross-immunity OR vaccine efficacy, whichever is larger, x current NAb.
+        self._advance_nab(covid, ti)
+        nab_eff = covid.pars.nab_eff
+        auids = covid.sim.people.auids
+        ru = np.asarray(auids)
+        nab_vals = np.asarray(covid.nab[auids])
+        # Natural source variant per active agent (was_inf = finite ti_recovered<=ti with finite variant).
+        tirec = np.asarray(covid.ti_recovered[auids])
+        rvar  = np.asarray(covid.recovered_variant[auids])
+        was_inf = np.isfinite(tirec) & (tirec <= ti) & np.isfinite(rvar)
+        # Vaccine source per active agent (only if vaccines are registered).
+        has_vacc = bool(covid.vaccine_pars)
+        if has_vacc:
+            is_vacc = np.asarray(covid.vaccinated[auids])
+            vsrc = np.asarray(covid.vaccine_source[auids])
+        for v in range(covid.nv):
+            natural = np.zeros(len(ru))
+            if was_inf.any():
+                natural[was_inf] = self.matrix[v, rvar[was_inf].astype(int)]
+            imm = natural
+            if has_vacc and is_vacc.any():
+                var_label = covid.variant_map[v]
+                eff_by_vacc = np.array([covid.vaccine_pars[covid.vaccine_map[i]].get(var_label, 1.0)
+                                        for i in sorted(covid.vaccine_map)])
+                vaccine = np.zeros(len(ru))
+                vaccine[is_vacc] = eff_by_vacc[vsrc[is_vacc].astype(int)]
+                imm = np.maximum(natural, vaccine)
+            eff = nab_vals * imm
+            covid.sus_imm[v, ru]  = cvimm.calc_VE(eff, 'sus',  nab_eff)
+            covid.symp_imm[v, ru] = cvimm.calc_VE(eff, 'symp', nab_eff)
+            covid.sev_imm[v, ru]  = cvimm.calc_VE(eff, 'sev',  nab_eff)
         return
