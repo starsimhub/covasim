@@ -174,6 +174,16 @@ class COVID(ss.Infection):
         nb = self.pars.n_beds_icu
         return nb is not None and np.count_nonzero(self.critical) > nb
 
+    @staticmethod
+    def _dur(dist, uids):
+        """Sample a duration and round to whole days, matching v3's ``lognormal_int``.
+
+        Covasim's durations are integer-day; without rounding here, the integer-timestep
+        threshold checks in step_state effectively *ceil* a continuous duration, lengthening
+        the generation interval and flattening the epidemic peak relative to v3.
+        """
+        return np.round(dist.rvs(uids))
+
     def set_prognoses(self, uids, sources=None):
         """Draw the full disease trajectory once at infection (the v3 pre-scheduled tree)."""
         super().set_prognoses(uids, sources)  # logs the infection
@@ -186,7 +196,7 @@ class COVID(ss.Infection):
         self.exposed[uids]     = True
         self.ti_infected[uids] = ti
         self.ti_exposed[uids]  = ti
-        self.ti_infectious[uids] = ti + p.dur_exp2inf.rvs(uids)
+        self.ti_infectious[uids] = ti + self._dur(p.dur_exp2inf, uids)
         # Reset all downstream dates (defensive; matches v3 "reset all other dates")
         for arr in (self.ti_symptomatic, self.ti_severe, self.ti_critical, self.ti_recovered, self.ti_dead):
             arr[uids] = np.nan
@@ -196,34 +206,34 @@ class COVID(ss.Infection):
         is_symp = self._symp_bern.rvs(uids)
         symp  = uids[is_symp]
         asymp = uids[~is_symp]
-        self.ti_recovered[asymp] = self.ti_infectious[asymp] + p.dur_asym2rec.rvs(asymp)
+        self.ti_recovered[asymp] = self.ti_infectious[asymp] + self._dur(p.dur_asym2rec, asymp)
 
         # Branch 2: severe? (among symptomatic)
-        self.ti_symptomatic[symp] = self.ti_infectious[symp] + p.dur_inf2sym.rvs(symp)
+        self.ti_symptomatic[symp] = self.ti_infectious[symp] + self._dur(p.dur_inf2sym, symp)
         self._sev_bern.set(p=p.rel_severe_prob * self.severe_prob[symp])
         is_sev = self._sev_bern.rvs(symp)
         sev  = symp[is_sev]
         mild = symp[~is_sev]
-        self.ti_recovered[mild] = self.ti_symptomatic[mild] + p.dur_mild2rec.rvs(mild)
+        self.ti_recovered[mild] = self.ti_symptomatic[mild] + self._dur(p.dur_mild2rec, mild)
 
         # Branch 3: critical? (among severe; no_hosp_factor raises the risk if beds are full)
-        self.ti_severe[sev] = self.ti_symptomatic[sev] + p.dur_sym2sev.rvs(sev)
+        self.ti_severe[sev] = self.ti_symptomatic[sev] + self._dur(p.dur_sym2sev, sev)
         hosp_factor = p.no_hosp_factor if self._hosp_full() else 1.0
         self._crit_bern.set(p=p.rel_crit_prob * self.crit_prob[sev] * hosp_factor)
         is_crit = self._crit_bern.rvs(sev)
         crit    = sev[is_crit]
         noncrit = sev[~is_crit]
-        self.ti_recovered[noncrit] = self.ti_severe[noncrit] + p.dur_sev2rec.rvs(noncrit)
+        self.ti_recovered[noncrit] = self.ti_severe[noncrit] + self._dur(p.dur_sev2rec, noncrit)
 
         # Branch 4: die? (among critical; no_icu_factor raises the risk if ICU is full)
-        self.ti_critical[crit] = self.ti_severe[crit] + p.dur_sev2crit.rvs(crit)
+        self.ti_critical[crit] = self.ti_severe[crit] + self._dur(p.dur_sev2crit, crit)
         icu_factor = p.no_icu_factor if self._icu_full() else 1.0
         self._death_bern.set(p=p.rel_death_prob * self.death_prob[crit] * icu_factor)
         is_dead = self._death_bern.rvs(crit)
         dead    = crit[is_dead]
         survive = crit[~is_dead]
-        self.ti_recovered[survive] = self.ti_critical[survive] + p.dur_crit2rec.rvs(survive)
-        self.ti_dead[dead] = self.ti_critical[dead] + p.dur_crit2die.rvs(dead)
+        self.ti_recovered[survive] = self.ti_critical[survive] + self._dur(p.dur_crit2rec, survive)
+        self.ti_dead[dead] = self.ti_critical[dead] + self._dur(p.dur_crit2die, dead)
         # (ti_recovered for `dead` stays NaN from the defensive reset -- death and recovery are exclusive)
 
         # Precompute the per-agent viral-load high->low switch time (v3 compute_viral_load trans_point).

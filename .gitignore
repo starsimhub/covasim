@@ -152,3 +152,8 @@ tests/regression/v3_m1_*seeds*.json
 tests/regression/v4_m1_*seeds*.json
 tests/regression/v3_m1_contacts*.json
 tests/regression/anchor_m1_snapshot.json
+
+# M2 single-variant full-natural-history regression baselines
+tests/regression/v3_m2_*seeds*.json
+tests/regression/v4_m2_*seeds*.json
+tests/regression/anchor_m2_snapshot.json

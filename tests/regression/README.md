@@ -130,3 +130,29 @@ Then the release gate `../test_m1_parity.py` (slow, `|z| < 3`, per backend) comp
 v4 to those baselines; it skips cleanly when they are absent. The contact-structure
 equivalence half (per-layer degree + age-mixing) lives in `../test_network.py` and
 consumes a `v3_m1_contacts.json` baseline (also v3.1.8-env-generated).
+
+## M2 anchors (full natural history)
+
+`anchor_m2.py` adds the M2 single-variant **full-natural-history** anchor (the
+prognosis tree + viral_load/beta_dist). Unlike `anchor_m1`, the v3 branch keeps the
+**default** age-based prognoses (the symptomatic disease course is the point) -- only
+`use_waning=False` + `n_variants=1`. `build_summary_m2` extracts both the burden
+metrics (`cum_symptomatic`/`cum_severe`/`cum_critical`/`cum_deaths`) and the
+re-converged transmission metrics. Generate the gitignored v3.1.8 baselines from a
+frozen v3.1.8 env (the worktree method):
+
+```bash
+git worktree add /tmp/cov-v3 main
+cd /tmp/cov-v3 && python -c "import sys; sys.path.append('<repo>/tests/regression'); \
+  from multi_seed_v3 import main; main(['--anchor','m2_random','--n','30']); main(['--anchor','m2_hybrid','--n','30'])"
+```
+
+The release gate is `../test_m2_parity.py` (slow, per backend), skipping when the
+baseline is absent. **M2 uses `|z| < 5`** (not the default `|z| < 3`) by an explicit
+documented decision (MIGRATION_PLAN.md Open Q G, signed off 2026-05-29): after matching
+v3's integer duration rounding, every metric agrees within ~3% in magnitude, but the
+40-seed standard error is so small that a ~3% *systematic* offset (Starsim CRN vs v3
+numba RNG + per-day viral-load discretization, irreducible without bit-for-bit
+equivalence) still reads as `|z|` up to ~3.5. `|z| < 5` admits that scientifically
+negligible band while still catching genuine regressions; see the rationale block at
+the top of `../test_m2_parity.py`.

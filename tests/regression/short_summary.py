@@ -112,3 +112,43 @@ def build_summary_m1(sim):
         'peak_prevalence':   peak_prevalence,
         'peak_n_infectious': peak_n_infectious,
     }
+
+
+# --- M2 (natural-history parity) summary -------------------------------------
+# Transmission metrics (re-converged at M2) PLUS the new burden cumulatives.
+METRIC_KEYS_M2 = (
+    'cum_infections', 'peak_prevalence', 'peak_n_infectious',
+    'cum_symptomatic', 'cum_severe', 'cum_critical', 'cum_deaths',
+)
+
+
+def build_summary_m2(sim):
+    """Return the M2 short summary (transmission + burden), under v3.1.8 or v4 (duck-typed).
+
+    cum_infections is seed-inclusive on both sides: v3 uses summary['cum_infections']; v4 uses
+    recovered + still-infected + cum_deaths (= everyone ever infected, since M2 has no reinfection).
+    Burden cumulatives come from sim.summary (v3) or the disease results (v4).
+    """
+    if hasattr(sim, 'diseases'):  # v4 (Starsim-based)
+        d = list(sim.diseases.values())[0]
+        res = d.results
+        cum_deaths = float(np.asarray(res['cum_deaths']).max())
+        return {
+            'cum_infections':    float(int(d.recovered.sum()) + int(d.infected.sum())) + cum_deaths,
+            'peak_prevalence':   float(np.asarray(res['prevalence']).max()),
+            'peak_n_infectious': float(np.asarray(res['n_infectious']).max()),
+            'cum_symptomatic':   float(np.asarray(res['cum_symptomatic']).max()),
+            'cum_severe':        float(np.asarray(res['cum_severe']).max()),
+            'cum_critical':      float(np.asarray(res['cum_critical']).max()),
+            'cum_deaths':        cum_deaths,
+        }
+    summary = sim.summary  # v3.1.8
+    return {
+        'cum_infections':    float(summary['cum_infections']),
+        'peak_prevalence':   float(_series_max(sim, 'prevalence')),
+        'peak_n_infectious': float(_series_max(sim, 'n_infectious')),
+        'cum_symptomatic':   float(summary['cum_symptomatic']),
+        'cum_severe':        float(summary['cum_severe']),
+        'cum_critical':      float(summary['cum_critical']),
+        'cum_deaths':        float(summary['cum_deaths']),
+    }

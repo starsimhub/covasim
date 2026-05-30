@@ -44,6 +44,14 @@ def _run_seed_m1(seed, pop_type):
     return build_summary_m1(sim)
 
 
+def _run_seed_m2(seed, pop_type):
+    from anchor_m2 import make_sim                 # noqa: E402
+    from short_summary import build_summary_m2     # noqa: E402
+    sim = make_sim(pop_type=pop_type, rand_seed=int(seed))
+    sim.run()
+    return build_summary_m2(sim)
+
+
 # Anchor registry: name -> (per-seed runner, default output filename template).
 def _anchor_runner(anchor):
     if anchor == 'm0':
@@ -53,12 +61,17 @@ def _anchor_runner(anchor):
         if pop_type not in ('random', 'hybrid'):
             raise ValueError(f"Unknown M1 anchor {anchor!r}; use m1_random or m1_hybrid.")
         return (lambda seed: _run_seed_m1(seed, pop_type), f'v3_m1_{pop_type}_seeds_n{{n}}.json')
-    raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_random, m1_hybrid.")
+    if anchor.startswith('m2_'):
+        pop_type = anchor.split('_', 1)[1]
+        if pop_type not in ('random', 'hybrid'):
+            raise ValueError(f"Unknown M2 anchor {anchor!r}; use m2_random or m2_hybrid.")
+        return (lambda seed: _run_seed_m2(seed, pop_type), f'v3_m2_{pop_type}_seeds_n{{n}}.json')
+    raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_random|hybrid, m2_random|hybrid.")
 
 
 def main(argv=None):
     p = argparse.ArgumentParser(description='Generate a v3.1.8 multi-seed baseline for a regression anchor.')
-    p.add_argument('--anchor', default='m0', help='Anchor: m0 | m1_random | m1_hybrid (default m0).')
+    p.add_argument('--anchor', default='m0', help='Anchor: m0 | m1_random|m1_hybrid | m2_random|m2_hybrid (default m0).')
     p.add_argument('--n', type=int, default=30, help='Number of seeds (default 30).')
     p.add_argument('--start-seed', type=int, default=0)
     p.add_argument('--out', type=Path, default=None, help='Output path (default per-anchor name).')
