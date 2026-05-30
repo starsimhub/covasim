@@ -681,6 +681,108 @@ class simple_vaccine(Intervention):
         return
 
 
+# %% Historical (pre-t=0) immunity (the v3 historical_* interventions) ------------------------------
+
+__all__ += ['historical_vaccinate_prob', 'historical_wave', 'prior_immunity']
+
+
+class historical_vaccinate_prob(vaccinate_prob):
+    """
+    Probability-based vaccination that may occur BEFORE t=0 (the v3 ``historical_vaccinate_prob``).
+
+    Negative ``days`` are applied at initialisation: a fraction ``prob`` of agents is vaccinated as if
+    on that (back-dated) day, so they start the sim with appropriately-decayed NAbs (via the M4
+    kinetic kernel, replayed from the event). Non-negative ``days`` behave like ``cv.vaccinate_prob``.
+    Requires ``use_waning=True``. (Bounded port: a single back-dated dose per pre-t=0 day; multi-dose
+    historical scheduling is approximated by the vaccine's per-dose peak NAb.)
+    """
+
+    def init_post(self):
+        super().init_post()  # registers the vaccine, builds _day_set, checks use_waning
+        covid = self._covid()
+        for day in sorted(d for d in self._day_set if d < 0):  # imprint each pre-t=0 day now
+            self._historical_dose(covid, day)
+        self._day_set = set(d for d in self._day_set if d >= 0)  # leave in-sim days to step()
+        return
+
+    def _historical_dose(self, covid, day):
+        alive = covid.sim.people.auids
+        eligible = alive[~np.asarray(covid.vaccinated[alive])]
+        if not len(eligible):
+            return
+        probs = _apply_subtarget_probs(np.full(len(eligible), float(self.prob)), eligible, self.subtarget, covid.sim)
+        self._select.set(p=probs)
+        chosen = eligible[self._select.rvs(eligible)]
+        chosen = chosen[~np.asarray(covid.dead[chosen])]
+        if not len(chosen):
+            return
+        self._doses[np.asarray(chosen)] += 1
+        covid.vaccinate_agents(chosen, self.label, self.index)  # sets vaccinated/source/doses/peak NAb
+        covid.imprint_historical_nab(chosen, day)               # decay the peak NAb from `day` to t=0
+        return
+
+
+class historical_wave(Intervention):
+    """
+    Seed a prior wave of natural infection before t=0 (the v3 ``historical_wave``).
+
+    At initialisation, a fraction ``prob`` of agents are marked recovered as if infected ``days_prior``
+    days ago, conferring back-dated natural NAbs (decayed via the M4 kernel) + the natural
+    cross-immunity matrix. Requires ``use_waning=True``. Bounded port: a single prior wave of the wild
+    variant; the agents are placed directly in the recovered state (not re-simulated).
+
+    Args:
+        days_prior (int): how many days before t=0 the prior wave occurred.
+        prob (float): fraction of the population infected in the prior wave.
+        variant (int): variant index of the prior wave (default 0, wild).
+    """
+
+    def __init__(self, days_prior, prob, variant=0, **kwargs):
+        super().__init__(**kwargs)
+        self.days_prior = int(days_prior)
+        self.prob = float(prob)
+        self.variant = int(variant)
+        self._select = ss.bernoulli(p=0.0)
+        return
+
+    def init_post(self):
+        super().init_post()
+        covid = self._covid()
+        if not covid.pars.use_waning:
+            raise RuntimeError('cv.historical_wave() requires use_waning=True.')
+        alive = covid.sim.people.auids
+        self._select.set(p=self.prob)
+        chosen = alive[self._select.rvs(alive)]
+        if not len(chosen):
+            return
+        event_day = -self.days_prior
+        # Natural NAbs (mild-symptom scaling), back-dated and decayed to t=0.
+        symp_scale = np.full(len(chosen), float(covid.pars.rel_imm_symp['mild']))
+        covid._update_peak_nab(chosen, symp_scale=symp_scale)
+        covid.imprint_historical_nab(chosen, event_day)
+        # Place the agents in the recovered state so the natural cross-immunity path also applies.
+        covid.susceptible[chosen] = False
+        covid.infected[chosen]    = False
+        covid.exposed[chosen]     = False
+        covid.recovered[chosen]   = True
+        covid.ti_recovered[chosen] = event_day
+        covid.recovered_variant[chosen] = self.variant
+        return
+
+    def step(self):
+        pass  # historical_wave acts only at initialisation (pre-t=0 imprint)
+
+
+def prior_immunity(*args, **kwargs):
+    """Seed prior immunity (the v3 ``prior_immunity`` wrapper).
+
+    Dispatches to ``historical_vaccinate_prob`` if a ``vaccine`` is given, else ``historical_wave``.
+    """
+    if 'vaccine' in kwargs or (args and isinstance(args[0], str)):
+        return historical_vaccinate_prob(*args, **kwargs)
+    return historical_wave(*args, **kwargs)
+
+
 # %% Beta / parameter / meta interventions ----------------------------------------------------------
 
 __all__ += ['change_beta', 'clip_edges', 'dynamic_pars', 'sequence']

@@ -525,9 +525,10 @@ class nab_histogram(Analyzer):
     Requires ``use_waning=True``. ``hists[date]`` = (counts, bin_edges) over agents with NAb > 0.
     """
 
-    def __init__(self, days, bins=None, **kwargs):
+    def __init__(self, days, bins=None, edges=None, **kwargs):
         super().__init__(**kwargs)
         self.days = sc.tolist(days)
+        bins = bins if bins is not None else edges  # ``edges`` is the v3 alias for ``bins``
         self.bins = np.array(bins) if bins is not None else np.linspace(0, 20, 41)
         self._dayset = None
         self.hists = sc.odict()

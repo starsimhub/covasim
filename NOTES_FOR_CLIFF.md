@@ -457,17 +457,17 @@ baselines are unaffected.
 - **Custom analyzers via `apply(sim)`**: `cv.Analyzer.step()` now dispatches to a subclass-defined
   v3-style `apply(self, sim)`. (Reserved module attribute names -- `t`, `pars`, `sim`, `dists`,
   `results` -- still cannot be used as custom storage; use e.g. `self.tvec`.)
-- Tests: `tests/test_unported_features.py` (6).
+- **`historical_vaccinate_prob` / `prior_immunity` / `historical_wave`** (pre-t=0 immunity): now
+  implemented. `cv.COVID.imprint_historical_nab(uids, event_day)` replays the connector's clamped NAb
+  accumulation from a back-dated (negative) `event_day` up to t=0, extending the `nab_kin` kernel to
+  cover the offset -- so historically-vaccinated/recovered agents start the sim with correctly-decayed
+  NAbs (a 360-day-old dose -> NAb 0.43 vs a 30-day-old dose -> 1.40, verified). `historical_wave`
+  additionally places the agents in the recovered state. Requires `use_waning=True`. Bounded:
+  single back-dated dose/wave per event; not yet cross-validated against v3's exact pre-t0 values.
+- Tests: `tests/test_unported_features.py` (9, incl. historical immunity + the `nab_histogram` `edges=` alias).
 
 ## Unported features still DEFERRED (with recipe)
 
-- **`historical_vaccinate_prob` / `prior_immunity` / `historical_wave`** (pre-t=0 immunity): the M4
-  NAb connector indexes the waning kernel by `clip(ti - t_nab_event, 0, npts-1)`, so a back-dated
-  event (e.g. `days=[-360]`) clamps to the sim-length-decayed value rather than the true 360-day
-  decay. Correct port: build `nab_kin` to cover `npts + max_historical_offset`, imprint the targeted
-  agents at init with a negative `t_nab_event` (= the historical day) + their peak NAb, and let the
-  existing connector indexing handle the decay. Needs init-ordering coordination (the kernel is built
-  in `cv.COVID.init_post`) + validation against v3's pre-t0 kinetics -- a focused follow-up.
 - **People-level disease-state access** (`sim.people.exposed`/`rel_sus`/`doses`): deliberately NOT
   proxied -- adding a `__getattr__`/`__getitem__` to `cv.People` (an `ss.People`) to forward to the
   disease module risks shadowing Starsim's own people internals. The v4 idiom is

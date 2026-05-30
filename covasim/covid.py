@@ -351,6 +351,34 @@ class COVID(ss.Infection):
         self.t_nab_event[uids] = self.ti
         return
 
+    def imprint_historical_nab(self, uids, event_day):
+        """Set the current NAb of ``uids`` as if their NAb event happened on (negative) ``event_day``.
+
+        Used for pre-t=0 immunity (``historical_vaccinate_prob`` / ``historical_wave``): replays the
+        connector's accumulation (``nab += nab_kin[i] x peak``, clamped to ``[0, peak]``) from the
+        back-dated event up to the current step, so the agents start the sim with appropriately-decayed
+        NAbs and continue along the same kinetic curve. ``peak_nab`` must already be set (by
+        ``_update_peak_nab``); this fills ``nab`` + ``t_nab_event``.
+        """
+        import covasim.immunity as cvimm
+        uids = ss.uids(uids)
+        if not len(uids):
+            return
+        offset = int(self.ti) - int(event_day)
+        if offset < 0:
+            offset = 0
+        # Ensure the precomputed kernel covers the historical offset (extend it harmlessly if needed).
+        if self.nab_kin is None or offset >= len(self.nab_kin):
+            self.nab_kin = cvimm.precompute_waning(offset + self.t.npts + 1, self.pars.nab_decay)
+        peak = np.asarray(self.peak_nab[uids], dtype=float)
+        nab = np.zeros(len(uids))
+        kin = self.nab_kin
+        for i in range(offset + 1):  # replay the connector's clamped accumulation event -> now
+            nab = np.clip(nab + kin[i] * peak, 0.0, peak)
+        self.nab[uids] = nab
+        self.t_nab_event[uids] = int(event_day)
+        return
+
     def _variant_of(self, uids, variant=None):
         """Per-UID variant index for a batch of new cases (aligned to ``uids`` order).
 

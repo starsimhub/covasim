@@ -78,6 +78,40 @@ def test_custom_analyzer_apply():
     assert max(rec.steps) > 0
 
 
+def test_historical_vaccinate_prob():
+    """Pre-t=0 vaccination imprints decayed NAbs at t=0; older events leave lower NAbs than recent ones."""
+    def run(day):
+        sim = cv.Sim(n_days=5, pop_size=5000, pop_infected=20, use_waning=True, rand_seed=1, verbose=0,
+                     interventions=cv.historical_vaccinate_prob(vaccine='pfizer', days=[day], prob=0.5))
+        sim.run()
+        d = sim.diseases.covid
+        return d.vaccinated.uids, np.asarray(d.nab[d.vaccinated.uids])
+    vacc, nab360 = run(-360)
+    _, nab30 = run(-30)
+    assert len(vacc) > 1500, '~50% vaccinated historically'
+    assert nab360.mean() > 0, 'historical NAbs are decayed but nonzero at t=0'
+    assert nab30.mean() > nab360.mean(), 'a 30-day-old event leaves higher NAbs than a 360-day-old one'
+
+
+def test_prior_immunity_wave():
+    """cv.prior_immunity(days, prob) seeds a prior natural-infection wave (recovered + NAbs at t=0)."""
+    sim = cv.Sim(n_days=10, pop_size=5000, pop_infected=20, use_waning=True, rand_seed=1, verbose=0,
+                 interventions=cv.prior_immunity(120, 0.05))
+    sim.run()
+    d = sim.diseases.covid
+    assert int(np.asarray(d.recovered.raw).sum()) > 100, '~5% recovered from the prior wave'
+    assert int((np.asarray(d.nab.raw) > 0).sum()) > 100, 'prior-wave agents carry NAbs'
+
+
+def test_nab_histogram_edges_alias():
+    """nab_histogram accepts the v3 `edges=` alias for `bins`."""
+    import numpy as np
+    sim = cv.Sim(n_days=20, pop_size=4000, pop_infected=50, use_waning=True, verbose=0,
+                 analyzers=cv.nab_histogram(days=[15], edges=np.linspace(-4, 2, 13)))
+    sim.run()
+    assert len(sim.get_analyzer().hists) == 1
+
+
 def test_nab_decay_custom_params_routed():
     """A custom nab_decay (passed as a kwarg) is routed to the COVID module and used."""
     sim = cv.Sim(pop_size=5000, pop_infected=50, n_days=40, use_waning=True, verbose=0,
