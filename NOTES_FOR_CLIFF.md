@@ -414,12 +414,17 @@ baselines are unaffected.
 
 ## Confirmed gaps still documented (not yet fixed)
 
-- **`sim['beta']` / `sim.start_day` access** (tut_plotting, tut_tips): v4 doesn't route item/attribute
-  access for covasim pars to the disease/sim-config. Read `sim.diseases.covid.pars` /
-  `sim._cv_config` instead, or add a routed `__getitem__`/`__getattr__` (risky on `ss.Sim`).
+- **`sim['beta']` / `sim.start_day` READS** are now supported: `cv.Sim.__getattr__` (a safe fallback,
+  like the People proxy) exposes the sim-level config + COVID parameters as attributes, and since
+  `ss.Sim.__getitem__` delegates to `getattr`, `sim['beta']` works too. **Setting** a disease
+  parameter via `sim['rel_death_prob'] = 2` is NOT routed (it sets a plain attribute) -- build a fresh
+  `cv.Sim(dict(rel_death_prob=2))` or use `cv.dynamic_pars`.
 - **Re-initialisation** (`sim.initialize(reset=True)`, tut_calibration): re-initialising an
   already-run sim trips a `total_pop`/`pop_scale` conflict under the Starsim object model. The v4 way
   is to build a fresh `cv.Sim` with the changed parameter. (No longer crashes with AttributeError.)
+- **`vaccinate_num` name collision** (tut_immunity c7): two `vaccinate_num` interventions in one sim
+  raise "Cannot add object ... already present" (Starsim requires unique module names; v3 allowed
+  duplicates). Give each a distinct `label=`. (Minor; not auto-uniquified to avoid masking real dupes.)
 
 ## Intentional v4 differences (NOT bugs) -- the v4 way
 
@@ -466,28 +471,42 @@ baselines are unaffected.
   single back-dated dose/wave per event; not yet cross-validated against v3's exact pre-t0 values.
 - Tests: `tests/test_unported_features.py` (9, incl. historical immunity + the `nab_histogram` `edges=` alias).
 
+- **People-level disease-state access** (`sim.people.exposed`/`rel_sus`/`doses`/...): now proxied.
+  `cv.People.__getattr__` forwards a whitelist of disease-state names to `sim.diseases.covid` (it's a
+  fallback, only consulted when normal lookup fails, so it can't shadow real People attributes).
+  Reads return the live disease array, so v3 write-through (`sim.people.rel_sus[inds] = 0` in a custom
+  intervention) works -- verified: a `protect_elderly` custom-function intervention now reduces deaths.
+
 ## Unported features still DEFERRED (with recipe)
 
-- **People-level disease-state access** (`sim.people.exposed`/`rel_sus`/`doses`): deliberately NOT
-  proxied -- adding a `__getattr__`/`__getitem__` to `cv.People` (an `ss.People`) to forward to the
-  disease module risks shadowing Starsim's own people internals. The v4 idiom is
-  `sim.diseases.covid.<state>`; custom functions should use that.
+- **`use_waning` default** (v3 `True` -> v4 `False`): every vaccination/immunity feature works with
+  `use_waning=True`, but the immunity tutorial (and default `vaccinate_*`) assume v3's default-on
+  waning. **Decision for you** (flagged earlier): I verified all parity anchors + `baseline.json` set
+  `use_waning` explicitly, so flipping the v4 default to `True` would NOT disturb the regression
+  infrastructure -- but it changes every default-sim result, so it's a released-default scientific
+  call I left to you. (Flip in `cv.Sim.__init__`'s `use_waning` default + regenerate `baseline.json`.)
+- **`cv.Layer` / `people.contacts` / `add_layer` / `reset_layer_pars` / `dynam_layer`** (the contact-
+  network internals in tut_advanced): the v4 network model differs structurally; not ported.
 
-## Per-notebook result (v4 cells erroring, after fixes)
+## Per-notebook result (v4 cells erroring) -- after ALL the follow-up fixes
+
+Total v4 tutorial-cell errors fell **56 -> 15** across the follow-up. The remaining 15 are: **5 the
+`use_waning` default** (immunity c2/4/6/8/9 -- the features work with `use_waning=True`; this is the
+one released-default decision left for Cliff), and the rest documented architectural items.
 
 | notebook | cells | v4 err | nature of remaining errors |
 |---|---|---|---|
-| tut_intro | 7 | 1 | `location=` (intentional) |
+| tut_intro | 7 | 0 | clean |
 | tut_running | 9 | 0 | clean |
-| tut_plotting | 16 | 1 | `sim.beta` attr access (documented gap) |
-| tut_people | 4 | 2 | `location=`, `sim.people.people` (intentional) |
-| tut_interventions | 12 | 3 | `r_eff` (gap), `subtarget` + fn-intervention (intentional) |
-| tut_analyzers | 4 | 3 | make_transtree-needs-analyzer, custom-Analyzer locked attr, people-state |
-| tut_immunity | 10 | 6 | `use_waning` default x3, subtarget, historical_vaccinate, prior_immunity |
-| tut_calibration | 7 | 1 | re-init conflict (documented gap) |
-| tut_advanced | 4 | 2 | Layer/contacts, dynam_layer (intentional) |
-| tut_tips | 12 | 1 | `sim.start_day` attr access (documented gap) |
 | tut_deployment | 0 | 0 | (markdown only) |
+| tut_plotting | 16 | 1 | `sim['beta']` SET path / a v3 plot-arg edge (read works now) |
+| tut_tips | 12 | 1 | a v3 metadata edge (`sim.start_day` reads now work) |
+| tut_calibration | 7 | 1 | re-init conflict (documented) |
+| tut_interventions | 12 | 1 | bare-function-intervention `.tvec` (use a cv.Intervention subclass) |
+| tut_people | 4 | 1 | `sim.people.people` save/load idiom (documented) |
+| tut_advanced | 4 | 2 | `cv.Layer`/`contacts`/`dynam_layer` (contact internals, not ported) |
+| tut_analyzers | 4 | 2 | make_transtree-needs-analyzer; custom-Analyzer reserved attr (`self.t`) |
+| tut_immunity | 10 | 6 | `use_waning` default (c2/4/6/8/9 work with use_waning=True) + a 2x-vaccinate_num name clash (c7) |
 
 v3 itself errors on only the Optuna calibration cell (a SQLite-storage issue in this headless env,
 present in v4 too); every other v3 cell ran clean, so the comparison baseline is sound.

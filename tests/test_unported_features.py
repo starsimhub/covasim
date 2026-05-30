@@ -112,6 +112,53 @@ def test_nab_histogram_edges_alias():
     assert len(sim.get_analyzer().hists) == 1
 
 
+def test_people_state_proxy_read():
+    """sim.people.<disease state> proxies through to the COVID module (v3 compat) without shadowing
+    real People attributes."""
+    sim = cv.Sim(pop_size=4000, pop_infected=40, n_days=15, verbose=0)
+    sim.run()
+    d = sim.diseases.covid
+    # Proxied reads return the live disease arrays.
+    assert int(np.asarray(sim.people.exposed).sum()) == int(np.asarray(d.exposed).sum())
+    assert int(np.asarray(sim.people.infectious).sum()) == int(np.asarray(d.infectious).sum())
+    assert np.asarray(sim.people.age).mean() > 0       # a real People attr still resolves
+    try:
+        _ = sim.people.definitely_not_an_attr
+        assert False, 'unknown attr should raise'
+    except AttributeError:
+        pass
+
+
+def test_people_state_proxy_writethrough():
+    """A custom-function intervention can write sim.people.rel_sus (write-through to the disease)."""
+    def protect_elderly(sim):
+        if sim.ti == sim.day('2020-04-01'):
+            sim.people.rel_sus[cv.true(np.asarray(sim.people.age) > 70)] = 0.0
+    base = cv.Sim(pop_size=8000, pop_infected=80, pop_type='hybrid', start_day='2020-03-01',
+                  n_days=80, rand_seed=1, verbose=0); base.run()
+    prot = cv.Sim(pop_size=8000, pop_infected=80, pop_type='hybrid', start_day='2020-03-01',
+                  n_days=80, rand_seed=1, verbose=0, interventions=protect_elderly); prot.run()
+    bd = float(np.asarray(base.diseases.covid.results['cum_deaths']).max())
+    pd = float(np.asarray(prot.diseases.covid.results['cum_deaths']).max())
+    assert pd < bd, 'protecting the elderly (via the people.rel_sus proxy) should reduce deaths'
+
+
+def test_sim_attr_proxy():
+    """v3-style sim.<par> / sim['par'] reads resolve to the config / COVID pars, without shadowing."""
+    sim = cv.Sim(pop_size=3000, pop_infected=30, pop_type='hybrid', start_day='2020-03-01', n_days=15,
+                 verbose=0)
+    sim.run()
+    assert abs(sim.beta - 0.016) < 1e-9 and sim.start_day == '2020-03-01' and sim.n_days == 15
+    assert sim['beta'] == sim.beta              # ss.Sim.__getitem__ delegates to getattr
+    assert sim['rel_death_prob'] == 1.0         # a COVID parameter
+    assert hasattr(sim, 'results') and hasattr(sim, 'diseases')  # real attrs unaffected
+    try:
+        _ = sim.definitely_missing
+        assert False
+    except AttributeError:
+        pass
+
+
 def test_nab_decay_custom_params_routed():
     """A custom nab_decay (passed as a kwarg) is routed to the COVID module and used."""
     sim = cv.Sim(pop_size=5000, pop_infected=50, n_days=40, use_waning=True, verbose=0,

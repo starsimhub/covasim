@@ -172,6 +172,22 @@ class Sim(ss.Sim):
             self.data = datafile if hasattr(datafile, 'columns') else cvm.load_data(datafile)
         return
 
+    def __getattr__(self, key):
+        """v3 compat: expose the Covasim sim-level config + COVID parameters as attributes.
+
+        So ``sim.beta`` / ``sim.start_day`` / ``sim.rel_death_prob`` (and, since ``ss.Sim.__getitem__``
+        delegates to ``getattr``, ``sim['beta']`` etc.) resolve. ``__getattr__`` is only consulted when
+        normal attribute lookup fails, so it cannot shadow real attributes. (Reads only; to *set* a
+        disease parameter, build a fresh ``cv.Sim(dict(...))`` or use ``cv.dynamic_pars``.)
+        """
+        cfg = self.__dict__.get('_cv_config', None)  # __dict__ access avoids re-triggering __getattr__
+        if cfg is not None and key in cfg:
+            return cfg[key]
+        covid = self.__dict__.get('_cv_covid', None)
+        if covid is not None and hasattr(covid, 'pars') and key in covid.pars:
+            return covid.pars[key]
+        raise AttributeError(f"'Sim' object has no attribute '{key}'")
+
     def initialize(self, *args, reset=False, **kwargs):
         """v3-compatibility alias for ``init`` (Starsim renamed ``initialize`` -> ``init``).
 

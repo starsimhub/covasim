@@ -157,13 +157,15 @@ The only required changes are the **namespaced summary key** and (optionally) dr
   is not yet ported.
 - **Loading pre-v4 pickles** — v3 `.sim`/`.scens` files will generally not unpickle under the new
   object model. Re-run from parameters, or keep v3 installed to read old files.
-- **People-level disease state** — `sim.people.exposed`/`rel_sus`/`doses` etc. moved to the disease
-  module: use `sim.diseases.covid.<state>`.
+- **`cv.Layer` / `people.contacts` / `dynam_layer`** — the v4 contact-network internals differ; the
+  low-level layer-manipulation API is not ported.
 
 The following ARE supported in v4 (some restored after the initial port): `location=` (country age
 distributions), vaccination `subtarget=`/`booster=`, custom `nab_decay` forms, custom analyzers via a
-v3-style `apply(sim)` method, `n_imports` background importation, the `r_eff` result, and pre-t=0
-immunity (`historical_vaccinate_prob`, `prior_immunity`, `historical_wave`; require `use_waning=True`).
+v3-style `apply(sim)` method, `n_imports` background importation, the `r_eff` result, pre-t=0 immunity
+(`historical_vaccinate_prob`, `prior_immunity`, `historical_wave`; require `use_waning=True`), and
+v3-style per-agent state reads via `sim.people.<state>` (e.g. `sim.people.exposed`, `sim.people.rel_sus`),
+which proxy through to `sim.diseases.covid`.
 
 ## 6. Getting help
 
