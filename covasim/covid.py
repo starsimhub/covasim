@@ -105,6 +105,12 @@ class COVID(ss.Infection):
             ss.FloatArr('severe_prob', default=0.0,    label='P(severe | symptomatic)'),
             ss.FloatArr('crit_prob',   default=0.0,    label='P(critical | severe)'),
             ss.FloatArr('death_prob',  default=0.0,    label='P(death | critical)'),
+            # Scalar per-agent variant tags (the v3 *_variant scalars; NaN = "none"). A COVID host
+            # has exactly ONE SEIR chain, so these are scalars, not 2D -- exclusivity is structural
+            # (M3 design spec sec.1). For nv==1 every infected agent is wild (variant 0).
+            ss.FloatArr('exposed_variant',    label='Variant index this agent is exposed/infected with'),
+            ss.FloatArr('infectious_variant', label='Variant index this agent is infectious with'),
+            ss.FloatArr('recovered_variant',  label='Variant index this agent last recovered from'),
             reset = True,
         )
 
@@ -114,6 +120,26 @@ class COVID(ss.Infection):
         self._sev_bern   = ss.bernoulli(p=0.5)
         self._crit_bern  = ss.bernoulli(p=0.5)
         self._death_bern = ss.bernoulli(p=0.5)
+
+        # --- Variant axis (M3) ---------------------------------------------------
+        # Design B: a SINGLE COVID module carries an internal variant dimension. nv==1
+        # (no variants registered) is byte-identical to M2. cv.variant.initialize() and
+        # cv.Sim(variants=...) grow these in M3 Task 2; the 5 per-variant keys come from
+        # parameters.get_variant_pars. wild is always index 0.
+        import covasim.parameters as cvpar  # lazy: covid.py imports before immunity.py
+        self.nv = 1
+        self.variant_map  = {0: 'wild'}                       # index -> label (wild always 0)
+        self.variant_pars = {'wild': dict(cvpar.get_variant_pars(variant='wild'))}  # 5 keys, all 1.0
+        # 2D per-variant immunity arrays sus_imm/symp_imm/sev_imm, shape (nv, n_raw), allocated in
+        # init_post once n_agents is known (plain ndarrays indexed by raw UID -- NOT growth-aware,
+        # so M3 forbids births; see init_post). All-zero at nv==1 => no effect (M2 byte-identity).
+        self.sus_imm = self.symp_imm = self.sev_imm = None
+        # Per-target variant of THIS step's new cases, keyed by UID (set in the M3 infect() override;
+        # read by set_prognoses). Empty => the stock single-variant path (everyone wild).
+        self._new_case_variant = {}
+        # Cross-immunity / reinfection switch (auto-True when nv>1; M3 Task 3). When False (the M2
+        # path) recovered agents stay susceptible=False (permanent immunity), preserving M2 exactly.
+        self.cross_immunity_active = False
         return
 
     @property
@@ -184,16 +210,72 @@ class COVID(ss.Infection):
         """
         return np.round(dist.rvs(uids))
 
-    def set_prognoses(self, uids, sources=None):
-        """Draw the full disease trajectory once at infection (the v3 pre-scheduled tree)."""
+    # Per-variant flow stems (the 4 v3 by_variant flows). new_infectious is counted at the
+    # infectious transition (step_state); the other three at infection (set_prognoses).
+    _FLOW_VARIANT_KEYS = ('new_infections', 'new_symptomatic', 'new_severe', 'new_infectious')
+
+    def _ensure_flow_variant(self):
+        """Lazily (re)allocate the per-variant flow accumulators, sized to the current ``nv``.
+
+        ``init_post`` (seeding) can call ``set_prognoses`` before ``init_results`` runs, and ``nv``
+        may have grown via ``cv.variant`` between ``__init__`` and ``init``; this keeps the dict
+        present and correctly sized in both cases.
+        """
+        fv = getattr(self, '_flow_variant', None)
+        if fv is None or fv['new_infections'].shape[0] != self.nv:
+            self._flow_variant = {k: np.zeros(self.nv) for k in self._FLOW_VARIANT_KEYS}
+        return
+
+    def _variant_of(self, uids, variant=None):
+        """Per-UID variant index for a batch of new cases (aligned to ``uids`` order).
+
+        ``variant`` set (int) => all these cases are that variant (seeds / mid-run imports).
+        ``variant`` None => read the per-target variant recorded by the M3 infect() override
+        (``_new_case_variant``, keyed by UID); empty dict => everyone wild (the M2 path).
+        """
+        u = np.asarray(uids)
+        if variant is not None:
+            return np.full(len(u), int(variant), dtype=int)
+        if self._new_case_variant:
+            return np.array([self._new_case_variant.get(int(x), 0) for x in u], dtype=int)
+        return np.zeros(len(u), dtype=int)
+
+    def set_prognoses(self, uids, sources=None, variant=None):
+        """Draw the full disease trajectory once at infection (the v3 pre-scheduled tree).
+
+        Variant-aware (M3): each branch probability is scaled by the per-variant
+        ``rel_*_prob`` and reduced by this variant's cross-immunity (``symp_imm``/``sev_imm``),
+        exactly as v3 ``people.infect`` (people.py:523,538). The per-UID multipliers fold
+        into the SAME four bernoulli draws as M2, so at ``nv==1`` (all-wild factors 1.0,
+        all-zero immunity) the draw sequence is byte-identical to M2.
+        """
         super().set_prognoses(uids, sources)  # logs the infection
         ti = self.ti
         p = self.pars
+        u = np.asarray(uids)
+        self._ensure_flow_variant()
 
-        # Entry: exposed and infectious latency
+        # Per-UID variant + per-variant branch-probability multipliers (length-nv lookups).
+        var_of = self._variant_of(uids, variant)
+        labels = [self.variant_map[i] for i in range(self.nv)]
+        relsymp_v  = np.array([self.variant_pars[l]['rel_symp_prob']   for l in labels])
+        relsev_v   = np.array([self.variant_pars[l]['rel_severe_prob'] for l in labels])
+        relcrit_v  = np.array([self.variant_pars[l]['rel_crit_prob']   for l in labels])
+        reldeath_v = np.array([self.variant_pars[l]['rel_death_prob']  for l in labels])
+        relsymp_u  = relsymp_v[var_of];  relsev_u   = relsev_v[var_of]
+        relcrit_u  = relcrit_v[var_of];  reldeath_u = reldeath_v[var_of]
+        # Per-UID cross-immunity reductions for this variant (NaN-free 0.0 at nv==1).
+        sympimm_u = self.symp_imm[var_of, u] if self.symp_imm is not None else np.zeros(len(u))
+        sevimm_u  = self.sev_imm[var_of, u]  if self.sev_imm  is not None else np.zeros(len(u))
+
+        # Entry: exposed + infectious latency; tag the variant; clear `recovered` on reinfection
+        # (matches v3 people.infect:497 -- prevents an n_recovered double-count; no-op at M2 since
+        # transmission only ever yields susceptible targets, who are not recovered).
         self.susceptible[uids] = False
         self.infected[uids]    = True
         self.exposed[uids]     = True
+        self.recovered[uids]   = False
+        self.exposed_variant[uids] = var_of.astype(float)
         self.ti_infected[uids] = ti
         self.ti_exposed[uids]  = ti
         self.ti_infectious[uids] = ti + self._dur(p.dur_exp2inf, uids)
@@ -202,7 +284,7 @@ class COVID(ss.Infection):
             arr[uids] = np.nan
 
         # Branch 1: symptomatic? (asymptomatic agents recover and cannot die)
-        self._symp_bern.set(p=p.rel_symp_prob * self.symp_prob[uids])
+        self._symp_bern.set(p=p.rel_symp_prob * relsymp_u * self.symp_prob[uids] * (1 - sympimm_u))
         is_symp = self._symp_bern.rvs(uids)
         symp  = uids[is_symp]
         asymp = uids[~is_symp]
@@ -210,7 +292,7 @@ class COVID(ss.Infection):
 
         # Branch 2: severe? (among symptomatic)
         self.ti_symptomatic[symp] = self.ti_infectious[symp] + self._dur(p.dur_inf2sym, symp)
-        self._sev_bern.set(p=p.rel_severe_prob * self.severe_prob[symp])
+        self._sev_bern.set(p=p.rel_severe_prob * relsev_u[is_symp] * self.severe_prob[symp] * (1 - sevimm_u[is_symp]))
         is_sev = self._sev_bern.rvs(symp)
         sev  = symp[is_sev]
         mild = symp[~is_sev]
@@ -219,7 +301,7 @@ class COVID(ss.Infection):
         # Branch 3: critical? (among severe; no_hosp_factor raises the risk if beds are full)
         self.ti_severe[sev] = self.ti_symptomatic[sev] + self._dur(p.dur_sym2sev, sev)
         hosp_factor = p.no_hosp_factor if self._hosp_full() else 1.0
-        self._crit_bern.set(p=p.rel_crit_prob * self.crit_prob[sev] * hosp_factor)
+        self._crit_bern.set(p=p.rel_crit_prob * relcrit_u[is_symp][is_sev] * self.crit_prob[sev] * hosp_factor)
         is_crit = self._crit_bern.rvs(sev)
         crit    = sev[is_crit]
         noncrit = sev[~is_crit]
@@ -228,13 +310,20 @@ class COVID(ss.Infection):
         # Branch 4: die? (among critical; no_icu_factor raises the risk if ICU is full)
         self.ti_critical[crit] = self.ti_severe[crit] + self._dur(p.dur_sev2crit, crit)
         icu_factor = p.no_icu_factor if self._icu_full() else 1.0
-        self._death_bern.set(p=p.rel_death_prob * self.death_prob[crit] * icu_factor)
+        self._death_bern.set(p=p.rel_death_prob * reldeath_u[is_symp][is_sev][is_crit] * self.death_prob[crit] * icu_factor)
         is_dead = self._death_bern.rvs(crit)
         dead    = crit[is_dead]
         survive = crit[~is_dead]
         self.ti_recovered[survive] = self.ti_critical[survive] + self._dur(p.dur_crit2rec, survive)
         self.ti_dead[dead] = self.ti_critical[dead] + self._dur(p.dur_crit2die, dead)
         # (ti_recovered for `dead` stays NaN from the defensive reset -- death and recovery are exclusive)
+
+        # Per-variant flows, counted AT INFECTION (the v3 quirk: new_{infections,symptomatic,severe}
+        # _by_variant are destined counts recorded in infect(); new_infectious_by_variant is counted
+        # at the infectious transition instead, in step_state).
+        self._flow_variant['new_infections']  += np.bincount(var_of,           minlength=self.nv)
+        self._flow_variant['new_symptomatic'] += np.bincount(var_of[is_symp],  minlength=self.nv)
+        self._flow_variant['new_severe']      += np.bincount(var_of[is_symp][is_sev], minlength=self.nv)
 
         # Precompute the per-agent viral-load high->low switch time (v3 compute_viral_load trans_point).
         # End of the infectious period = recovery or death date (whichever is set).
@@ -249,8 +338,19 @@ class COVID(ss.Infection):
     def step_state(self):
         """Advance the state machine (before transmission); flip flags on ti thresholds, no re-draws."""
         ti = self.ti
-        # exposed -> infectious (the infectious property derives from ti_infectious; clear `exposed`)
-        self.exposed[(self.exposed & (self.ti_infectious <= ti)).uids] = False
+        self._ensure_flow_variant()
+        # Reset the per-variant flow accumulators for this step. new_infectious is counted here;
+        # new_{infections,symptomatic,severe} are accumulated later in set_prognoses (during step()).
+        for v in self._flow_variant.values():
+            v[:] = 0.0
+        # exposed -> infectious: tag infectious_variant from exposed_variant (v3 check_infectious),
+        # count new_infectious_by_variant, then clear the `exposed` flag.
+        new_inf = (self.exposed & (self.ti_infectious <= ti)).uids
+        if len(new_inf):
+            iv = self.exposed_variant[new_inf]
+            self.infectious_variant[new_inf] = iv
+            self._flow_variant['new_infectious'] += np.bincount(np.asarray(iv).astype(int), minlength=self.nv)
+            self.exposed[new_inf] = False
         # Stage onsets -- count only NEW transitions (for the flow Results); flags are cumulative-nested.
         new_symp = (self.infected & ~self.symptomatic & (self.ti_symptomatic <= ti)).uids
         self.symptomatic[new_symp] = True
@@ -258,13 +358,21 @@ class COVID(ss.Infection):
         self.severe[new_sev] = True
         new_crit = (self.infected & ~self.critical & (self.ti_critical <= ti)).uids
         self.critical[new_crit] = True
-        # -> recovered (permanent immunity; clear the stage flags)
+        # -> recovered (clear the stage flags; tag recovered_variant; clear active-infection variant
+        # tags). Under cross_immunity_active (M3 nv>1) recovery restores susceptibility so the agent
+        # can be reinfected by a heterologous variant; otherwise (M2 path) immunity is permanent.
         new_rec = (self.infected & (self.ti_recovered <= ti)).uids
         self.infected[new_rec]     = False
         self.recovered[new_rec]    = True
         self.symptomatic[new_rec]  = False
         self.severe[new_rec]       = False
         self.critical[new_rec]     = False
+        if len(new_rec):
+            self.recovered_variant[new_rec]  = self.exposed_variant[new_rec]
+            self.infectious_variant[new_rec] = np.nan
+            self.exposed_variant[new_rec]    = np.nan
+            if self.cross_immunity_active:
+                self.susceptible[new_rec] = True
         # -> dead (request the death; resolved in step_die after transmission)
         new_dead = (self.infected & (self.ti_dead <= ti)).uids
         if len(new_dead):
@@ -294,6 +402,10 @@ class COVID(ss.Infection):
         self.recovered[uids]    = False
         self.susceptible[uids]  = False
         self.dead[uids]         = True
+        # Clear the scalar variant tags (v3 people.py:309-311); clean state + M4/M6 safety.
+        self.exposed_variant[uids]    = np.nan
+        self.infectious_variant[uids] = np.nan
+        self.recovered_variant[uids]  = np.nan
         return
 
     # --- results --------------------------------------------------------------
@@ -326,6 +438,30 @@ class COVID(ss.Infection):
             R('cum_deaths',      'Cumulative deaths'),
         )
         self._flow = dict(symptomatic=0, severe=0, critical=0, recoveries=0, deaths=0)
+
+        # The 12-key 2D by_variant sub-dict (v3 sim.results['variant']), shape (nv, npts), FLOAT dtype
+        # (v3 result_float -- avoids truncation). Built as a NESTED ss.Results because define_results
+        # forces shape=npts (1D); the auto-scaler does not descend into it, so the scale=True members
+        # are scaled MANUALLY by pop_scale in finalize (M3 design spec sec.7; done at sim level, Task 4).
+        nv, npts = self.nv, self.t.npts
+        def RV(name, scale, label):
+            return ss.Result(name, dtype=float, scale=scale, shape=(nv, npts), label=label,
+                             module=self.label, timevec=self.t.timevec)
+        variant_res = ss.Results(self.label)
+        variant_res += RV('prevalence_by_variant',     False, 'Prevalence by variant')
+        variant_res += RV('incidence_by_variant',      False, 'Incidence by variant')
+        variant_res += RV('new_infections_by_variant',  True, 'New infections by variant')
+        variant_res += RV('cum_infections_by_variant',  True, 'Cumulative infections by variant')
+        variant_res += RV('new_symptomatic_by_variant', True, 'New symptomatic by variant')
+        variant_res += RV('cum_symptomatic_by_variant', True, 'Cumulative symptomatic by variant')
+        variant_res += RV('new_severe_by_variant',      True, 'New severe by variant')
+        variant_res += RV('cum_severe_by_variant',      True, 'Cumulative severe by variant')
+        variant_res += RV('new_infectious_by_variant',  True, 'New infectious by variant')
+        variant_res += RV('cum_infectious_by_variant',  True, 'Cumulative infectious by variant')
+        variant_res += RV('n_exposed_by_variant',       True, 'Number exposed by variant')
+        variant_res += RV('n_infectious_by_variant',    True, 'Number infectious by variant')
+        self.results['variant'] = variant_res
+        self._ensure_flow_variant()
         return
 
     def update_results(self):
@@ -339,6 +475,22 @@ class COVID(ss.Infection):
         res.new_critical[ti]    = self._flow['critical']
         res.new_recoveries[ti]  = self._flow['recoveries']
         res.new_deaths[ti]      = self._flow['deaths']
+
+        # By-variant flows (accumulated this step) + stocks (counted from the live tags).
+        vres = res['variant']
+        fv = self._flow_variant
+        vres['new_infections_by_variant'][:, ti]  = fv['new_infections']
+        vres['new_symptomatic_by_variant'][:, ti] = fv['new_symptomatic']
+        vres['new_severe_by_variant'][:, ti]      = fv['new_severe']
+        vres['new_infectious_by_variant'][:, ti]  = fv['new_infectious']
+        exp_uids = self.exposed.uids
+        if len(exp_uids):
+            vres['n_exposed_by_variant'][:, ti] = np.bincount(
+                np.asarray(self.exposed_variant[exp_uids]).astype(int), minlength=self.nv)
+        inf_uids = self.infectious.uids
+        if len(inf_uids):
+            vres['n_infectious_by_variant'][:, ti] = np.bincount(
+                np.asarray(self.infectious_variant[inf_uids]).astype(int), minlength=self.nv)
         return
 
     def finalize_results(self):
@@ -350,6 +502,13 @@ class COVID(ss.Infection):
         res.cum_critical[:]    = np.cumsum(res.new_critical[:])
         res.cum_recoveries[:]  = np.cumsum(res.new_recoveries[:])
         res.cum_deaths[:]      = np.cumsum(res.new_deaths[:])
+
+        # By-variant cumulatives (cumsum along the time axis). The pop_scale scaling, the wild
+        # cum_infections seed-offset, and the prevalence/incidence denominators are applied at the
+        # sim level in cv.Sim.finalize (M3 design spec sec.7); here we only accumulate the flows.
+        vres = res['variant']
+        for stem in ('infections', 'symptomatic', 'severe', 'infectious'):
+            vres[f'cum_{stem}_by_variant'][:] = np.cumsum(vres[f'new_{stem}_by_variant'][:], axis=1)
         return
 
     # --- seeding --------------------------------------------------------------
@@ -362,6 +521,21 @@ class COVID(ss.Infection):
         from the sim seed); otherwise defer to ``ss.Infection`` (``ss.bernoulli`` / None).
         """
         self._fill_prognoses()  # must precede any set_prognoses call (seeding below)
+
+        # Allocate the 2D per-variant immunity arrays (the v3 imm_states), shape (nv, n_raw), indexed
+        # by RAW uid (aligned with rel_sus.raw / FloatArr indexing). These are plain ndarrays, NOT
+        # ss.Arr, so they do NOT auto-grow/reorder on UID churn -- M3 therefore requires a constant
+        # population (no births). M4/M6 must make these growth-aware (M3 design spec sec.1, adversary #10).
+        births = [m for m in self.sim.demographics.values()
+                  if any(s in type(m).__name__.lower() for s in ('birth', 'pregnan'))]
+        if births:
+            raise NotImplementedError('cv.COVID variant immunity arrays are not growth-aware: births/'
+                                      'pregnancy are unsupported in M3 (deferred to M4/M6).')
+        n_raw = len(self.rel_sus.raw)
+        self.sus_imm  = np.zeros((self.nv, n_raw))
+        self.symp_imm = np.zeros((self.nv, n_raw))
+        self.sev_imm  = np.zeros((self.nv, n_raw))
+        self._ensure_flow_variant()
 
         exact = self.pars.init_prev if isinstance(self.pars.init_prev, (int, np.integer)) else None
         if exact is None:
