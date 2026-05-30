@@ -236,3 +236,23 @@ Note: the build_fn applies pars after init, so only RUNTIME-read pars (severity 
 calibrate correctly; init-time pars (e.g. per-layer beta as a dict) would need a pre-init hook
 (follow-up). Remaining milestones: M8 (MultiSim/Scenarios), M9 (analyzers/TransTree/synthpops),
 M10 (release).
+
+---
+
+# M8 (MultiSim / Scenarios / parallel) — landed (2026-05-30)
+
+Combined spec+plan + 1 commit. cv.MultiSim runs a sim across seeds via ss.MultiSim and reduces over
+the per-seed COVID time-series Results to a median/mean + 10/90 quantile band (ss.MultiSim.run works
+with cv.Sim, but its reduce() chokes on Covasim's bridged/nested results, so cv.MultiSim reduces
+itself). cv.parallel/multi_run/single_run are the run helpers. cv.Scenarios builds a fresh cv.Sim per
+named scenario (basepars + override pars), runs a cv.MultiSim, and stores the reduced UQ per scenario.
+
+Acceptance met: cv.MultiSim produces median + bands (band width>0 where seeds differ, median within
+band); cv.Scenarios baseline-vs-pfizer gives a clear reduction (8222 -> 301 infections). UQ demo
+examples/m8_uq_sweep.py (+ /tmp/m8_uq_sweep.png): 10-seed median + 10/90 band. The "retrofit
+acceptance tests onto multi-seed z-score gates" sub-task was already satisfied -- the M1-M6 parity
+gates ARE multi-seed z-score gates (parity_gate over N v4 vs M v3 seeds).
+
+Note: ss.MultiSim forks for parallelism -> a benign multiprocess DeprecationWarning (Python 3.13);
+reported but not promoted under the strict bar. Remaining: M9 (analyzers/TransTree/synthpops),
+M10 (release). **Session: M3-M8 done.**
