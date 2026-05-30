@@ -102,3 +102,31 @@ def test_vaccine_per_variant_efficacy():
     sus_beta = np.asarray(d.sus_imm[beta_i])[np.asarray(vacc)]
     assert sus_wild.mean() > sus_beta.mean(), \
         f'pfizer should protect vaccinated agents more vs wild than beta: wild={sus_wild.mean():.3f} beta={sus_beta.mean():.3f}'
+
+
+# --- simple_vaccine (non-NAb, use_waning=False) ------------------------------
+
+def test_simple_vaccine_reduces_infections_without_waning():
+    """cv.simple_vaccine (use_waning=False) reduces susceptibility directly => fewer infections."""
+    base = _sim(use_waning=False); base.run()
+    sv = _sim(use_waning=False,
+              interventions=cv.simple_vaccine(days=0, prob=0.6, rel_sus=0.2, rel_symp=0.5)); sv.run()
+    assert _ever_infected(sv) < _ever_infected(base), 'simple_vaccine should reduce the epidemic'
+    assert float(np.asarray(sv.diseases.covid.results['cum_vaccinated']).max()) > 0
+    # No NAb pipeline involved (use_waning=False => no connector, no peak_nab).
+    assert not (np.asarray(sv.diseases.covid.peak_nab) > 0).any(), 'simple_vaccine does not confer NAbs'
+
+
+def test_simple_vaccine_scales_rel_sus():
+    """simple_vaccine multiplies vaccinated agents' rel_sus by the rel_sus efficacy factor."""
+    sim = _sim(use_waning=False, n_days=10,
+               interventions=cv.simple_vaccine(days=0, prob=1.0, rel_sus=0.3))
+    sim.init()
+    d = sim.diseases.covid
+    base_rel_sus = np.asarray(d.rel_sus).copy()
+    sim.run()
+    # Everyone vaccinated at day 0 with rel_sus=0.3 (first dose full efficacy) => rel_sus scaled to 0.3x.
+    vacc = d.vaccinated.uids
+    assert len(vacc) > 0
+    ratio = np.asarray(d.rel_sus[vacc]) / np.maximum(base_rel_sus[np.asarray(vacc)], 1e-9)
+    assert np.allclose(ratio, 0.3, atol=0.02), 'rel_sus scaled by the vaccine efficacy factor'

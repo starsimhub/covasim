@@ -158,3 +158,34 @@ a scalar approximation of v3's per-layer values (spec Open Q A); the aggregate a
 testing/tracing/quarantine — each functionally complete, validated against v3.1.8 with passing parity
 gates, and committed on `starsim-port-2`. Remaining: M6 (vaccination, the last NAb-pipeline consumer),
 M7 (calibration), M8 (multisim/scenarios), M9 (analyzers/TransTree/synthpops), M10 (release).
+
+---
+
+# M6 (vaccination) — also landed this session (2026-05-30)
+
+Vaccination is the last consumer of the M4 NAb pipeline. Spec+plan + 3 commits (additive: no
+vaccination intervention => M1-M5 byte-identical; the vaccine NAb draw uses a separate Dist so M4
+is unchanged).
+
+- **Task 1:** vaccination state (vaccinated/doses/vaccine_source/date_vaccinated) + vaccine registry
+  on cv.COVID; `_update_peak_nab` generalised (vaccine nab_init/nab_boost, no symptom scaling); the
+  connector's check_immunity now takes `imm = max(natural_cross, vaccine_eff)` over ever-recovered +
+  vaccinated agents, then `calc_VE(nab x imm)`. calc_VE_symp ported (for target_eff).
+- **Task 2:** cv.BaseVaccination + cv.vaccinate_prob / cv.vaccinate_num / cv.vaccinate + the predefined
+  products (pfizer/moderna/az/jj/novavax/sinovac/sinopharm) with per-variant efficacy + target_eff.
+- **Task 3:** cv.simple_vaccine (non-NAb, use_waning=False direct rel_sus/symp scaling) + anchor_m6 +
+  test_m6_parity + v3.1.8 baseline.
+
+## 🎯 M6 reproduces v3 within |z|<2.1
+
+The M6 vaccination anchor (single-variant, use_waning=True, vaccinate_prob('pfizer')) matches the
+v3.1.8 baseline on EVERY metric: cum_infections z~-2.0, cum_severe ~0, cum_deaths ~-1, peak ~-1.8,
+cum_doses/cum_vaccinated ~-0.9 (random; hybrid similar). One fix along the way: cum_infections must
+count infection EVENTS (sum of cum_infections_by_variant) not unique-ever-infected agents, since
+use_waning produces reinfections (the v3 definition). Per-variant efficacy works (pfizer protects
+vaccinated agents more vs wild than the escape variant beta); simple_vaccine reduces susceptibility
+without the NAb pipeline. Demo /tmp/m6_demo.png (pfizer 1500/day: 20847->836 infections, 105->3 deaths).
+
+**Deferred from M6:** historical_vaccinate_prob / historical_wave / prior_immunity (pre-t0 NAb
+imprinting) -- noted for a follow-up. Remaining milestones: M7 (calibration/Fit), M8 (multisim/
+scenarios), M9 (analyzers/TransTree/synthpops), M10 (release).

@@ -100,6 +100,10 @@ def _resolve_run(anchor):
         pop_type = anchor.split('_', 1)[1]
         from anchor_m5 import run_and_summarize as run_m5  # noqa: E402
         return lambda: run_m5(pop_type=pop_type)
+    if anchor.startswith('m6_'):
+        pop_type = anchor.split('_', 1)[1]
+        from anchor_m6 import run_and_summarize as run_m6  # noqa: E402
+        return lambda: run_m6(pop_type=pop_type)
     raise ValueError(f"Unknown anchor {anchor!r}; choices: m0, m1_*, m2_*, m3_*, m4_random|hybrid.")
 
 

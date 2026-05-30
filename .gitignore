@@ -171,3 +171,8 @@ tests/regression/anchor_m4_snapshot.json
 tests/regression/v3_m5_*seeds*.json
 tests/regression/v4_m5_*seeds*.json
 tests/regression/anchor_m5_snapshot.json
+
+# M6 vaccination regression baselines
+tests/regression/v3_m6_*seeds*.json
+tests/regression/v4_m6_*seeds*.json
+tests/regression/anchor_m6_snapshot.json

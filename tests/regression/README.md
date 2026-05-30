@@ -240,3 +240,21 @@ cross-seed SE is so tiny that the residual reads as |z|~8 on the random backend 
 Starsim-CRN-vs-v3-RNG offset (analogous to M2's documented residual). The iso/quar transmissibility
 factors are a scalar M5 approximation of v3's per-layer values (spec Open Q A; the per-layer
 refinement would tighten hybrid further but the aggregate already matches).
+
+## M6 anchor (vaccination)
+
+`anchor_m6.py` is the single-variant natural-history scenario with `use_waning=True` plus a pfizer
+vaccination campaign (`vaccinate_prob('pfizer', days=20, prob=0.05)`). `build_summary_m6` pins the
+burden (`cum_infections`/`cum_severe`/`cum_deaths`/`peak_n_infectious`) plus the vaccination outcomes
+(`cum_doses`/`cum_vaccinated`). Generate the gitignored v3.1.8 baseline:
+
+```bash
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m6_random --n 30
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m6_hybrid --n 30
+```
+
+The release gate is `../test_m6_parity.py` (slow, per backend). Because vaccine immunity shares the
+M4 NAb pipeline (which re-converges to v3 at |z|<3.5), the vaccinated trajectory tracks v3: **every
+pinned metric matches within |z|<2.1** — burden, peak, doses, and vaccinated. (`cum_infections` counts
+infection EVENTS = sum of `cum_infections_by_variant`, matching v3's flow definition, since
+`use_waning=True` produces reinfections.) Gate threshold |z|<5 as M2-M5.

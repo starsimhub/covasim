@@ -252,7 +252,7 @@ class contact_tracing(Intervention):
 
 # %% Vaccination interventions (M6) -----------------------------------------------------------------
 
-__all__ += ['BaseVaccination', 'vaccinate', 'vaccinate_prob', 'vaccinate_num']
+__all__ += ['BaseVaccination', 'vaccinate', 'vaccinate_prob', 'vaccinate_num', 'simple_vaccine']
 
 
 def _check_doses(doses, interval):
@@ -517,3 +517,69 @@ def vaccinate(*args, **kwargs):
     if 'num_doses' in kwargs:
         return vaccinate_num(*args, **kwargs)
     return vaccinate_prob(*args, **kwargs)
+
+
+class simple_vaccine(Intervention):
+    """
+    Simple (non-NAb) vaccine (the v3 ``simple_vaccine``): directly scales susceptibility and the
+    symptomatic probability of vaccinated agents, rather than going through the NAb pipeline. Intended
+    for ``use_waning=False``; preserves the v3 public API.
+
+    Args:
+        days (int/list): day(s) on which to vaccinate.
+        prob (float): probability of being vaccinated on each applied day.
+        rel_sus (float): relative susceptibility after vaccination (0 = perfect protection, 1 = none).
+        rel_symp (float): relative symptomatic probability after vaccination (0 = perfect, 1 = none).
+        cumulative (bool/list): per-dose efficacy weights; False=[1,0] (only the 1st dose helps),
+            True=[1] (every dose at full efficacy), or an explicit list.
+    """
+
+    def __init__(self, days, prob=1.0, rel_sus=0.0, rel_symp=0.0, cumulative=False, **kwargs):
+        super().__init__(**kwargs)
+        self.days = days
+        self.prob = prob
+        self.rel_sus = rel_sus
+        self.rel_symp = rel_symp
+        if cumulative in [0, False]:
+            cumulative = [1, 0]
+        elif cumulative in [1, True]:
+            cumulative = [1]
+        self.cumulative = np.array(cumulative, dtype=float)
+        self._day_set = None
+        self._doses_by_this = None
+        self._select = ss.bernoulli(p=0.0)
+        return
+
+    def init_post(self):
+        super().init_post()
+        self._day_set = set(int(round(d)) for d in sc.toarray(self.days))
+        self._doses_by_this = np.zeros(len(self._covid().rel_sus.raw), dtype=int)
+        return
+
+    def step(self):
+        ti = self.ti
+        if ti not in self._day_set:
+            return
+        covid = self._covid()
+        alive = covid.sim.people.auids
+        self._select.set(p=self.prob)
+        vacc = alive[self._select.rvs(alive)]
+        if not len(vacc):
+            return
+        va = np.asarray(vacc)
+        # Per-dose efficacy weight (later doses may add nothing, per `cumulative`).
+        eff_doses = np.minimum(self._doses_by_this[va], len(self.cumulative) - 1)
+        vacc_eff = self.cumulative[eff_doses]
+        rel_sus_eff  = (1.0 - vacc_eff) + vacc_eff * self.rel_sus
+        rel_symp_eff = (1.0 - vacc_eff) + vacc_eff * self.rel_symp
+        # Directly scale susceptibility + symptomatic probability (no NAb pipeline).
+        covid.rel_sus[vacc]   = np.asarray(covid.rel_sus[vacc]) * rel_sus_eff
+        covid.symp_prob[vacc] = np.asarray(covid.symp_prob[vacc]) * rel_symp_eff
+        # Bookkeeping.
+        prior = np.asarray(covid.vaccinated[vacc])
+        self._doses_by_this[va] += 1
+        covid.vaccinated[vacc] = True
+        covid.doses[vacc] = np.asarray(covid.doses[vacc]) + 1
+        covid._vacc_flow['doses'] += len(vacc)
+        covid._vacc_flow['vaccinated'] += int((~prior).sum())
+        return
