@@ -222,6 +222,11 @@ class COVID(ss.Infection):
         self.vaccine_pars = {}
         self.vaccine_map  = {}
         self._vacc_nab_init = ss.normal(loc=0.0, scale=2.0)
+
+        # Transmission log for cv.TransTree (M9). Recording is OFF by default and switched on only by a
+        # cv.TransTree analyzer, so the M1-M8 hot path is untouched (byte-identical). Reset in init_post.
+        self._record_transmissions = False
+        self.infection_events = []
         return
 
     @property
@@ -566,6 +571,12 @@ class COVID(ss.Infection):
             case_variant = np.concatenate(case_variant)[inds]
             # Record per-target variant keyed by UID (survives set_outcomes' congenital/age split).
             self._new_case_variant = {int(u): int(v) for u, v in zip(np.asarray(new_cases), case_variant)}
+            # M9: log transmission events (source, target, ti, variant) for cv.TransTree, ONLY when a
+            # TransTree analyzer has switched recording on -- so M1-M8 (flag off) stay byte-identical.
+            if self._record_transmissions:
+                ti = self.ti
+                for s_, t_, v_ in zip(np.asarray(sources), np.asarray(new_cases), case_variant):
+                    self.infection_events.append((int(s_), int(t_), int(ti), int(v_)))
         else:
             new_cases = ss.uids()
             sources = ss.uids()
@@ -964,6 +975,7 @@ class COVID(ss.Infection):
             import covasim.immunity as cvimm  # lazy: covid.py imports before immunity.py
             self.nab_kin = cvimm.precompute_waning(self.t.npts, self.pars.nab_decay)
         self._pending_quarantine = {}  # M5: start_day -> [(uid, end_day)] (reset for clean re-runs)
+        self.infection_events = []     # M9: transmission log (reset for clean re-runs)
 
         exact = self.pars.init_prev if isinstance(self.pars.init_prev, (int, np.integer)) else None
         if exact is None:

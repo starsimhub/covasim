@@ -256,3 +256,24 @@ gates ARE multi-seed z-score gates (parity_gate over N v4 vs M v3 seeds).
 Note: ss.MultiSim forks for parallelism -> a benign multiprocess DeprecationWarning (Python 3.13);
 reported but not promoted under the strict bar. Remaining: M9 (analyzers/TransTree/synthpops),
 M10 (release). **Session: M3-M8 done.**
+
+---
+
+# M9 (analyzers / TransTree) — partially landed (2026-05-30)
+
+- **cv.Analyzer(ss.Analyzer)** base + **cv.snapshot** (per-agent state on given days), **cv.age_histogram**
+  (state-by-age-bin counts), **cv.nab_histogram** (NAb distribution, use_waning) -- all ss.Analyzer
+  subclasses running at the analyzer slot. Validated: snapshot/age-hist counts match the result series;
+  analyzers are observational (adding one is byte-identical).
+- **cv.TransTree**: reconstructs the transmission tree from a transmission log on cv.COVID that is
+  recorded ONLY when a TransTree analyzer is attached (gated -> M1-M8 byte-identical). Exposes
+  infection_events (source,target,day,variant), n_targets (offspring per infector), r0 (mean offspring;
+  ~2.6 in a hybrid run), make_detailed(). Full networkx graph + tree plotting deferred to the plotting pass.
+
+## Remaining M9 (blocked / deferred)
+- **synthpops backend** (pop_type='synthpops', LTCF layer): BLOCKED -- synthpops is not installed in
+  this env. Implement + test when available.
+- **cv.daily_age_stats** + the Covasim-specific sim.plot()/Fit.plot views: a plotting pass (deferred).
+
+**Session: M3-M8 complete + M9 analyzers/TransTree.** Remaining for v4.0: finish M9 (synthpops +
+plotting) and M10 (release: docs/migration guide, regenerate baselines, strip delegations, tag).

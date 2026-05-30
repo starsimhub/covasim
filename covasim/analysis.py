@@ -7,8 +7,10 @@ Terminology (as v3): *difference* = sim - data per matched point; *goodness-of-f
 difference through ``compute_gof``; *loss* = gof x weight; *mismatch* = sum of losses (the scalar
 minimised during calibration).
 
-The other analyzers (``snapshot``/``age_histogram``/``daily_age_stats``/``nab_histogram``) and the
-``cv.TransTree`` + ``cv.Fit.plot`` come in M9; ``cv.Calibration`` (Optuna) is the rest of M7.
+M9 adds the analyzers (``cv.Analyzer`` base + ``snapshot``/``age_histogram``/``nab_histogram``) and
+``cv.TransTree`` (built over a gated transmission log on ``cv.COVID``). Remaining M9 pieces:
+``cv.daily_age_stats``, the Covasim-specific ``sim.plot()``/``Fit.plot`` views (a plotting pass), and
+the synthpops population backend (optional dependency, not installed here).
 """
 import numpy as np
 import pandas as pd
@@ -303,3 +305,205 @@ class Calibration(sc.prettyobj):
         self.best_pars = self._calib.best_pars
         self.df = getattr(self._calib, 'df', None)
         return self
+
+
+# %% Analyzers (M9) ---------------------------------------------------------------------------------
+
+import starsim as ss  # noqa: E402  (kept here so Fit/Calibration above stay starsim-light)
+
+__all__ += ['Analyzer', 'snapshot', 'age_histogram', 'nab_histogram']
+
+_SNAPSHOT_STATES = ('susceptible', 'exposed', 'infectious', 'symptomatic', 'severe', 'critical',
+                    'recovered', 'dead', 'diagnosed', 'quarantined', 'isolated', 'vaccinated')
+
+
+class Analyzer(ss.Analyzer):
+    """Base class for Covasim analyzers (same public name as v3; runs at the analyzer loop slot)."""
+
+    def _covid(self):
+        return list(self.sim.diseases.values())[0]
+
+    def _resolve_days(self, days):
+        """Convert a list of int day-offsets / date-strings into a set of int day indices."""
+        tv = [str(d)[:10] for d in np.asarray(self.sim.t.timevec)]
+        out = set()
+        for d in sc.tolist(days):
+            if isinstance(d, (int, np.integer)):
+                out.add(int(d))
+            else:
+                ds = str(d)[:10]
+                if ds in tv:
+                    out.add(tv.index(ds))
+        return out
+
+    def _datekey(self, ti):
+        return str(np.asarray(self.sim.t.timevec)[ti])[:10]
+
+
+class snapshot(Analyzer):
+    """
+    Snapshot the per-agent disease state on specified days (the v3 ``cv.snapshot``).
+
+    ``snapshots[date]`` is an objdict with the per-(active-)agent boolean state arrays, ``age``, and
+    (under waning) ``nab``. ``get(day_or_date)`` retrieves one.
+    """
+
+    def __init__(self, days, *args, **kwargs):
+        super().__init__(**kwargs)
+        self.days = sc.tolist(days) + list(args)
+        self._dayset = None
+        self.snapshots = sc.odict()
+        return
+
+    def init_post(self):
+        super().init_post()
+        self._dayset = self._resolve_days(self.days)
+        return
+
+    def step(self):
+        ti = self.ti
+        if ti not in self._dayset:
+            return
+        covid = self._covid()
+        snap = sc.objdict()
+        snap['age'] = np.asarray(self.sim.people.age).copy()
+        for state in _SNAPSHOT_STATES:
+            if hasattr(covid, state):
+                snap[state] = np.asarray(getattr(covid, state)).copy()
+        if covid.pars.use_waning:
+            snap['nab'] = np.asarray(covid.nab).copy()
+        self.snapshots[self._datekey(ti)] = snap
+        return
+
+    def get(self, key=None):
+        """Retrieve a snapshot by date string, or the first if no key."""
+        if key is None:
+            return self.snapshots[list(self.snapshots.keys())[0]]
+        if isinstance(key, (int, np.integer)):
+            key = str(np.asarray(self.sim.t.timevec)[int(key)])[:10]
+        return self.snapshots[str(key)[:10]]
+
+
+class age_histogram(Analyzer):
+    """
+    Age histograms of disease states on specified days (the v3 ``cv.age_histogram``).
+
+    ``hists[date][state]`` is the per-age-bin count of agents in ``state``; ``bins`` are the age-bin edges.
+    """
+
+    def __init__(self, days, states=None, bins=None, **kwargs):
+        super().__init__(**kwargs)
+        self.days = sc.tolist(days)
+        self.states = states or ['exposed', 'infectious', 'severe', 'critical', 'dead']
+        self.bins = np.array(bins) if bins is not None else np.arange(0, 101, 10)
+        self._dayset = None
+        self.hists = sc.odict()
+        return
+
+    def init_post(self):
+        super().init_post()
+        self._dayset = self._resolve_days(self.days)
+        return
+
+    def step(self):
+        ti = self.ti
+        if ti not in self._dayset:
+            return
+        covid = self._covid()
+        ages = np.asarray(self.sim.people.age)
+        hist = sc.objdict(bins=self.bins)
+        for state in self.states:
+            if not hasattr(covid, state):
+                continue
+            mask = np.asarray(getattr(covid, state))
+            counts, _ = np.histogram(ages[mask.astype(bool)], bins=self.bins)
+            hist[state] = counts
+        self.hists[self._datekey(ti)] = hist
+        return
+
+
+class nab_histogram(Analyzer):
+    """
+    Histogram of neutralizing-antibody (NAb) levels on specified days (the v3 ``cv.nab_histogram``).
+
+    Requires ``use_waning=True``. ``hists[date]`` = (counts, bin_edges) over agents with NAb > 0.
+    """
+
+    def __init__(self, days, bins=None, **kwargs):
+        super().__init__(**kwargs)
+        self.days = sc.tolist(days)
+        self.bins = np.array(bins) if bins is not None else np.linspace(0, 20, 41)
+        self._dayset = None
+        self.hists = sc.odict()
+        return
+
+    def init_post(self):
+        super().init_post()
+        self._dayset = self._resolve_days(self.days)
+        return
+
+    def step(self):
+        ti = self.ti
+        if ti not in self._dayset:
+            return
+        covid = self._covid()
+        nab = np.asarray(covid.nab)
+        nab = nab[nab > 0]
+        counts, edges = np.histogram(nab, bins=self.bins)
+        self.hists[self._datekey(ti)] = sc.objdict(counts=counts, bins=edges)
+        return
+
+
+__all__ += ['TransTree']
+
+
+class TransTree(Analyzer):
+    """
+    Reconstruct the transmission tree (the v3 ``cv.TransTree``) from the disease's transmission log.
+
+    Attaching this analyzer switches on transmission logging in ``cv.COVID`` (off otherwise, so the
+    core sim is unaffected). After the run it exposes:
+
+      - ``infection_events``: list of ``(source_uid, target_uid, ti, variant_index)`` (source < 0 = a
+        seed/import, i.e. a tree root with no infector);
+      - ``n_targets``: ``{source_uid: number of secondary infections}``;
+      - ``r0``: the mean number of secondary infections per infector (a transmission-tree R estimate);
+      - ``make_detailed()``: a DataFrame of the events.
+
+    The full networkx graph + tree plotting are part of the M9 plotting pass (deferred).
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.infection_events = None
+        self.n_targets = None
+        self.r0 = None
+        return
+
+    def init_post(self):
+        super().init_post()
+        covid = self._covid()
+        covid._record_transmissions = True   # switch on transmission logging
+        covid.infection_events = []
+        return
+
+    def step(self):
+        """No per-step work: TransTree records via cv.COVID.infect() and assembles in finalize()."""
+        pass
+
+    def finalize(self):
+        super().finalize()
+        covid = self._covid()
+        self.infection_events = list(covid.infection_events)
+        sources = np.array([e[0] for e in self.infection_events], dtype=int) if self.infection_events else np.array([], dtype=int)
+        infectors = sources[sources >= 0]                  # exclude seeds/imports (no infector)
+        uniq, counts = (np.unique(infectors, return_counts=True) if len(infectors) else (np.array([]), np.array([])))
+        self.n_targets = {int(u): int(c) for u, c in zip(uniq, counts)}
+        # R estimate: mean secondary infections per distinct infector.
+        self.r0 = float(len(infectors) / len(uniq)) if len(uniq) else 0.0
+        return
+
+    def make_detailed(self):
+        """Return a DataFrame of the transmission events (source, target, day, variant)."""
+        rows = [dict(source=s, target=t, day=ti, variant=v) for s, t, ti, v in (self.infection_events or [])]
+        return pd.DataFrame(rows, columns=['source', 'target', 'day', 'variant'])
