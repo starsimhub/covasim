@@ -16,9 +16,12 @@ do not re-divide). Recovery confers permanent immunity (``use_waning=False``);
 waning / NAbs / reinfection are M4. Deaths are requested via
 ``sim.people.request_death`` and finalized in ``step_die``.
 
-Per-agent transmissibility (``viral_load`` x ``beta_dist``) is added in M2 Task 2;
-multiple variants in M3. Transmission stays the stock CRN-safe
-``ss.Infection.infect()`` -- no custom transmission code.
+Per-agent transmissibility is now time-varying: each agent draws a constant
+overdispersion factor (``beta_dist``, mean 1.0) at init and a two-level viral-load
+kernel (``viral_dist``) over its infectious period, written to ``rel_trans`` each
+step before transmission. Multiple variants come in M3. Transmission stays the
+stock CRN-safe ``ss.Infection.infect()`` -- no custom transmission code; M2 only
+writes the per-agent ``rel_trans`` state it consumes.
 """
 import numpy as np
 import starsim as ss
@@ -68,6 +71,10 @@ class COVID(ss.Infection):
             n_beds_icu     = None,
             no_hosp_factor = 2.0,
             no_icu_factor  = 2.0,
+            # Per-agent transmissibility shape (parameters.py:60-63); closes the residual transmission gap
+            beta_dist    = dict(dist='neg_binomial', par1=1.0, par2=0.45, step=0.01),  # constant per-agent overdispersion (mean 1.0)
+            viral_dist   = dict(frac_time=0.3, load_ratio=2, high_cap=4),               # time-varying viral load (two-level, mean-preserving)
+            asymp_factor = 1.0,                                                         # transmissibility multiplier for asymptomatic agents
         )
         self.update_pars(pars, **kwargs)
 
@@ -81,8 +88,10 @@ class COVID(ss.Infection):
             ss.BoolState('critical',                   label='Critical (needs ICU)'),
             ss.BoolState('recovered',                  label='Recovered'),
             ss.BoolState('dead',                       label='Dead'),
-            ss.FloatArr('rel_sus',     default=1.0,    label='Relative susceptibility'),
-            ss.FloatArr('rel_trans',   default=1.0,    label='Relative transmissibility'),
+            ss.FloatArr('rel_sus',      default=1.0,   label='Relative susceptibility'),
+            ss.FloatArr('rel_trans',    default=1.0,   label='Relative transmissibility (time-varying)'),
+            ss.FloatArr('rel_trans_base', default=1.0, label='Per-agent baseline transmissibility (beta_dist draw)'),
+            ss.FloatArr('ti_vl_switch',                label='Time index of the viral-load high->low switch'),
             ss.FloatArr('ti_infected',                 label='Time index of infection'),
             ss.FloatArr('ti_exposed',                  label='Time index of becoming exposed'),
             ss.FloatArr('ti_infectious',               label='Time index of becoming infectious'),
@@ -133,6 +142,26 @@ class COVID(ss.Infection):
         self.crit_prob[:]   = progs['crit_probs'][inds]
         self.death_prob[:]  = progs['death_probs'][inds]
         self.rel_sus[:]     = progs['sus_ORs'][inds]  # age-dependent susceptibility (v3 people.py:157)
+
+        # Per-agent constant transmissibility draw (trans_ORs x beta_dist), drawn once at init
+        # (v3 people.py:159). trans_ORs are all 1.0, so this is the beta_dist overdispersion draw.
+        bd = self.pars.beta_dist
+        rate, disp, step = bd['par1'], bd['par2'], bd.get('step', 1)
+        nbn_n = disp
+        nbn_p = disp / (rate/step + disp)  # cv.n_neg_binomial parameterization (utils.py:430)
+        try:
+            seed = int(self.sim.pars.rand_seed)
+        except Exception:
+            seed = 0
+        rng = np.random.default_rng(seed*100 + 60)  # distinct deterministic stream (network 0-4, seeding 50)
+        draw = rng.negative_binomial(nbn_n, nbn_p, len(age)) * step
+        self.rel_trans_base[:] = progs['trans_ORs'][inds] * draw
+
+        # Cache the two-level viral-load constants (mean-preserving normalizer Z; v3 utils.py:39-84)
+        vd = self.pars.viral_dist
+        z = 1.0 + vd['frac_time'] * (vd['load_ratio'] - 1)
+        self._vl_high = vd['load_ratio'] / z
+        self._vl_low  = 1.0 / z
         return
 
     def _hosp_full(self):
@@ -196,6 +225,15 @@ class COVID(ss.Infection):
         self.ti_recovered[survive] = self.ti_critical[survive] + p.dur_crit2rec.rvs(survive)
         self.ti_dead[dead] = self.ti_critical[dead] + p.dur_crit2die.rvs(dead)
         # (ti_recovered for `dead` stays NaN from the defensive reset -- death and recovery are exclusive)
+
+        # Precompute the per-agent viral-load high->low switch time (v3 compute_viral_load trans_point).
+        # End of the infectious period = recovery or death date (whichever is set).
+        ti_dead = self.ti_dead[uids]
+        end = np.where(np.isnan(ti_dead), self.ti_recovered[uids], ti_dead)
+        infect_days = end - self.ti_infectious[uids]
+        vd = p.viral_dist
+        trans_point = np.minimum(vd['frac_time'], vd['high_cap'] / infect_days)  # cap the high phase at high_cap days
+        self.ti_vl_switch[uids] = self.ti_infectious[uids] + trans_point * infect_days
         return
 
     def step_state(self):
@@ -218,6 +256,15 @@ class COVID(ss.Infection):
         to_dead = (self.infected & (self.ti_dead <= ti)).uids
         if len(to_dead):
             self.sim.people.request_death(to_dead)
+
+        # Update per-agent transmissibility BEFORE this step's transmission (loop slot 5 precedes infect at 9):
+        # rel_trans = beta_dist draw x viral_load(t) x asymp_factor (v3 compute_trans_sus, utils.py:90-93).
+        inf = self.infectious.uids
+        if len(inf):
+            early = ti < np.asarray(self.ti_vl_switch[inf])           # high viral-load phase (front-loaded)
+            vl = np.where(early, self._vl_high, self._vl_low)
+            f_asymp = np.where(np.asarray(self.symptomatic[inf]), 1.0, self.pars.asymp_factor)
+            self.rel_trans[inf] = self.rel_trans_base[inf] * vl * f_asymp
         return
 
     def step_die(self, uids):

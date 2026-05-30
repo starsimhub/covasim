@@ -140,6 +140,24 @@ def test_recovery_xor_death():
     assert (has_rec | has_dead).all(), 'every infected agent must have a recovery or a death scheduled'
 
 
+def test_beta_dist_mean_preserving():
+    """The per-agent beta_dist overdispersion draw has mean ~1.0 (so it shifts variance, not the mean)."""
+    sim, d = _inited_for_prognoses(n_agents=20_000)
+    base = _arr(d.rel_trans_base)
+    assert abs(base.mean() - 1.0) < 0.05, f'beta_dist draw mean should be ~1.0, got {base.mean():.3f}'
+    assert base.std() > 0.5, f'beta_dist should be overdispersed (superspreaders), std={base.std():.2f}'
+
+
+def test_viral_load_mean_preserving():
+    """The two-level viral-load kernel is mean-preserving in continuous time (front-loaded)."""
+    sim, d = _inited_for_prognoses(n_agents=100)
+    hi, lo = d._vl_high, d._vl_low
+    ft = d.pars.viral_dist['frac_time']
+    assert hi > 1.0 > lo > 0.0, f'high phase > 1 > low phase, got high={hi:.3f} low={lo:.3f}'
+    # Continuous time-average over an uncapped infection = frac_time*high + (1-frac_time)*low = 1.
+    assert abs(ft*hi + (1 - ft)*lo - 1.0) < 1e-9, 'viral-load kernel must be mean-preserving (continuous time)'
+
+
 def test_step_die_resets_flags():
     """step_die clears all disease flags and sets dead=True for the given uids."""
     sim, d = _inited_for_prognoses()
