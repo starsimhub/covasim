@@ -43,7 +43,7 @@ class Sim(ss.Sim):
 
     def __init__(self, pars=None, people=None, pop_size=20_000, pop_infected=20,
                  pop_type='random', n_days=60, start_day='2020-03-01', rand_seed=1,
-                 beta=None, **kwargs):
+                 beta=None, pop_scale=None, total_pop=None, **kwargs):
         if pop_type not in _BETA_LAYER:
             raise ValueError(f"pop_type {pop_type!r} not supported in M1 (choices: 'random', 'hybrid').")
         base_beta = _BASE_BETA if beta is None else beta
@@ -60,7 +60,17 @@ class Sim(ss.Sim):
             betadict = {lk: ss.probperday(base_beta*bl) for lk, bl in _BETA_LAYER[pop_type].items()}
             diseases = cvcov.COVID(beta=betadict, init_prev=int(pop_infected))
 
+        # Absolute population scaling: each agent represents pop_scale real people. Starsim
+        # auto-multiplies every scale=True Result by pop_scale at finalize. Pass at most one of
+        # total_pop / pop_scale (Starsim derives the other; setting both raises). Dynamic
+        # rescaling (v3 rescale/make_naive) is deferred to a later milestone.
+        scale_kw = {}
+        if total_pop is not None:
+            scale_kw['total_pop'] = total_pop
+        if pop_scale is not None:
+            scale_kw['pop_scale'] = pop_scale
+
         super().__init__(pars=pars, people=people, networks=networks, diseases=diseases,
                          start=ss.date(start_day), dur=ss.days(n_days), dt=ss.days(1),
-                         rand_seed=rand_seed, **kwargs)
+                         rand_seed=rand_seed, **scale_kw, **kwargs)
         return

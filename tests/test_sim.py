@@ -55,6 +55,24 @@ def test_override_diseases_kwarg():
     assert sim.results is not None
 
 
+def test_pop_scale_scales_extensive_results():
+    """pop_scale multiplies extensive (scale=True) results but leaves intensive ones unchanged.
+
+    Same seed -> identical agent-level dynamics, only the result scaling differs.
+    """
+    base = cv.Sim(pop_size=10_000, pop_infected=20, pop_type='random', n_days=60, rand_seed=1)
+    base.run()
+    scaled = cv.Sim(pop_size=10_000, pop_infected=20, pop_type='random', n_days=60, rand_seed=1, pop_scale=10)
+    scaled.run()
+    rb, rs = base.diseases.covid.results, scaled.diseases.covid.results
+    cum_b = float(np.asarray(rb['cum_infections']).max())
+    cum_s = float(np.asarray(rs['cum_infections']).max())
+    assert cum_s == pytest.approx(10 * cum_b, rel=1e-6), 'extensive results should scale by pop_scale'
+    prev_b = float(np.asarray(rb['prevalence']).max())
+    prev_s = float(np.asarray(rs['prevalence']).max())
+    assert prev_s == pytest.approx(prev_b, rel=1e-6), 'intensive results (prevalence) must be unchanged by pop_scale'
+
+
 def test_deterministic_same_seed():
     a = cv.Sim(pop_size=2000, pop_infected=20, pop_type='hybrid', n_days=40, rand_seed=8); a.run()
     b = cv.Sim(pop_size=2000, pop_infected=20, pop_type='hybrid', n_days=40, rand_seed=8); b.run()

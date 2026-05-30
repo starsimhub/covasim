@@ -241,21 +241,27 @@ class COVID(ss.Infection):
         ti = self.ti
         # exposed -> infectious (the infectious property derives from ti_infectious; clear `exposed`)
         self.exposed[(self.exposed & (self.ti_infectious <= ti)).uids] = False
-        # infectious -> symptomatic -> severe -> critical (cumulative nested flags)
-        self.symptomatic[(self.infected & (self.ti_symptomatic <= ti)).uids] = True
-        self.severe[(self.infected & (self.ti_severe <= ti)).uids] = True
-        self.critical[(self.infected & (self.ti_critical <= ti)).uids] = True
+        # Stage onsets -- count only NEW transitions (for the flow Results); flags are cumulative-nested.
+        new_symp = (self.infected & ~self.symptomatic & (self.ti_symptomatic <= ti)).uids
+        self.symptomatic[new_symp] = True
+        new_sev = (self.infected & ~self.severe & (self.ti_severe <= ti)).uids
+        self.severe[new_sev] = True
+        new_crit = (self.infected & ~self.critical & (self.ti_critical <= ti)).uids
+        self.critical[new_crit] = True
         # -> recovered (permanent immunity; clear the stage flags)
-        rec = (self.infected & (self.ti_recovered <= ti)).uids
-        self.infected[rec]     = False
-        self.recovered[rec]    = True
-        self.symptomatic[rec]  = False
-        self.severe[rec]       = False
-        self.critical[rec]     = False
+        new_rec = (self.infected & (self.ti_recovered <= ti)).uids
+        self.infected[new_rec]     = False
+        self.recovered[new_rec]    = True
+        self.symptomatic[new_rec]  = False
+        self.severe[new_rec]       = False
+        self.critical[new_rec]     = False
         # -> dead (request the death; resolved in step_die after transmission)
-        to_dead = (self.infected & (self.ti_dead <= ti)).uids
-        if len(to_dead):
-            self.sim.people.request_death(to_dead)
+        new_dead = (self.infected & (self.ti_dead <= ti)).uids
+        if len(new_dead):
+            self.sim.people.request_death(new_dead)
+        # Capture this step's flows for update_results
+        self._flow = dict(symptomatic=len(new_symp), severe=len(new_sev), critical=len(new_crit),
+                          recoveries=len(new_rec), deaths=len(new_dead))
 
         # Update per-agent transmissibility BEFORE this step's transmission (loop slot 5 precedes infect at 9):
         # rel_trans = beta_dist draw x viral_load(t) x asymp_factor (v3 compute_trans_sus, utils.py:90-93).
@@ -283,20 +289,57 @@ class COVID(ss.Infection):
     # --- results --------------------------------------------------------------
 
     def init_results(self):
-        """Add an n_infectious result (infectious is a property, so not auto-counted).
+        """Define the daily-flow (new_*) and cumulative (cum_*) burden Results.
 
-        The full burden Results (new_*/cum_*/n_* for symptomatic/severe/critical/deaths)
-        are added in M2 Task 3.
+        Stocks (n_symptomatic/n_severe/n_critical/n_recovered/n_infected/n_dead) are
+        AUTO-created and counted by Starsim from the BoolStates, so they are not defined
+        here -- only n_infectious (a property, not a state) is manual. ss.Infection already
+        provides prevalence / new_infections / cum_infections. All are scale=True so Starsim
+        multiplies them by pop_scale at finalize.
         """
         super().init_results()
+
+        def R(name, label):
+            return ss.Result(name, dtype=int, scale=True, label=label)
+
         self.define_results(
-            ss.Result('n_infectious', dtype=int, scale=True, label='Number infectious'),
+            R('n_infectious',  'Number infectious'),  # infectious is a property, not auto-counted
+            R('new_symptomatic', 'New symptomatic'),
+            R('new_severe',      'New severe'),
+            R('new_critical',    'New critical'),
+            R('new_recoveries',  'New recoveries'),
+            R('new_deaths',      'New deaths'),
+            R('cum_symptomatic', 'Cumulative symptomatic'),
+            R('cum_severe',      'Cumulative severe'),
+            R('cum_critical',    'Cumulative critical'),
+            R('cum_recoveries',  'Cumulative recoveries'),
+            R('cum_deaths',      'Cumulative deaths'),
         )
+        self._flow = dict(symptomatic=0, severe=0, critical=0, recoveries=0, deaths=0)
         return
 
     def update_results(self):
-        super().update_results()
-        self.results.n_infectious[self.ti] = int(np.count_nonzero(self.infectious))
+        super().update_results()  # auto-counts the BoolState stocks (n_symptomatic, n_severe, ...)
+        ti = self.ti
+        res = self.results
+        res.n_infectious[ti] = int(np.count_nonzero(self.infectious))
+        # Flows (captured this timestep in step_state)
+        res.new_symptomatic[ti] = self._flow['symptomatic']
+        res.new_severe[ti]      = self._flow['severe']
+        res.new_critical[ti]    = self._flow['critical']
+        res.new_recoveries[ti]  = self._flow['recoveries']
+        res.new_deaths[ti]      = self._flow['deaths']
+        return
+
+    def finalize_results(self):
+        """Cumulate the daily flows into the cum_* Results (the hpvsim M02 pattern)."""
+        super().finalize_results()
+        res = self.results
+        res.cum_symptomatic[:] = np.cumsum(res.new_symptomatic[:])
+        res.cum_severe[:]      = np.cumsum(res.new_severe[:])
+        res.cum_critical[:]    = np.cumsum(res.new_critical[:])
+        res.cum_recoveries[:]  = np.cumsum(res.new_recoveries[:])
+        res.cum_deaths[:]      = np.cumsum(res.new_deaths[:])
         return
 
     # --- seeding --------------------------------------------------------------

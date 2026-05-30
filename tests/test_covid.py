@@ -140,6 +140,21 @@ def test_recovery_xor_death():
     assert (has_rec | has_dead).all(), 'every infected agent must have a recovery or a death scheduled'
 
 
+def test_burden_results_cascade():
+    """The cumulative burden Results form a decreasing cascade and are populated + monotonic."""
+    sim = cv.Sim(pop_size=20_000, pop_infected=50, pop_type='random', n_days=120, rand_seed=1)
+    sim.run()
+    r = sim.diseases.covid.results
+    cs   = float(_arr(r['cum_symptomatic']).max())
+    csev = float(_arr(r['cum_severe']).max())
+    ccrit= float(_arr(r['cum_critical']).max())
+    cd   = float(_arr(r['cum_deaths']).max())
+    assert cs > csev > ccrit > cd > 0, f'burden cascade should decrease + be positive: {cs}/{csev}/{ccrit}/{cd}'
+    assert np.all(np.diff(_arr(r['cum_deaths'])) >= 0), 'cum_deaths must be non-decreasing'
+    # total deaths (cum) should match the population shrink (dead agents removed)
+    assert abs(cd - (20_000 - len(sim.people))) <= 1, 'cum_deaths should equal the population shrink'
+
+
 def test_beta_dist_mean_preserving():
     """The per-agent beta_dist overdispersion draw has mean ~1.0 (so it shifts variance, not the mean)."""
     sim, d = _inited_for_prognoses(n_agents=20_000)
