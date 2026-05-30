@@ -583,3 +583,198 @@ class simple_vaccine(Intervention):
         covid._vacc_flow['doses'] += len(vacc)
         covid._vacc_flow['vaccinated'] += int((~prior).sum())
         return
+
+
+# %% Beta / parameter / meta interventions ----------------------------------------------------------
+
+__all__ += ['change_beta', 'clip_edges', 'dynamic_pars', 'sequence']
+
+
+def _day_change_map(days, changes):
+    """Build a {day_index: change_value} map from parallel days/changes (scalars or lists)."""
+    days = [int(round(d)) for d in sc.toarray(days)]
+    changes = np.atleast_1d(np.asarray(sc.toarray(changes), dtype=float))
+    if changes.size == 1:
+        changes = np.full(len(days), changes.item())
+    return {d: float(c) for d, c in zip(days, changes)}
+
+
+class change_beta(Intervention):
+    """
+    Change transmissibility (beta) by a factor on given days (the v3 ``cv.change_beta``).
+
+    Args:
+        days (int/list): day(s) on which to change beta.
+        changes (float/list): the multiplicative change(s) (1 = no change, 0 = no transmission),
+            applied to the ORIGINAL beta (not cumulative).
+        layers (str/list): which network layers to change (default: all of the disease's beta layers).
+    """
+
+    def __init__(self, days, changes, layers=None, **kwargs):
+        super().__init__(**kwargs)
+        self.days = days
+        self.changes = changes
+        self.layers = layers
+        self._map = None
+        self._orig = None     # {layer: original per-day beta value (float)}
+        return
+
+    def init_post(self):
+        super().init_post()
+        covid = self._covid()
+        self._map = _day_change_map(self.days, self.changes)
+        beta = covid.pars.beta
+        layers = list(beta.keys()) if self.layers is None else sc.tolist(self.layers)
+        self._orig = {lk: float(beta[lk]) for lk in layers}
+        return
+
+    def step(self):
+        ti = self.ti
+        if ti not in self._map:
+            return
+        covid = self._covid()
+        change = self._map[ti]
+        for lk, orig in self._orig.items():
+            covid.pars.beta[lk] = ss.probperday(orig * change)  # scale the original per-day beta
+        return
+
+
+class clip_edges(Intervention):
+    """
+    Reduce contacts by clipping a fraction of network edges on given days (the v3 ``cv.clip_edges``).
+
+    Unlike change_beta (which scales transmissibility), this removes edges, so it also reduces the
+    pool of traceable contacts. ``changes`` is the fraction of edges to KEEP (1 = all, 0 = none),
+    applied to the original edge set (not cumulative); removed edges are restored when the fraction
+    rises again.
+
+    Args:
+        days (int/list): day(s) on which to clip.
+        changes (float/list): fraction of edges to keep on each day.
+        layers (str/list): which layers to clip (default: all).
+    """
+
+    def __init__(self, days, changes, layers=None, **kwargs):
+        super().__init__(**kwargs)
+        self.days = days
+        self.changes = changes
+        self.layers = layers
+        self._map = None
+        self._orig = None     # {layer: (p1, p2, beta) of the ORIGINAL full edge set}
+        return
+
+    def init_post(self):
+        super().init_post()
+        self._map = _day_change_map(self.days, self.changes)
+        nets = self.sim.networks
+        self.layers = list(nets.keys()) if self.layers is None else sc.tolist(self.layers)
+        self._orig = {}
+        for lk in self.layers:
+            e = nets[lk].edges
+            self._orig[lk] = (np.array(e.p1), np.array(e.p2), np.array(e.beta))
+        return
+
+    def step(self):
+        ti = self.ti
+        if ti not in self._map:
+            return
+        keep = self._map[ti]
+        nets = self.sim.networks
+        try:
+            base = int(self.sim.pars.rand_seed)
+        except Exception:
+            base = 0
+        for li, lk in enumerate(self.layers):
+            p1, p2, beta = self._orig[lk]
+            n = len(p1)
+            if not n:
+                continue
+            n_keep = int(round(keep * n))
+            rng = np.random.default_rng([base, 93, ti, li])
+            sel = np.sort(rng.choice(n, size=n_keep, replace=False)) if n_keep < n else np.arange(n)
+            edges = nets[lk].edges
+            edges.p1 = ss.uids(p1[sel])
+            edges.p2 = ss.uids(p2[sel])
+            edges.beta = beta[sel]
+        return
+
+
+class dynamic_pars(Intervention):
+    """
+    Change parameters at specified days (the v3 ``cv.dynamic_pars``).
+
+    Args:
+        pars (dict): ``{parname: {'days': d_or_list, 'vals': v_or_list}}``; ``parname`` is resolved
+            against the COVID module pars (then the sim pars), with an optional dotted path. Use
+            ``cv.change_beta`` for the per-layer beta dict.
+        kwargs: ``parname=dict(days=..., vals=...)`` entries may also be passed directly.
+    """
+
+    def __init__(self, pars=None, **kwargs):
+        super().__init__()
+        pars = sc.mergedicts(pars, kwargs)
+        self.par_changes = {}
+        for parname, spec in pars.items():
+            days = [int(round(d)) for d in sc.toarray(spec['days'])]
+            vals = spec['vals']
+            vals = list(vals) if sc.isiterable(vals) and not isinstance(vals, dict) else [vals] * len(days)
+            self.par_changes[parname] = dict(zip(days, vals))
+        return
+
+    def init_post(self):
+        super().init_post()
+        return
+
+    @staticmethod
+    def _apply(sim, parname, value):
+        covid = list(sim.diseases.values())[0]
+        if parname in covid.pars:
+            covid.pars[parname] = value
+        elif parname in sim.pars:
+            sim.pars[parname] = value
+        else:
+            covid.pars[parname] = value
+
+    def step(self):
+        ti = self.ti
+        for parname, daymap in self.par_changes.items():
+            if ti in daymap:
+                self._apply(self.sim, parname, daymap[ti])
+        return
+
+
+class sequence(Intervention):
+    """
+    Switch between a sequence of interventions over time (the v3 ``cv.sequence``).
+
+    Args:
+        days (list): the day on which each intervention becomes the active one.
+        interventions (list): the interventions, aligned to ``days``; on each step the most recently
+            activated intervention is applied.
+    """
+
+    def __init__(self, days, interventions, **kwargs):
+        super().__init__(**kwargs)
+        assert len(sc.toarray(days)) == len(interventions), 'days and interventions must align'
+        self.days = [int(round(d)) for d in sc.toarray(days)]
+        self.interventions = interventions
+        return
+
+    def init_pre(self, sim):
+        super().init_pre(sim)
+        for intv in self.interventions:  # initialise the child interventions
+            intv.init_pre(sim)
+        return
+
+    def init_post(self):
+        super().init_post()
+        for intv in self.interventions:
+            intv.init_post()
+        return
+
+    def step(self):
+        ti = self.ti
+        active = [i for i, d in enumerate(self.days) if d <= ti]  # most recently activated
+        if active:
+            self.interventions[active[-1]].step()
+        return
