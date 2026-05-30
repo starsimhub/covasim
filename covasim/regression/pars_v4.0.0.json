@@ -7,7 +7,7 @@
   "end_day": null,
   "rand_seed": 1,
   "beta": 0.016,
-  "use_waning": false,
+  "use_waning": true,
   "covid": {
     "init_prev": 20,
     "beta": {
@@ -174,6 +174,7 @@
     "n_beds_icu": null,
     "no_hosp_factor": 2.0,
     "no_icu_factor": 2.0,
+    "n_imports": 0,
     "beta_dist": {
       "dist": "neg_binomial",
       "par1": 1.0,
@@ -186,7 +187,7 @@
       "high_cap": 4
     },
     "asymp_factor": 1.0,
-    "use_waning": false,
+    "use_waning": true,
     "nab_init": {
       "dist": "normal",
       "par1": 0,

@@ -35,8 +35,10 @@ def _interventions():
 def make_sim(pop_type='random', rand_seed=0, **kwargs):
     """Build the M5 testing/tracing/quarantine anchor for the current Covasim build."""
     if _IS_V4:
+        # M5 is the no-waning (M2-style) testing/tracing scenario; set use_waning=False explicitly to
+        # match the v3 branch (the cv.Sim default is now True, matching v3, so it must be set here).
         pars = dict(pop_size=POP_SIZE, pop_infected=POP_INFECTED, pop_type=pop_type, n_days=N_DAYS,
-                    rand_seed=rand_seed, interventions=_interventions(), verbose=0)
+                    rand_seed=rand_seed, use_waning=False, interventions=_interventions(), verbose=0)
         return cv.Sim(**sc.mergedicts(pars, kwargs))
     # v3.1.8: single-variant, no waning (M2-style), with the same testing + tracing interventions.
     pars = dict(pop_size=POP_SIZE, pop_infected=POP_INFECTED, pop_type=pop_type, n_days=N_DAYS,

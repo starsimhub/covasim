@@ -64,8 +64,8 @@ def test_calc_VE_invalid_axis():
 # === Task 2: NAb state + acquisition/boosting on cv.COVID ===
 
 def test_use_waning_false_no_nab_state():
-    """With use_waning=False (default) no NAb state evolves and no connector is attached."""
-    sim = cv.Sim(pop_size=8000, pop_infected=30, pop_type='random', n_days=60, rand_seed=1, verbose=0)
+    """With use_waning=False no NAb state evolves and no connector is attached."""
+    sim = cv.Sim(pop_size=8000, pop_infected=30, pop_type='random', n_days=60, rand_seed=1, use_waning=False, verbose=0)
     sim.run()
     d = sim.diseases.covid
     assert d.pars.use_waning is False

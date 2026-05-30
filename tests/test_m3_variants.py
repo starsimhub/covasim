@@ -22,8 +22,10 @@ def _arr(x):
 
 
 def _run(pop_type='random', pop_size=8000, pop_infected=30, n_days=60, seed=1):
+    # M3 exercises the STATIC cross-immunity path (use_waning=False; waning is M4). The cv.Sim default
+    # is now use_waning=True (matching v3), so these static-path tests set it explicitly.
     sim = cv.Sim(pop_size=pop_size, pop_infected=pop_infected, pop_type=pop_type,
-                 n_days=n_days, rand_seed=seed, verbose=0)
+                 n_days=n_days, rand_seed=seed, use_waning=False, verbose=0)
     sim.run()
     return sim
 
@@ -156,11 +158,11 @@ def test_nv1_infect_override_byte_identical_to_stock():
     """
     saved = cv.COVID.infect
     try:
-        s_over = cv.Sim(pop_size=20000, pop_infected=50, pop_type='random', n_days=80, rand_seed=3, verbose=0)
+        s_over = cv.Sim(pop_size=20000, pop_infected=50, pop_type='random', n_days=80, rand_seed=3, use_waning=False, verbose=0)
         s_over.run()
         over = np.asarray(s_over.diseases.covid.results['n_infectious'])
         cv.COVID.infect = ss.Infection.infect  # restore stock single-beta infect on the same class
-        s_stock = cv.Sim(pop_size=20000, pop_infected=50, pop_type='random', n_days=80, rand_seed=3, verbose=0)
+        s_stock = cv.Sim(pop_size=20000, pop_infected=50, pop_type='random', n_days=80, rand_seed=3, use_waning=False, verbose=0)
         s_stock.run()
         stock = np.asarray(s_stock.diseases.covid.results['n_infectious'])
     finally:
@@ -233,8 +235,9 @@ def test_string_variant_sugar_introduces_at_t0():
 # === Task 3: cv.CrossImmunity connector + reinfection ===
 
 def _multivariant_sim(seed=2, n_days=100):
+    # M3 static-matrix path: use_waning=False (the cv.Sim default is now True, matching v3).
     sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='random', n_days=n_days, rand_seed=seed,
-                 verbose=0, variants=cv.variant('beta', days=20, n_imports=30))
+                 use_waning=False, verbose=0, variants=cv.variant('beta', days=20, n_imports=30))
     sim.run()
     return sim
 
@@ -248,8 +251,8 @@ def test_connector_auto_attached_and_flag_set():
 
 
 def test_nv1_no_connector_permanent_immunity():
-    """At nv==1 no connector is attached, recovered stay immune, and behavior is unchanged."""
-    sim = cv.Sim(pop_size=8000, pop_infected=30, pop_type='random', n_days=80, rand_seed=1, verbose=0)
+    """At nv==1 (and use_waning=False) no connector is attached, recovered stay permanently immune."""
+    sim = cv.Sim(pop_size=8000, pop_infected=30, pop_type='random', n_days=80, rand_seed=1, use_waning=False, verbose=0)
     sim.run()
     assert len(sim.connectors) == 0, 'no connector at nv==1'
     d = sim.diseases.covid

@@ -68,7 +68,7 @@ class Sim(ss.Sim):
         beta         = _pick('beta',         beta,         None)
         pop_scale    = _pick('pop_scale',    pop_scale,    None)
         total_pop    = _pick('total_pop',    total_pop,    None)
-        use_waning   = _pick('use_waning',   use_waning,   False)
+        use_waning   = _pick('use_waning',   use_waning,   True)  # v3 default: waning immunity ON
         datafile     = _pick('datafile',     datafile,     None)
         location     = _pick('location',     location,     None)
         if variants is None:
@@ -172,18 +172,51 @@ class Sim(ss.Sim):
             self.data = datafile if hasattr(datafile, 'columns') else cvm.load_data(datafile)
         return
 
+    def _resolve_covid(self):
+        """Return the COVID module to read/write pars on: the live disease post-init, else the one
+        stored in ``self.pars`` (which Starsim deep-copies into the sim at init, so pre-run edits to its
+        pars propagate). Uses ``__dict__`` access only, so it is safe to call from ``__getattr__``."""
+        diseases = self.__dict__.get('diseases', None)
+        if diseases is not None and 'covid' in diseases:
+            return diseases['covid']
+        pars = self.__dict__.get('pars', None)
+        pd = getattr(pars, 'diseases', None) if pars is not None else None
+        if pd is not None:
+            if hasattr(pd, 'pars'):           # a single disease module (the cv.Sim case)
+                return pd
+            try:                              # a list / ndict of modules
+                for m in (pd.values() if hasattr(pd, 'values') else pd):
+                    if type(m).__name__ == 'COVID':
+                        return m
+            except Exception:
+                pass
+        return self.__dict__.get('_cv_covid', None)
+
+    def __setitem__(self, key, value):
+        """v3 dict-set: route a COVID disease parameter to the module (``sim['rel_death_prob'] = 2``).
+
+        Resolves the live disease (post-init) or the pre-init module, so a fresh
+        ``cv.Sim(); sim['rel_death_prob'] = 2; sim.run()`` applies the change. Non-disease keys fall back
+        to the stock ``ss.Sim`` behaviour (set as an attribute).
+        """
+        covid = self._resolve_covid()
+        if covid is not None and hasattr(covid, 'pars') and key in covid.pars:
+            covid.pars[key] = value
+            return
+        return super().__setitem__(key, value)
+
     def __getattr__(self, key):
         """v3 compat: expose the Covasim sim-level config + COVID parameters as attributes.
 
         So ``sim.beta`` / ``sim.start_day`` / ``sim.rel_death_prob`` (and, since ``ss.Sim.__getitem__``
-        delegates to ``getattr``, ``sim['beta']`` etc.) resolve. ``__getattr__`` is only consulted when
-        normal attribute lookup fails, so it cannot shadow real attributes. (Reads only; to *set* a
-        disease parameter, build a fresh ``cv.Sim(dict(...))`` or use ``cv.dynamic_pars``.)
+        delegates to ``getattr``, ``sim['beta']`` etc.) resolve -- reflecting any values set via
+        ``sim['key'] = ...``. ``__getattr__`` is only consulted when normal attribute lookup fails, so it
+        cannot shadow real attributes.
         """
         cfg = self.__dict__.get('_cv_config', None)  # __dict__ access avoids re-triggering __getattr__
         if cfg is not None and key in cfg:
             return cfg[key]
-        covid = self.__dict__.get('_cv_covid', None)
+        covid = self._resolve_covid()
         if covid is not None and hasattr(covid, 'pars') and key in covid.pars:
             return covid.pars[key]
         raise AttributeError(f"'Sim' object has no attribute '{key}'")

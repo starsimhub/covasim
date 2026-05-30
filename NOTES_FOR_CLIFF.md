@@ -412,13 +412,20 @@ baselines are unaffected.
   `cv.Sim(n_imports=...)` or `cv.dynamic_pars`.
 - Tests: `tests/test_confirmed_gaps.py` (6 tests). Baselines regenerated. Full suite green.
 
+## Confirmed gaps -- now fixed (2026-05-30, second follow-up)
+
+- **`use_waning` default flipped `False` -> `True`** to match v3 (the user's call). `cv.Sim()` now runs
+  with waning immunity + the cross-immunity connector by default, so `vaccinate_*`/the immunity
+  tutorial work without an explicit `use_waning=True`. All parity anchors + `baseline.json` set
+  `use_waning` explicitly, so the regression infrastructure is unaffected; `pars_v4.0.0.json`
+  (the default-sim snapshot) was regenerated.
+- **`sim['par'] = value` SET now routes to the disease** (`cv.Sim.__setitem__` + a `_resolve_covid`
+  helper). A fresh `cv.Sim(); sim['rel_death_prob'] = 4; sim.run()` applies the change (cum_deaths
+  rises), and `sim['rel_death_prob']` reads it back. Resolves the live disease post-init, else the
+  module Starsim deep-copies in at init (so pre-run edits propagate).
+
 ## Confirmed gaps still documented (not yet fixed)
 
-- **`sim['beta']` / `sim.start_day` READS** are now supported: `cv.Sim.__getattr__` (a safe fallback,
-  like the People proxy) exposes the sim-level config + COVID parameters as attributes, and since
-  `ss.Sim.__getitem__` delegates to `getattr`, `sim['beta']` works too. **Setting** a disease
-  parameter via `sim['rel_death_prob'] = 2` is NOT routed (it sets a plain attribute) -- build a fresh
-  `cv.Sim(dict(rel_death_prob=2))` or use `cv.dynamic_pars`.
 - **Re-initialisation** (`sim.initialize(reset=True)`, tut_calibration): re-initialising an
   already-run sim trips a `total_pop`/`pop_scale` conflict under the Starsim object model. The v4 way
   is to build a fresh `cv.Sim` with the changed parameter. (No longer crashes with AttributeError.)
@@ -479,12 +486,6 @@ baselines are unaffected.
 
 ## Unported features still DEFERRED (with recipe)
 
-- **`use_waning` default** (v3 `True` -> v4 `False`): every vaccination/immunity feature works with
-  `use_waning=True`, but the immunity tutorial (and default `vaccinate_*`) assume v3's default-on
-  waning. **Decision for you** (flagged earlier): I verified all parity anchors + `baseline.json` set
-  `use_waning` explicitly, so flipping the v4 default to `True` would NOT disturb the regression
-  infrastructure -- but it changes every default-sim result, so it's a released-default scientific
-  call I left to you. (Flip in `cv.Sim.__init__`'s `use_waning` default + regenerate `baseline.json`.)
 - **`cv.Layer` / `people.contacts` / `add_layer` / `reset_layer_pars` / `dynam_layer`** (the contact-
   network internals in tut_advanced): the v4 network model differs structurally; not ported.
 

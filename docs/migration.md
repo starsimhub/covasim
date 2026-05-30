@@ -68,16 +68,12 @@ NumPy/Numba stream. As a result, **v4 results are not bit-for-bit identical to v
 This is expected. Equivalence is validated statistically: the migration ships multi-seed z-score
 *parity gates* that confirm v4 and v3.1.8 agree within sampling noise on the headline metrics.
 
-### 2.3 `use_waning` now defaults to `False`
+### 2.3 `use_waning` defaults to `True` (as in v3)
 
-In v3, `use_waning` defaulted to `True`. In v4 it defaults to **`False`**. This matters because the
-vaccination interventions (`cv.vaccinate_prob`/`vaccinate_num`) require the NAb/waning engine — under
-the v4 default they raise, directing you to either pass `use_waning=True` or use `cv.simple_vaccine`.
-If you want v3-like behaviour, set `use_waning=True` explicitly:
-
-```python
-sim = cv.Sim(use_waning=True, interventions=cv.vaccinate_prob('pfizer', days=30, prob=0.1))
-```
+As in v3, `use_waning` defaults to **`True`** — `cv.Sim()` runs with waning immunity (NAbs +
+cross-immunity) by default, and the NAb-based vaccination interventions
+(`cv.vaccinate_prob`/`vaccinate_num`) work out of the box. Pass `use_waning=False` for the simpler
+permanent-immunity model (and `cv.simple_vaccine` for non-NAb vaccination).
 
 ### 2.4 `sim.init()` (with `sim.initialize()` retained)
 
