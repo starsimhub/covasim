@@ -122,3 +122,64 @@ def test_nab_boost_on_reinfection():
     covid.set_prognoses(uids)
     peak2 = np.asarray(covid.peak_nab)[np.asarray(uids)]
     assert np.allclose(peak2, peak1 * covid.pars.nab_boost), 'reinfection boosts peak_nab by nab_boost'
+
+
+# === Task 3: NAb-weighted cross-immunity + reinfection/breakthrough ===
+
+def _run(use_waning, n_days=300, seed=2):
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='random', n_days=n_days, rand_seed=seed,
+                 use_waning=use_waning, verbose=0)
+    sim.run()
+    return sim
+
+
+def test_waning_increases_reinfection_and_protection():
+    """v3 test_waning directional check: waning => higher cum_infections, reinfections, NAbs, protection."""
+    s0 = _run(False)
+    s1 = _run(True)
+    d0, d1 = s0.diseases.covid, s1.diseases.covid
+    ci0 = float(np.asarray(d0.results['variant']['cum_infections_by_variant']).sum(axis=0)[-1])
+    ci1 = float(np.asarray(d1.results['variant']['cum_infections_by_variant']).sum(axis=0)[-1])
+    assert ci1 > ci0, 'cum_infections higher with waning (reinfection)'
+    assert float(np.asarray(d1.n_breakthroughs).sum()) > 0, 'breakthrough reinfections occur with waning'
+    assert float(np.asarray(d0.n_breakthroughs).sum()) == 0, 'no reinfection without waning'
+    assert float(np.asarray(d1.results['pop_nabs']).max()) > 0, 'population NAbs are nonzero with waning'
+    assert float(np.asarray(d1.results['pop_protection']).max()) > 0, 'population protection nonzero with waning'
+    assert float(np.asarray(d0.results['pop_nabs']).max()) == 0, 'no NAbs without waning'
+
+
+def test_nab_trajectory_rises_then_decays():
+    """A cohort's mean NAb rises to a peak (over ~growth_time) then decays over a long horizon."""
+    sim = _run(True, n_days=365, seed=5)
+    pop_nabs = np.asarray(sim.diseases.covid.results['pop_nabs'])
+    peak_t = int(np.argmax(pop_nabs))
+    assert pop_nabs[peak_t] > 0
+    # Rises to the peak, then ends below the peak (decay phase reached by day 365).
+    assert pop_nabs[-1] < pop_nabs[peak_t], 'population NAbs decay after the peak'
+    assert peak_t > 0, 'NAbs grow before peaking (not maximal at t=0)'
+
+
+def test_use_waning_nv1_allows_some_reinfection():
+    """Under use_waning, single-variant reinfection is nonzero (calc_VE(nab×1.0) < 1), unlike M2/M3."""
+    sim = _run(True, n_days=400, seed=3)
+    d = sim.diseases.covid
+    assert d.nv == 1 and d.cross_immunity_active is True
+    assert float(np.asarray(d.n_breakthroughs).sum()) > 0, 'same-variant reinfection occurs as NAbs wane'
+
+
+def test_connector_writes_calc_VE_under_waning():
+    """Under waning, sus_imm equals calc_VE(nab × matrix) for ever-recovered agents (not the raw matrix)."""
+    sim = _run(True, n_days=120, seed=2)
+    d = sim.diseases.covid
+    matrix = sim.connectors.crossimmunity.matrix
+    ti = d.ti
+    rec = (d.ti_recovered <= ti).uids
+    rec = rec[np.isfinite(np.asarray(d.recovered_variant[rec]))]
+    assert len(rec) > 0
+    ru = np.asarray(rec)
+    src_v = np.asarray(d.recovered_variant[rec]).astype(int)
+    nab = np.asarray(d.nab[rec])
+    expected = cvimm.calc_VE(nab * matrix[0, src_v], 'sus', d.pars.nab_eff)
+    assert np.allclose(d.sus_imm[0, ru], expected), 'sus_imm = calc_VE(nab × matrix) under waning'
+    # And it is NOT just the static matrix (NAb weighting actually reduces protection below the matrix).
+    assert np.any(d.sus_imm[0, ru] < matrix[0, src_v] - 1e-9), 'NAb weighting lowers protection below the raw matrix'

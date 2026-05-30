@@ -79,3 +79,41 @@ late wave) + aggregate burden cascade.
 
 If you'd rather the gate enforce per-variant parity strictly, that's a no-op until M4 lands NAbs;
 flagging here so the convergent-subset choice is visible and reversible.
+
+---
+
+# M4 (waning immunity + NAbs) — also landed this session
+
+Continued straight into M4 (the largest net-new piece). Wrote the M4 spec+plan
+(`migration_plan/{specs,plans}/2026-05-29-covasim-m4-*.md`) then implemented it in 3 commits.
+Additive + gated behind `use_waning` (default **False** ⇒ M2/M3 byte-identical; **True** ⇒ NAb engine).
+
+- **Task 1:** ported the NAb kernel (`precompute_waning`/`nab_growth_decay`/...) + `calc_VE` into
+  `immunity.py` — the default kernel is **bit-identical to v3** (max diff 0.0).
+- **Task 2:** host-level NAb state (`peak_nab`/`nab`/`t_nab_event`/`n_breakthroughs`) on `cv.COVID`;
+  acquisition/boosting at infection (`_update_peak_nab`: severity-scaled initial draw, `nab_boost` on
+  reinfection), breakthrough `trans_redux`, `nab_kin` precompute, `cv.Sim(use_waning=...)` wiring.
+- **Task 3:** `cv.CrossImmunity` advances NAb kinetics each step and writes
+  `sus_imm/symp_imm/sev_imm = calc_VE(nab × matrix, axis)` under waning (static matrix otherwise);
+  `pop_nabs`/`pop_protection` results; `anchor_m4.py` + `test_m4_parity.py`.
+
+## 🎯 M4 closes the M3 divergence — full per-variant parity
+
+The M3 v3.1.8 baseline was generated with `use_waning=True`, so it's the right target for M4. Re-running
+the M3 anchor with `use_waning=True` (v4 NAb engine) re-converges **every** metric to within |z|<3.5:
+
+| metric | M3 static \|z\| | **M4 NAb \|z\|** |
+|---|---|---|
+| cum_infections (agg) | 42 | **−0.3** |
+| cum_infections_alpha | 11 | **−1.0** |
+| cum_infections_delta | 25 | **−0.3** |
+| peak_n_infectious_delta | 46 | **−0.1** |
+| peak_n_infectious (agg) | 3.3 | **−3.4** |
+
+(random; hybrid similar, max |z|=2.5.) So `test_m4_parity.py` hard-gates the **whole** metric set at
+|z|<5 (vs M3's convergent subset) — both backends pass. Directional `test_waning` checks also pass
+(waning ⇒ more cum_infections/reinfections/pop_nabs/pop_protection). Demo: `/tmp/m4_demo.png`
+(NAb rise-then-wane + protection curve + reinfection).
+
+**Net:** M3 + M4 are both functionally complete, validated against v3.1.8, and committed on
+`starsim-port-2`. Vaccination (M6) is the remaining consumer of this NAb pipeline.

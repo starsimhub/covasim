@@ -642,6 +642,11 @@ class COVID(ss.Infection):
             R('cum_deaths',      'Cumulative deaths'),
             R('n_imports',       'Number of imported infections'),  # bumped by import_variant (M3)
         )
+        # M4 immunity summaries (population means -> scale=False). Filled only under use_waning.
+        self.define_results(
+            ss.Result('pop_nabs',       dtype=float, scale=False, label='Population mean NAb level'),
+            ss.Result('pop_protection', dtype=float, scale=False, label='Population mean protective immunity'),
+        )
         self._flow = dict(symptomatic=0, severe=0, critical=0, recoveries=0, deaths=0)
 
         # The 12-key 2D by_variant sub-dict (v3 sim.results['variant']), shape (nv, npts), FLOAT dtype
@@ -698,6 +703,13 @@ class COVID(ss.Infection):
             iv = np.asarray(self.infectious_variant[inf_uids]); fin = np.isfinite(iv)
             if fin.any():
                 vres['n_infectious_by_variant'][:, ti] = np.bincount(iv[fin].astype(int), minlength=self.nv)
+
+        # M4 population immunity summaries (mean over alive agents): NAb level + wild-axis protection.
+        if self.pars.use_waning:
+            nab = np.asarray(self.nab)  # active (alive) values
+            res.pop_nabs[ti] = float(nab.mean()) if len(nab) else 0.0
+            auids = np.asarray(self.sim.people.auids)
+            res.pop_protection[ti] = float(self.sus_imm[0][auids].mean()) if len(auids) else 0.0
         return
 
     def finalize_results(self):

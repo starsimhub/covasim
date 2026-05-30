@@ -59,32 +59,61 @@ class CrossImmunity(ss.Connector):
         covid.cross_immunity_active = True       # enable reinfection (Open Q B; use_waning reserved for M4)
         return
 
-    def step(self):
-        """Write per-variant protection for every ever-recovered agent from the matrix.
+    @staticmethod
+    def _advance_nab(covid, ti):
+        """Step every agent's NAb level forward along the precomputed kinetic kernel (v3 update_nab).
 
-        Keyed off the **ever-recovered** mask (finite ``ti_recovered`` whose recovery date has
-        passed -- v3's ``was_inf = t >= date_recovered``), NOT the transient ``recovered`` BoolState,
-        so protection persists correctly across the reinfection window and (in M4) once
-        time-since-recovery kinetics arrive. NAb-free: ``imm = matrix[target_variant, source_variant]``.
+        ``nab += nab_kin[ti − t_nab_event] × peak_nab``, clamped to ``[0, peak_nab]``. The kernel index
+        is clamped to the kernel length so long horizons (or post-peak agents) stay in range.
+        """
+        nab_uids = (covid.t_nab_event <= ti).uids  # agents with a past NAb event (NaN <= ti is False)
+        if not len(nab_uids):
+            return
+        t_since = (ti - np.asarray(covid.t_nab_event[nab_uids])).astype(int)
+        t_since = np.clip(t_since, 0, len(covid.nab_kin) - 1)
+        peak = np.asarray(covid.peak_nab[nab_uids])
+        new = np.asarray(covid.nab[nab_uids]) + covid.nab_kin[t_since] * peak
+        covid.nab[nab_uids] = np.clip(new, 0.0, peak)
+        return
+
+    def step(self):
+        """Write per-variant protection for every ever-recovered agent (the v3 check_immunity slot).
+
+        Keyed off the **ever-recovered** mask (finite ``ti_recovered ≤ ti`` -- v3's
+        ``was_inf = t >= date_recovered``), NOT the transient ``recovered`` BoolState. Two regimes:
+          - ``use_waning=False`` (M2/M3): static, NAb-free -- ``imm = matrix[target, source]``.
+          - ``use_waning=True`` (M4): advance NAb kinetics, then ``imm = calc_VE(nab × matrix, axis)``
+            per axis (sus/symp/sev), so protection rises then wanes with the agent's NAb titre.
         """
         covid = self._covid()
         ti = covid.ti
-        rec = (covid.ti_recovered <= ti).uids   # finite ti_recovered that has passed (NaN <= ti is False)
+        waning = bool(covid.pars.use_waning)
+        if waning:
+            self._advance_nab(covid, ti)
+        rec = (covid.ti_recovered <= ti).uids   # finite ti_recovered that has passed
         if not len(rec):
             return
-        # Defensive: only index the matrix for agents whose recovered_variant is finite. By construction
-        # this is every ever-recovered living agent (death/recovery are exclusive, and reinfection resets
-        # ti_recovered to NaN), but guarding the .astype(int) here keeps it robust if that ever changes
-        # (a NaN->int cast would otherwise produce an out-of-bounds matrix index).
+        # Defensive: only index the matrix for agents whose recovered_variant is finite (guards the
+        # .astype(int); by construction every ever-recovered living agent qualifies).
         src = np.asarray(covid.recovered_variant[rec])
         finite = np.isfinite(src)
         if not finite.any():
             return
-        ru = np.asarray(rec)[finite]
+        rec_f = rec[finite]
+        ru = np.asarray(rec_f)
         src_v = src[finite].astype(int)          # the variant each recovered from
-        for v in range(covid.nv):                # target variant v; matrix[v, source] is the protection
-            imm = self.matrix[v, src_v]
-            covid.sus_imm[v, ru]  = imm
-            covid.symp_imm[v, ru] = imm
-            covid.sev_imm[v, ru]  = imm
+        if waning:
+            nab_eff = covid.pars.nab_eff
+            nab_vals = np.asarray(covid.nab[rec_f])   # current NAb titre of the ever-recovered agents
+            for v in range(covid.nv):                 # effective NAbs = nab × cross-immunity weight
+                eff = nab_vals * self.matrix[v, src_v]
+                covid.sus_imm[v, ru]  = cvimm.calc_VE(eff, 'sus',  nab_eff)
+                covid.symp_imm[v, ru] = cvimm.calc_VE(eff, 'symp', nab_eff)
+                covid.sev_imm[v, ru]  = cvimm.calc_VE(eff, 'sev',  nab_eff)
+        else:
+            for v in range(covid.nv):                 # target variant v; matrix[v, source] is the protection
+                imm = self.matrix[v, src_v]
+                covid.sus_imm[v, ru]  = imm
+                covid.symp_imm[v, ru] = imm
+                covid.sev_imm[v, ru]  = imm
         return

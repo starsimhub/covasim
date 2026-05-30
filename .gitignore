@@ -162,3 +162,7 @@ tests/regression/anchor_m2_snapshot.json
 tests/regression/v3_m3_*seeds*.json
 tests/regression/v4_m3_*seeds*.json
 tests/regression/anchor_m3_snapshot.json
+
+# M4 waning-immunity + NAb regression artifacts (M4 reuses the v3_m3 use_waning=True baseline)
+tests/regression/v4_m4_*seeds*.json
+tests/regression/anchor_m4_snapshot.json

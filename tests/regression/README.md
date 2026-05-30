@@ -204,3 +204,17 @@ the static matrix suffices but diverge where NAb kinetics dominate:
 The gate therefore hard-gates only the convergent subset and prints the full per-metric
 table (`[GATE]`/`[info]`) for diagnostics; see the rationale block at the top of
 `../test_m3_parity.py` and the demo in `NOTES_FOR_CLIFF.md`.
+
+## M4 anchor (waning immunity + NAbs)
+
+`anchor_m4.py` is the M3 multi-variant anchor (wild + alpha@d10 + delta@d30) **with the NAb engine
+on** (`use_waning=True`). The v3.1.8 side is byte-for-byte the M3 anchor's v3 branch (which already
+ran `use_waning=True`), so **M4 reuses the M3 v3.1.8 baseline** (`v3_m3_<pt>_seeds_n*.json`) — no
+new baseline. `build_summary_m3` serves both milestones.
+
+The release gate is `../test_m4_parity.py` (slow, per backend). Where M3's *static* cross-immunity
+diverged from v3 on the per-variant escape dynamics (delta `|z|~25-46`, gated only on a convergent
+subset), M4's NAb-weighted cross-immunity (`sus_imm = calc_VE(nab × matrix)`) **re-converges every
+pinned metric** — aggregate burden AND per-variant wild/alpha/delta counts — to within `|z|<3.5` of
+the same v3 baseline. So M4 hard-gates the WHOLE metric set at `|z|<5`. This is the M4 acceptance:
+the documented M3 static-vs-NAb divergence closes once NAbs are wired.
