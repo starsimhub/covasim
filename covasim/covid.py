@@ -87,6 +87,9 @@ class COVID(ss.Infection):
                                 beta_symp_inf=0.038, alpha_sev_symp=-0.014, beta_sev_symp=0.079),  # NAb->efficacy
             rel_imm_symp = dict(asymp=0.85, mild=1.0, severe=1.5),  # natural-immunity scaling by symptom severity
             trans_redux  = 0.59,                                 # transmissibility reduction for breakthrough infections
+            # Testing / quarantine (M5; parameters.py:106-108). The iso/quar beta factors are wired in
+            # M5 Task 3; quar_period is used by schedule_quarantine.
+            quar_period  = 14,                                   # days an agent quarantines
         )
         self.update_pars(pars, **kwargs)
 
@@ -130,6 +133,20 @@ class COVID(ss.Infection):
             ss.FloatArr('nab',             default=0.0, label='Current neutralizing-antibody titre'),
             ss.FloatArr('t_nab_event',                  label='Time index of the last NAb-conferring event'),
             ss.FloatArr('n_breakthroughs', default=0.0, label='Number of breakthrough (post-NAb) infections'),
+            # Testing / tracing / quarantine host state (M5; v3 states). All default False/NaN, so they
+            # are inert until a testing or contact-tracing intervention sets the trigger dates =>
+            # M1-M4 are byte-identical with no such intervention attached.
+            ss.BoolState('tested',         label='Ever tested'),
+            ss.BoolState('diagnosed',      label='Diagnosed (confirmed case)'),
+            ss.BoolState('known_contact',  label='Known contact of a diagnosed case'),
+            ss.BoolState('quarantined',    label='In quarantine'),
+            ss.BoolState('isolated',       label='In isolation'),
+            ss.FloatArr('date_tested',          label='Date last tested'),
+            ss.FloatArr('date_pos_test',        label='Date of a test that will return positive'),
+            ss.FloatArr('date_diagnosed',       label='Date diagnosed'),
+            ss.FloatArr('date_quarantined',     label='Date entered quarantine'),
+            ss.FloatArr('date_end_quarantine',  label='Date quarantine ends'),
+            ss.FloatArr('date_end_isolation',   label='Date isolation ends'),
             reset = True,
         )
 
@@ -179,6 +196,13 @@ class COVID(ss.Infection):
         # drawn when use_waning. nab_kin (the precomputed waning kernel) is built in init_post.
         self._nab_init = ss.normal(loc=self.pars.nab_init['par1'], scale=self.pars.nab_init['par2'])
         self.nab_kin = None
+
+        # Testing (M5). The test bernoulli (sensitivity / loss-to-follow-up) is created LAST so the
+        # other branch Dists keep their CRN slots; only drawn when covid.test() is called by a testing
+        # intervention => no testing intervention => no draw => byte-identical to M1-M4. The pending-
+        # quarantine schedule (start_day -> [(uid, end_day)]) is (re)set in init_post.
+        self._test_bern = ss.bernoulli(p=1.0)
+        self._pending_quarantine = {}
         return
 
     @property
@@ -525,6 +549,83 @@ class COVID(ss.Infection):
             self.results['n_imports'][self.ti] += len(uids)
         return uids
 
+    # --- testing / tracing / quarantine (M5) ----------------------------------
+
+    def test(self, uids, test_sensitivity=1.0, loss_prob=0.0, test_delay=0):
+        """Test agents and schedule positive diagnoses (the v3 ``People.test`` action).
+
+        Called by the testing interventions (M5 Task 2), not directly by users. Infectious agents
+        test positive with probability ``test_sensitivity``; not-already-diagnosed positives that are
+        not lost to follow-up get ``date_diagnosed = ti + test_delay`` (and ``date_pos_test = ti``).
+        Returns the UIDs that will be diagnosed.
+        """
+        uids = ss.uids(np.unique(np.asarray(uids)))
+        if not len(uids):
+            return uids
+        ti = self.ti
+        self.tested[uids] = True
+        self.date_tested[uids] = ti
+        inf = uids[np.asarray(self.infectious[uids])]          # only infectious agents can test positive
+        if not len(inf):
+            return ss.uids()
+        self._test_bern.set(p=test_sensitivity)
+        pos = inf[self._test_bern.rvs(inf)]                    # true positives (sensitivity)
+        not_diag = pos[np.isnan(np.asarray(self.date_diagnosed[pos]))]  # exclude already-diagnosed
+        if not len(not_diag):
+            return ss.uids()
+        self._test_bern.set(p=1.0 - loss_prob)
+        final = not_diag[self._test_bern.rvs(not_diag)]        # exclude loss-to-follow-up
+        self.date_diagnosed[final] = ti + test_delay
+        self.date_pos_test[final] = ti
+        return final
+
+    def schedule_quarantine(self, uids, start_date=None, period=None):
+        """Schedule a quarantine request (the v3 ``People.schedule_quarantine``).
+
+        Eligibility (not already dead/recovered/diagnosed/isolated) is re-checked when ``start_date``
+        is reached, in ``_step_testing``. Defaults: ``start_date=ti``, ``period=quar_period``.
+        """
+        ti = self.ti
+        start_date = ti if start_date is None else int(start_date)
+        period = self.pars.quar_period if period is None else int(period)
+        bucket = self._pending_quarantine.setdefault(start_date, [])
+        for u in np.asarray(uids):
+            bucket.append((int(u), start_date + period))
+        return
+
+    def _step_testing(self):
+        """Diagnosis / quarantine / isolation state machines (the v3 People.check_* updates).
+
+        Inert until a testing/tracing intervention sets the trigger dates or schedules a quarantine
+        (all date arrays default NaN and the pending-quarantine dict is empty), so this is a no-op for
+        M1-M4 -- no RNG, no state change.
+        """
+        ti = self.ti
+        # check_diagnosed: positives become diagnosed when their (delayed) diagnosis date arrives.
+        self.date_pos_test[((self.date_pos_test <= ti) & ~self.diagnosed).uids] = np.nan
+        new_diag = ((self.date_diagnosed <= ti) & ~self.diagnosed).uids
+        self.diagnosed[new_diag] = True
+        # check_enter_iso: anyone diagnosed this step isolates until recovery.
+        if len(new_diag):
+            self.isolated[new_diag] = True
+            self.date_end_isolation[new_diag] = self.ti_recovered[new_diag]
+        # check_exit_iso: release agents whose isolation has ended.
+        self.isolated[((self.date_end_isolation <= ti) & self.isolated).uids] = False
+        # check_quar: process pending quarantine requests scheduled for today.
+        pending = self._pending_quarantine.pop(ti, [])
+        for ind, end_day in pending:
+            if self.quarantined[ind]:
+                self.date_end_quarantine[ind] = max(float(self.date_end_quarantine[ind]), end_day)
+            elif not (self.dead[ind] or self.recovered[ind] or self.diagnosed[ind] or self.isolated[ind]):
+                self.quarantined[ind] = True
+                self.date_quarantined[ind] = ti
+                self.date_end_quarantine[ind] = end_day
+        # Diagnosed-today agents end quarantine (they move to isolation instead).
+        self.date_end_quarantine[(self.quarantined & (self.date_diagnosed == ti)).uids] = ti
+        # Release agents whose quarantine has ended.
+        self.quarantined[((self.date_end_quarantine <= ti) & self.quarantined).uids] = False
+        return
+
     def _introduce_variants(self):
         """Drive mid-run + t0 variant introductions (the v3 ``variant.apply``) on matched days."""
         for var in self._variant_objs:
@@ -585,6 +686,9 @@ class COVID(ss.Infection):
         self._flow = dict(symptomatic=len(new_symp), severe=len(new_sev), critical=len(new_crit),
                           recoveries=len(new_rec), deaths=len(new_dead))
 
+        # Testing/tracing/quarantine state machines (M5; inert with no testing intervention attached).
+        self._step_testing()
+
         # Update per-agent transmissibility BEFORE this step's transmission (loop slot 5 precedes infect at 9):
         # rel_trans = beta_dist draw x viral_load(t) x asymp_factor (v3 compute_trans_sus, utils.py:90-93).
         inf = self.infectious.uids
@@ -610,6 +714,10 @@ class COVID(ss.Infection):
         self.exposed_variant[uids]    = np.nan
         self.infectious_variant[uids] = np.nan
         self.recovered_variant[uids]  = np.nan
+        # Clear testing/quarantine flags on death (v3 check_death; inert when no testing is active).
+        self.known_contact[uids] = False
+        self.quarantined[uids]   = False
+        self.isolated[uids]      = False
         return
 
     # --- results --------------------------------------------------------------
@@ -760,6 +868,7 @@ class COVID(ss.Infection):
         if self.pars.use_waning:
             import covasim.immunity as cvimm  # lazy: covid.py imports before immunity.py
             self.nab_kin = cvimm.precompute_waning(self.t.npts, self.pars.nab_decay)
+        self._pending_quarantine = {}  # M5: start_day -> [(uid, end_day)] (reset for clean re-runs)
 
         exact = self.pars.init_prev if isinstance(self.pars.init_prev, (int, np.integer)) else None
         if exact is None:
