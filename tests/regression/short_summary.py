@@ -226,3 +226,38 @@ def build_summary_m3(sim):
         out[f'cum_infections_{lab}']    = float(ci[i, -1]) if i is not None else 0.0
         out[f'peak_n_infectious_{lab}'] = float(ni[i].max()) if i is not None else 0.0
     return out
+
+
+# --- M5 (testing / tracing / quarantine) summary -----------------------------
+# Burden + epidemic shape PLUS the testing/quarantine outcomes.
+METRIC_KEYS_M5 = (
+    'cum_infections', 'cum_deaths', 'peak_n_infectious',
+    'cum_tests', 'cum_diagnoses', 'peak_n_quarantined', 'peak_n_isolated',
+)
+
+
+def build_summary_m5(sim):
+    """Return the M5 short summary (burden + testing/quarantine), under v3.1.8 or v4 (duck-typed)."""
+    if hasattr(sim, 'diseases'):  # v4
+        d = list(sim.diseases.values())[0]
+        res = d.results
+        cum_deaths = float(np.asarray(res['cum_deaths']).max())
+        return {
+            'cum_infections':     float(int(d.recovered.sum()) + int(d.infected.sum())) + cum_deaths,
+            'cum_deaths':         cum_deaths,
+            'peak_n_infectious':  float(np.asarray(res['n_infectious']).max()),
+            'cum_tests':          float(np.asarray(res['cum_tests']).max()),
+            'cum_diagnoses':      float(np.asarray(res['cum_diagnoses']).max()),
+            'peak_n_quarantined': float(np.asarray(res['n_quarantined']).max()),
+            'peak_n_isolated':    float(np.asarray(res['n_isolated']).max()),
+        }
+    summary = sim.summary  # v3.1.8
+    return {
+        'cum_infections':     float(summary['cum_infections']),
+        'cum_deaths':         float(summary['cum_deaths']),
+        'peak_n_infectious':  float(_series_max(sim, 'n_infectious')),
+        'cum_tests':          float(summary['cum_tests']),
+        'cum_diagnoses':      float(summary['cum_diagnoses']),
+        'peak_n_quarantined': float(_series_max(sim, 'n_quarantined')),
+        'peak_n_isolated':    float(_series_max(sim, 'n_isolated')),
+    }

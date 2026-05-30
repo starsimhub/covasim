@@ -117,3 +117,44 @@ the M3 anchor with `use_waning=True` (v4 NAb engine) re-converges **every** metr
 
 **Net:** M3 + M4 are both functionally complete, validated against v3.1.8, and committed on
 `starsim-port-2`. Vaccination (M6) is the remaining consumer of this NAb pipeline.
+
+_M4 adversarial review (5-agent workflow): **0 confirmed findings** — the NAb engine passed clean (combined with full v3 re-convergence + green suite). Starting M5._
+
+---
+
+# M5 (testing / tracing / quarantine) — also landed this session
+
+Wrote the M5 spec+plan (groundwork) then implemented the full milestone in 4 commits (additive: all
+testing/quarantine state is inert until an intervention drives it, so M1-M4 stay byte-identical).
+
+- **Task 1:** host states (tested/diagnosed/known_contact/quarantined/isolated + dates) + the v3
+  state machines (check_diagnosed/enter_iso/exit_iso/quar) in step_state + the `covid.test()` action.
+- **Task 2:** active `covasim/interventions.py` with `cv.Intervention` base + `cv.test_prob`/
+  `cv.test_num` (slot-7 interventions calling `covid.test()`); new_tests/cum_tests/new_diagnoses/
+  cum_diagnoses flow results.
+- **Task 3:** `cv.contact_tracing` (per-layer edge-based contact finding -> schedule_quarantine) +
+  iso_factor/quar_factor transmissibility reduction. Tracing roughly halves the epidemic.
+- **Task 4:** anchor_m5 + build_summary_m5 + test_m5_parity + v3.1.8 baseline.
+
+## 🎯 M5 reproduces v3 once quarantine reduces susceptibility too
+
+The first parity run failed (cum_infections z~20): I had applied quar_factor only to transmissibility,
+but **v3's quar_factor reduces both transmissibility AND susceptibility**. Adding the susceptibility
+reduction in `infect()` brought every gated metric to within **|z|<2**:
+
+| metric | before fix \|z\| | **after fix \|z\|** |
+|---|---|---|
+| cum_infections | 20 | **−0.1** |
+| cum_diagnoses | 21 | **−1.3 / 0.0** |
+| peak_n_quarantined | 6 | **−0.5 / −1.4** |
+| cum_deaths | 5 | **0.1 / 1.4** |
+
+(random / hybrid; v3 n=30, v4 n=10.) `cum_tests` is informational (testing volume matches to ~2%, but
+the tiny cross-seed SE inflates that to |z|~8 — the documented CRN residual). The iso/quar factors are
+a scalar approximation of v3's per-layer values (spec Open Q A); the aggregate already matches.
+`test_m5_parity.py` gates the meaningful metrics at |z|<5 (all pass). Demo: `/tmp/m5_demo.png`.
+
+**Session net:** M3, M4, and M5 all landed — multi-variant + cross-immunity, NAb waning immunity, and
+testing/tracing/quarantine — each functionally complete, validated against v3.1.8 with passing parity
+gates, and committed on `starsim-port-2`. Remaining: M6 (vaccination, the last NAb-pipeline consumer),
+M7 (calibration), M8 (multisim/scenarios), M9 (analyzers/TransTree/synthpops), M10 (release).

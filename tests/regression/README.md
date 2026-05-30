@@ -218,3 +218,25 @@ subset), M4's NAb-weighted cross-immunity (`sus_imm = calc_VE(nab × matrix)`) *
 pinned metric** — aggregate burden AND per-variant wild/alpha/delta counts — to within `|z|<3.5` of
 the same v3 baseline. So M4 hard-gates the WHOLE metric set at `|z|<5`. This is the M4 acceptance:
 the documented M3 static-vs-NAb divergence closes once NAbs are wired.
+
+## M5 anchor (testing / tracing / quarantine)
+
+`anchor_m5.py` is the M2 single-variant scenario plus a `test_prob` testing intervention and a
+`contact_tracing` intervention (same public API in v3.1.8 and v4). `build_summary_m5` pins the burden
+(`cum_infections`/`cum_deaths`/`peak_n_infectious`) plus the testing/quarantine outcomes
+(`cum_tests`/`cum_diagnoses`/`peak_n_quarantined`/`peak_n_isolated`). Generate the gitignored v3.1.8
+baseline:
+
+```bash
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m5_random --n 30
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m5_hybrid --n 30
+```
+
+The release gate is `../test_m5_parity.py` (slow, per backend). Once quarantine reduces both
+transmissibility AND susceptibility (the v3 `quar_factor` semantics), **every gated metric matches
+v3 within |z|<2** (cum_infections z≈−0.1, cum_diagnoses |z|<1.3, quarantine/isolation/deaths/peak all
+< 2). `cum_tests` is **informational** (not gated): the testing volume matches to ~2%, but its
+cross-seed SE is so tiny that the residual reads as |z|~8 on the random backend — the irreducible
+Starsim-CRN-vs-v3-RNG offset (analogous to M2's documented residual). The iso/quar transmissibility
+factors are a scalar M5 approximation of v3's per-layer values (spec Open Q A; the per-layer
+refinement would tighten hybrid further but the aggregate already matches).

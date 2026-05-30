@@ -471,6 +471,10 @@ class COVID(ss.Infection):
         betamap = self.validate_beta()
         susc = self.susceptible  # the age-OR baseline x susceptible mask (cross-immunity folds in per variant)
         auids = np.asarray(self.sim.people.auids)  # active UIDs, aligned with the FloatArr active values
+        # M5: quarantined agents are also LESS SUSCEPTIBLE (v3 quar_factor applies to transmissibility
+        # AND susceptibility). Inert with no testing intervention (nobody quarantined => multiplier 1).
+        quar_vals = np.asarray(self.quarantined.values)
+        quar_mult = np.where(quar_vals, self.pars.quar_factor, 1.0) if quar_vals.any() else None
         new_cases, sources, networks, case_variant = [], [], [], []
 
         for vi in range(nv):
@@ -492,6 +496,8 @@ class COVID(ss.Infection):
                 # attached (M2/M3 nv==1, use_waning=False), so this is a no-op there => byte-identical.
                 # Index by the active UIDs so only active values are touched (no garbage-slot arithmetic).
                 sus_vals = sus_vals * (1.0 - self.sus_imm[vi][auids])
+            if quar_mult is not None:  # M5: quarantined agents are less susceptible
+                sus_vals = sus_vals * quar_mult
             rel_sus = self.rel_sus.asnew(sus_vals)
 
             for i, (nkey, route) in enumerate(self.sim.networks.items()):
