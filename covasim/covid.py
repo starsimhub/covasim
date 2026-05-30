@@ -75,6 +75,18 @@ class COVID(ss.Infection):
             beta_dist    = dict(dist='neg_binomial', par1=1.0, par2=0.45, step=0.01),  # constant per-agent overdispersion (mean 1.0)
             viral_dist   = dict(frac_time=0.3, load_ratio=2, high_cap=4),               # time-varying viral load (two-level, mean-preserving)
             asymp_factor = 1.0,                                                         # transmissibility multiplier for asymptomatic agents
+            # Waning immunity / NAbs (M4; parameters.py:69-78). use_waning=False keeps the M2/M3 static
+            # path (no NAb state evolves) -- byte-identical. When True, cv.CrossImmunity advances NAb
+            # kinetics and maps them to per-axis protection via calc_VE. Defaults are the v3 values.
+            use_waning   = False,
+            nab_init     = dict(dist='normal', par1=0, par2=2),  # log2(initial NAb) after natural infection
+            nab_decay    = dict(form='nab_growth_decay', growth_time=21, decay_rate1=np.log(2)/50,
+                                decay_time1=150, decay_rate2=np.log(2)/250, decay_time2=365),
+            nab_boost    = 1.5,                                  # multiplicative boost to peak NAb on reinfection
+            nab_eff      = dict(alpha_inf=1.08, alpha_inf_diff=1.812, beta_inf=0.967, alpha_symp_inf=-0.739,
+                                beta_symp_inf=0.038, alpha_sev_symp=-0.014, beta_sev_symp=0.079),  # NAb->efficacy
+            rel_imm_symp = dict(asymp=0.85, mild=1.0, severe=1.5),  # natural-immunity scaling by symptom severity
+            trans_redux  = 0.59,                                 # transmissibility reduction for breakthrough infections
         )
         self.update_pars(pars, **kwargs)
 
@@ -111,6 +123,13 @@ class COVID(ss.Infection):
             ss.FloatArr('exposed_variant',    label='Variant index this agent is exposed/infected with'),
             ss.FloatArr('infectious_variant', label='Variant index this agent is infectious with'),
             ss.FloatArr('recovered_variant',  label='Variant index this agent last recovered from'),
+            # Neutralizing-antibody (NAb) host-level state (M4; v3 nab_states). 1D per host (the NAb
+            # pool is shared across all prior infections/vaccinations; cross-immunity weights it per
+            # variant in the connector). Only evolves when use_waning=True (else all-default => inert).
+            ss.FloatArr('peak_nab',        default=0.0, label='Peak neutralizing-antibody titre'),
+            ss.FloatArr('nab',             default=0.0, label='Current neutralizing-antibody titre'),
+            ss.FloatArr('t_nab_event',                  label='Time index of the last NAb-conferring event'),
+            ss.FloatArr('n_breakthroughs', default=0.0, label='Number of breakthrough (post-NAb) infections'),
             reset = True,
         )
 
@@ -154,6 +173,12 @@ class COVID(ss.Infection):
         # susceptible=False (permanent immunity), preserving M2 byte-identically. cv.CrossImmunity
         # (M3 Task 3) flips this on when attached (nv>1), enabling reinfection + static cross-immunity.
         self.cross_immunity_active = False
+
+        # NAb engine (M4). The init_nab Dist (log2 NAb after natural infection) is created LAST so the
+        # M2/M3 branch bernoullis keep their CRN slots (=> use_waning=False stays byte-identical). Only
+        # drawn when use_waning. nab_kin (the precomputed waning kernel) is built in init_post.
+        self._nab_init = ss.normal(loc=self.pars.nab_init['par1'], scale=self.pars.nab_init['par2'])
+        self.nab_kin = None
         return
 
     @property
@@ -238,6 +263,26 @@ class COVID(ss.Infection):
         fv = getattr(self, '_flow_variant', None)
         if fv is None or fv['new_infections'].shape[0] != self.nv:
             self._flow_variant = {k: np.zeros(self.nv) for k in self._FLOW_VARIANT_KEYS}
+        return
+
+    def _update_peak_nab(self, uids, symp_scale):
+        """Set/boost peak NAb at (re)infection (M4; the v3 ``update_peak_nab``).
+
+        Agents with prior NAbs (``peak_nab>0``) are boosted by ``nab_boost``; the rest draw an initial
+        log2 NAb from ``nab_init``, scaled by symptom severity (``symp_scale`` = the per-UID
+        ``rel_imm_symp`` factor) and normalised onto the vaccine scale by ``1 + alpha_inf_diff``.
+        """
+        p = self.pars
+        prior = np.asarray(self.peak_nab[uids]) > 0
+        prior_uids = uids[prior]
+        no_prior_uids = uids[~prior]
+        if len(prior_uids):  # boost agents who already had NAbs (reinfection / prior vaccination)
+            self.peak_nab[prior_uids] = self.peak_nab[prior_uids] * p.nab_boost
+        if len(no_prior_uids):  # draw an initial NAb for agents with no prior immunity
+            init = np.asarray(self._nab_init.rvs(no_prior_uids))  # log2(NAb)
+            norm = 1.0 + p.nab_eff['alpha_inf_diff']              # normalise natural -> vaccine NAb scale
+            self.peak_nab[no_prior_uids] = (2.0 ** init) * symp_scale[~prior] * norm
+        self.t_nab_event[uids] = self.ti
         return
 
     def _variant_of(self, uids, variant=None):
@@ -353,6 +398,25 @@ class COVID(ss.Infection):
         vd = p.viral_dist
         trans_point = np.minimum(vd['frac_time'], vd['high_cap'] / infect_days)  # cap the high phase at high_cap days
         self.ti_vl_switch[uids] = self.ti_infectious[uids] + trans_point * infect_days
+
+        # NAb acquisition + breakthrough transmissibility (M4; only under waning immunity). When
+        # use_waning=False this whole block is skipped, so no NAb Dist is drawn => byte-identical to M3.
+        if p.use_waning:
+            # Per-UID symptom-severity scaling for the initial NAb (asymp/mild/severe -> rel_imm_symp).
+            ris = p.rel_imm_symp
+            symp_scale = np.full(len(u), ris['asymp'], dtype=float)
+            symp_scale[is_symp] = ris['mild']
+            sev_positions = np.nonzero(is_symp)[0][is_sev]  # uids-positions that reached the severe branch
+            symp_scale[sev_positions] = ris['severe']
+            # Breakthrough: the FIRST reinfection of an agent with prior NAbs gets reduced transmissibility
+            # (v3 first-breakthrough rule); read peak_nab BEFORE _update_peak_nab sets/boosts it.
+            prior_bt = uids[np.asarray(self.peak_nab[uids]) > 0]
+            if len(prior_bt):
+                first = prior_bt[np.asarray(self.n_breakthroughs[prior_bt]) == 0]
+                if len(first):
+                    self.rel_trans_base[first] = self.rel_trans_base[first] * p.trans_redux
+                self.n_breakthroughs[prior_bt] = self.n_breakthroughs[prior_bt] + 1
+            self._update_peak_nab(uids, symp_scale)
         return
 
     def infect(self):
@@ -394,9 +458,11 @@ class COVID(ss.Infection):
                 trans_vals = trans_vals * rel_beta_v
             rel_trans = self.rel_trans.asnew(trans_vals)
             sus_vals = susc * self.rel_sus
-            if nv > 1:  # reduce susceptibility by this variant's cross-immunity (NaN-free at nv==1)
-                # Index sus_imm (raw, by-UID) at the active UIDs so we fold into the active values only
-                # (never the uninitialized inactive raw slots -- avoids spurious over/underflow warnings).
+            if self.cross_immunity_active:  # reduce susceptibility by this variant's cross-immunity
+                # Fold sus_imm (incl. the M4 NAb-weighted value) even at nv==1, so use_waning=True
+                # single-variant reinfection is protected. sus_imm is all-zero when no connector is
+                # attached (M2/M3 nv==1, use_waning=False), so this is a no-op there => byte-identical.
+                # Index by the active UIDs so only active values are touched (no garbage-slot arithmetic).
                 sus_vals = sus_vals * (1.0 - self.sus_imm[vi][auids])
             rel_sus = self.rel_sus.asnew(sus_vals)
 
@@ -677,6 +743,11 @@ class COVID(ss.Infection):
         self.symp_imm = np.zeros((self.nv, n_raw))
         self.sev_imm  = np.zeros((self.nv, n_raw))
         self._ensure_flow_variant()
+
+        # Precompute the NAb waning kernel once (M4); indexed by (ti - t_nab_event) in the connector.
+        if self.pars.use_waning:
+            import covasim.immunity as cvimm  # lazy: covid.py imports before immunity.py
+            self.nab_kin = cvimm.precompute_waning(self.t.npts, self.pars.nab_decay)
 
         exact = self.pars.init_prev if isinstance(self.pars.init_prev, (int, np.integer)) else None
         if exact is None:

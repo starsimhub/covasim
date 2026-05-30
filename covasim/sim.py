@@ -45,7 +45,7 @@ class Sim(ss.Sim):
 
     def __init__(self, pars=None, people=None, pop_size=20_000, pop_infected=20,
                  pop_type='random', n_days=60, start_day='2020-03-01', rand_seed=1,
-                 beta=None, pop_scale=None, total_pop=None, variants=None, **kwargs):
+                 beta=None, pop_scale=None, total_pop=None, variants=None, use_waning=False, **kwargs):
         if pop_type not in _BETA_LAYER:
             raise ValueError(f"pop_type {pop_type!r} not supported in M1 (choices: 'random', 'hybrid').")
         base_beta = _BASE_BETA if beta is None else beta
@@ -63,13 +63,14 @@ class Sim(ss.Sim):
         diseases = kwargs.pop('diseases', None)
         if diseases is None:
             betadict = {lk: ss.probperday(base_beta*bl) for lk, bl in _BETA_LAYER[pop_type].items()}
-            diseases = cvcov.COVID(beta=betadict, init_prev=int(pop_infected), variants=variants)
+            diseases = cvcov.COVID(beta=betadict, init_prev=int(pop_infected), variants=variants,
+                                   use_waning=use_waning)
 
-        # Auto-attach the cross-immunity connector when more than one variant circulates (M3); it
-        # applies the static cross-immunity matrix each step and enables reinfection. Users can pass
-        # connectors=... to override (e.g. a custom immunity matrix or to disable).
+        # Auto-attach the cross-immunity connector when waning immunity is on (M4) OR more than one
+        # variant circulates (M3): it applies cross-immunity each step (NAb-weighted under use_waning,
+        # else the static matrix) and enables reinfection. Users can pass connectors=... to override.
         connectors = kwargs.pop('connectors', None)
-        if connectors is None and getattr(diseases, 'nv', 1) > 1:
+        if connectors is None and (getattr(diseases, 'nv', 1) > 1 or getattr(diseases.pars, 'use_waning', False)):
             connectors = cvconn.CrossImmunity()
         if connectors is not None:
             kwargs['connectors'] = connectors
