@@ -4,6 +4,7 @@
   "pop_type": "random",
   "n_days": 60,
   "start_day": "2020-03-01",
+  "end_day": null,
   "rand_seed": 1,
   "beta": 0.016,
   "use_waning": false,

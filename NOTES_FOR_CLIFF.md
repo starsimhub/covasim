@@ -391,20 +391,29 @@ baselines are unaffected.
 - **`cv.Calibration`**: restored the v3 `custom_fn=` hook and `plot_trend`/`plot_sims`/`plot_all`
   (delegating to the Starsim calibration plotters).
 
-## Confirmed real gaps -- DOCUMENTED for follow-up (not yet fixed)
+## Confirmed real gaps -- FIXED in the follow-up (2026-05-30)
 
-These are genuine v4 regressions but touch the disease results/dynamics (so they need a baseline
-regeneration and/or a scientific-correctness decision) -- left for a deliberate follow-up:
+- **`r_eff` result** -- ported v3's 'daily' `compute_r_eff` into `cv.COVID.finalize_results` (a new
+  `scale=False` Result, bridged to `sim.results`; mean infectious duration x non-imported new
+  infections / n_infectious, smoothed). `sim.plot('r_eff')` works.
+- **Quarantine result series** -- added `new_quarantined`/`cum_quarantined`/`test_yield`
+  (`n_quarantined`/`n_isolated` were already auto-counted from the BoolStates).
+- **CONTACT-TRACING QUARANTINE BUG (important)** -- found while adding the quarantine results: with
+  the **default `trace_time=0`**, contact tracing **never quarantined anyone** (`n_quarantined`
+  stayed 0). Cause: `_step_testing` pops today's quarantine queue in `step_state` (loop slot 4),
+  *before* `contact_tracing.step` schedules it (slot 7), so same-day requests were popped before being
+  added. Fix: `schedule_quarantine` clamps a same-day/past `start_date` to `ti+1`. `trace_time>=1`
+  (e.g. the M5 parity anchor's `trace_time=2`) was already fine and is unchanged, so the parity gates
+  still pass; the default baseline (`contact_tracing(start_day=50)`, `trace_time=0`) now quarantines,
+  so `baseline.json` was regenerated.
+- **`dynamic_pars(n_imports=...)` background importation** -- registered `n_imports` as a COVID par
+  (default 0) and added `_seed_imports` (Poisson draw of susceptibles -> wild infection each step,
+  via `import_variant`). **Inert at the default `n_imports=0` (byte-identical)**; settable via
+  `cv.Sim(n_imports=...)` or `cv.dynamic_pars`.
+- Tests: `tests/test_confirmed_gaps.py` (6 tests). Baselines regenerated. Full suite green.
 
-- **`r_eff` result missing** (tut_interventions): v3 computed `results['r_eff']` (daily method) at
-  finalize; v4's COVID module defines no `r_eff`, but it's still listed in `defaults.overview_plots`.
-  Fix: port v3 `compute_r_eff` into `cv.COVID.finalize_results` as a new `scale=False` Result.
-- **Quarantine result series missing** (tut_interventions): the quarantine *state* exists, but
-  `new_quarantined`/`n_quarantined`/`test_yield` Results are not defined. Fix: add them to
-  `cv.COVID.init_results`/`update_results` (additive; the state is already tracked).
-- **`dynamic_pars(n_imports=...)` is a dead value** (tut_interventions): v4 has no background-import
-  seeding path, so changing `n_imports` mid-run does nothing. Fix: seed imports each step from
-  `pars.n_imports` (this DOES change dynamics, so it needs care + a baseline check).
+## Confirmed gaps still documented (not yet fixed)
+
 - **`sim['beta']` / `sim.start_day` access** (tut_plotting, tut_tips): v4 doesn't route item/attribute
   access for covasim pars to the disease/sim-config. Read `sim.diseases.covid.pars` /
   `sim._cv_config` instead, or add a routed `__getitem__`/`__getattr__` (risky on `ss.Sim`).

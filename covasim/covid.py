@@ -24,6 +24,7 @@ stock CRN-safe ``ss.Infection.infect()`` -- no custom transmission code; M2 only
 writes the per-agent ``rel_trans`` state it consumes.
 """
 import numpy as np
+import sciris as sc
 import starsim as ss
 
 __all__ = ['COVID']
@@ -71,6 +72,10 @@ class COVID(ss.Infection):
             n_beds_icu     = None,
             no_hosp_factor = 2.0,
             no_icu_factor  = 2.0,
+            # Background importation: expected number of externally-imported (wild) infections seeded
+            # per day (parameters.py:66). Default 0 -> inert (no imports, byte-identical). Settable via
+            # cv.Sim(n_imports=...) or cv.dynamic_pars(n_imports=...).
+            n_imports    = 0,
             # Per-agent transmissibility shape (parameters.py:60-63); closes the residual transmission gap
             beta_dist    = dict(dist='neg_binomial', par1=1.0, par2=0.45, step=0.01),  # constant per-agent overdispersion (mean 1.0)
             viral_dist   = dict(frac_time=0.3, load_ratio=2, high_cap=4),               # time-varying viral load (two-level, mean-preserving)
@@ -634,9 +639,15 @@ class COVID(ss.Infection):
 
         Eligibility (not already dead/recovered/diagnosed/isolated) is re-checked when ``start_date``
         is reached, in ``_step_testing``. Defaults: ``start_date=ti``, ``period=quar_period``.
+
+        ``schedule_quarantine`` is called by the contact-tracing intervention (loop slot 7), which runs
+        *after* ``_step_testing`` has already processed today's queue (slot 4, inside ``step_state``).
+        A request for the current day (the default ``trace_time=0``) would therefore be popped before it
+        is added and silently lost, so same-day/past requests are clamped to the next step.
         """
         ti = self.ti
         start_date = ti if start_date is None else int(start_date)
+        start_date = max(start_date, ti + 1)  # see docstring: _step_testing already ran this step
         period = self.pars.quar_period if period is None else int(period)
         bucket = self._pending_quarantine.setdefault(start_date, [])
         for u in np.asarray(uids):
@@ -696,6 +707,32 @@ class COVID(ss.Infection):
         self.date_end_quarantine[(self.quarantined & (self.date_diagnosed == ti)).uids] = ti
         # Release agents whose quarantine has ended.
         self.quarantined[((self.date_end_quarantine <= ti) & self.quarantined).uids] = False
+        return
+
+    def _seed_imports(self):
+        """Seed background imported (wild) infections each step (v3 ``sim.py`` n_imports importation).
+
+        Draws a Poisson(``n_imports``) count and infects that many currently-susceptible agents with
+        the wild variant. Inert (no draw, no state change) when ``n_imports == 0`` (the default).
+        """
+        n_exp = float(self.pars.n_imports)
+        if n_exp <= 0:
+            return
+        ti = self.ti
+        try:
+            base = int(self.sim.pars.rand_seed)
+        except Exception:
+            base = 0
+        rng = np.random.default_rng([base, 77, ti])  # per-step CRN-style stream (mirrors clip_edges)
+        n = int(rng.poisson(n_exp))
+        if n <= 0:
+            return
+        susc = np.asarray(self.susceptible.uids)
+        if not len(susc):
+            return
+        n = min(n, len(susc))
+        chosen = ss.uids(np.sort(rng.choice(susc, size=n, replace=False)))
+        self.import_variant(chosen, 0)  # wild variant; bumps the n_imports Result
         return
 
     def _introduce_variants(self):
@@ -768,6 +805,9 @@ class COVID(ss.Infection):
 
         # Testing/tracing/quarantine state machines (M5; inert with no testing intervention attached).
         self._step_testing()
+
+        # Background importation (v3 sim.py:583-588); inert when n_imports == 0 (the default).
+        self._seed_imports()
 
         # Update per-agent transmissibility BEFORE this step's transmission (loop slot 5 precedes infect at 9):
         # rel_trans = beta_dist draw x viral_load(t) x asymp_factor (v3 compute_trans_sus, utils.py:90-93).
@@ -845,6 +885,13 @@ class COVID(ss.Infection):
             R('cum_doses',       'Cumulative vaccine doses'),
             R('new_vaccinated',  'Newly vaccinated people'),
             R('cum_vaccinated',  'Cumulative vaccinated people'),
+            R('new_quarantined', 'Newly quarantined people'),  # quarantine flow (n_quarantined is auto-counted)
+            R('cum_quarantined', 'Cumulative quarantined people'),
+        )
+        # Derived/rate Results (population-level, scale=False): test yield + effective reproduction number.
+        self.define_results(
+            ss.Result('test_yield', dtype=float, scale=False, label='Test yield (diagnoses/tests)'),
+            ss.Result('r_eff',      dtype=float, scale=False, label='Effective reproduction number'),
         )
         # M4 immunity summaries (population means -> scale=False). Filled only under use_waning.
         self.define_results(
@@ -895,6 +942,10 @@ class COVID(ss.Infection):
         res.new_diagnoses[ti]   = self._test_flow['diagnoses']
         res.new_doses[ti]       = self._vacc_flow['doses']      # M6 vaccination flows
         res.new_vaccinated[ti]  = self._vacc_flow['vaccinated']
+        # Quarantine flow + test yield (the quarantine STOCK n_quarantined is auto-counted by Starsim).
+        res.new_quarantined[ti] = int(np.count_nonzero(np.asarray(self.date_quarantined.raw) == ti))
+        n_tests = self._test_flow['tests']
+        res.test_yield[ti]      = (self._test_flow['diagnoses'] / n_tests) if n_tests > 0 else 0.0
 
         # By-variant flows (accumulated this step) + stocks (counted from the live tags).
         vres = res['variant']
@@ -935,6 +986,12 @@ class COVID(ss.Infection):
         res.cum_diagnoses[:]   = np.cumsum(res.new_diagnoses[:])
         res.cum_doses[:]       = np.cumsum(res.new_doses[:])       # M6
         res.cum_vaccinated[:]  = np.cumsum(res.new_vaccinated[:])
+        res.cum_quarantined[:] = np.cumsum(res.new_quarantined[:])
+
+        # Effective reproduction number (the v3 'daily' method): mean infectious duration times the
+        # daily non-imported new infections divided by the number infectious, then smoothed (with the
+        # initial seed period averaged so it isn't dominated by the seeds). A diagnostic, not a driver.
+        self._compute_r_eff(res)
 
         # By-variant cumulatives (cumsum along the time axis). The pop_scale scaling, the wild
         # cum_infections seed-offset, and the prevalence/incidence denominators are applied at the
@@ -942,6 +999,34 @@ class COVID(ss.Infection):
         vres = res['variant']
         for stem in ('infections', 'symptomatic', 'severe', 'infectious'):
             vres[f'cum_{stem}_by_variant'][:] = np.cumsum(vres[f'new_{stem}_by_variant'][:], axis=1)
+        return
+
+    def _compute_r_eff(self, res):
+        """Fill ``results['r_eff']`` using the v3 'daily' method (ported from v3 ``Sim.compute_r_eff``)."""
+        npts = self.t.npts
+        # Mean infectious duration over agents who reached an outcome (recovery or death).
+        ti_inf = np.asarray(self.ti_infectious.raw, dtype=float)
+        ti_rec = np.asarray(self.ti_recovered.raw, dtype=float)
+        ti_dead = np.asarray(self.ti_dead.raw, dtype=float)
+        outcome = np.where(np.isfinite(ti_rec), ti_rec, ti_dead)  # whichever occurred
+        has = np.isfinite(outcome) & np.isfinite(ti_inf)
+        mean_inf = float((outcome[has] - ti_inf[has]).mean()) if has.any() else 0.0
+
+        new_inf = np.asarray(res['new_infections'], dtype=float) - np.asarray(res['n_imports'], dtype=float)
+        n_inf = np.asarray(res['n_infectious'], dtype=float)
+        raw = mean_inf * np.divide(new_inf, n_inf, out=np.zeros(npts), where=n_inf > 0)
+
+        # Average over the initial seed period, then smooth (v3 behaviour), guarding short arrays.
+        if npts >= 3:
+            initial = int(min(npts, 12))  # approx dur_exp2inf (4.5) + dur_asym2rec (8.0) seed period
+            for i in range(initial):
+                raw[i] = raw[i:initial].mean()
+            values = sc.smooth(raw, 2)
+            values[:2] = raw[:2]      # avoid edge artefacts from the smoothing kernel
+            values[-2:] = raw[-2:]
+        else:
+            values = raw
+        res.r_eff[:] = values
         return
 
     # --- seeding --------------------------------------------------------------
