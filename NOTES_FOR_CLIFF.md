@@ -495,19 +495,22 @@ Total v4 tutorial-cell errors fell **56 -> 15** across the follow-up. The remain
 `use_waning` default** (immunity c2/4/6/8/9 -- the features work with `use_waning=True`; this is the
 one released-default decision left for Cliff), and the rest documented architectural items.
 
+Total v4 tutorial-cell errors fell **56 -> 10** across the whole follow-up. 5 of the 11 notebooks are
+fully clean; the rest are documented architectural / notebook-idiom items (no remaining easy wins).
+
 | notebook | cells | v4 err | nature of remaining errors |
 |---|---|---|---|
 | tut_intro | 7 | 0 | clean |
 | tut_running | 9 | 0 | clean |
+| tut_plotting | 16 | 0 | clean (sim.beta reads + plot args fixed) |
+| tut_tips | 12 | 0 | clean (sim.start_day etc. read now) |
 | tut_deployment | 0 | 0 | (markdown only) |
-| tut_plotting | 16 | 1 | `sim['beta']` SET path / a v3 plot-arg edge (read works now) |
-| tut_tips | 12 | 1 | a v3 metadata edge (`sim.start_day` reads now work) |
-| tut_calibration | 7 | 1 | re-init conflict (documented) |
+| tut_calibration | 7 | 1 | re-init conflict (documented; build a fresh sim) |
 | tut_interventions | 12 | 1 | bare-function-intervention `.tvec` (use a cv.Intervention subclass) |
 | tut_people | 4 | 1 | `sim.people.people` save/load idiom (documented) |
 | tut_advanced | 4 | 2 | `cv.Layer`/`contacts`/`dynam_layer` (contact internals, not ported) |
 | tut_analyzers | 4 | 2 | make_transtree-needs-analyzer; custom-Analyzer reserved attr (`self.t`) |
-| tut_immunity | 10 | 6 | `use_waning` default (c2/4/6/8/9 work with use_waning=True) + a 2x-vaccinate_num name clash (c7) |
+| tut_immunity | 10 | 3 | bare-fn `num_doses` using `sim.t` (use `sim.ti`); `sim.people.doses.copy()` (use `np.asarray`); a 2x-`vaccinate_num` name clash (give distinct `label=`) |
 
 v3 itself errors on only the Optuna calibration cell (a SQLite-storage issue in this headless env,
 present in v4 too); every other v3 cell ran clean, so the comparison baseline is sound.

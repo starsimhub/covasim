@@ -550,6 +550,26 @@ class nab_histogram(Analyzer):
         self.hists[self._datekey(ti)] = sc.objdict(counts=counts, bins=edges)
         return
 
+    def plot(self, fig=None, **kwargs):
+        """Bar plot of the NAb-level histogram(s); defined here so Starsim's generic analyzer plot
+        (which assumes a flat results dict) isn't used."""
+        import matplotlib.pyplot as plt
+        days = list(self.hists.keys()) or ['(none)']
+        if fig is None:
+            fig, axes = plt.subplots(len(days), 1, figsize=(8, 3.2 * len(days)), squeeze=False)
+            axes = axes.flatten()
+        else:
+            axes = np.atleast_1d(fig.axes)
+        for ax, day in zip(axes, days):
+            h = self.hists.get(day, {})
+            bins = np.asarray(h.get('bins', self.bins))
+            counts = np.asarray(h.get('counts', []))
+            if len(counts):
+                ax.bar((bins[:-1] + bins[1:]) / 2, counts, width=np.diff(bins) * 0.9, alpha=0.7)
+            ax.set_title(f'NAb histogram ({day})'); ax.set_xlabel('NAb level (log2)'); ax.set_ylabel('Count')
+        fig.tight_layout()
+        return fig
+
 
 __all__ += ['TransTree']
 

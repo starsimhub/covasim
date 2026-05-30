@@ -56,6 +56,8 @@ def test_nab_histogram_counts_positive_nabs():
     nh = sim.analyzers['nab_histogram']
     hist = nh.hists[list(nh.hists.keys())[0]]
     assert int(hist['counts'].sum()) > 0, 'some agents have positive NAbs by day 40 under waning'
+    import matplotlib; matplotlib.use('agg')
+    assert nh.plot() is not None, 'nab_histogram has its own .plot() (not the generic one)'
 
 
 def test_snapshot_get_by_date_and_day():
