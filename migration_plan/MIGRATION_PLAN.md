@@ -142,13 +142,26 @@ The pinned anchor scenario for M0 is a representative-but-clean vanilla sim (iso
 
 **Acceptance test:** Multi-variant prevalence and per-variant trajectories overlap v3.1.8.
 
-**Sub-tasks:**
-- Replicate `cv.COVID(ss.Infection)` per variant — one disease instance per variant (`diseases = [cv.COVID(variant=v) for v in [...]]`), each carrying its own `rel_beta`/`rel_symp_prob`/`rel_severe_prob`/`rel_crit_prob`/`rel_death_prob` (from `get_variant_pars`). Eliminate the genotype/variant array dimension in favor of N instances, following the hpvsim genotype→variant analogy.
-- **Enforce host-level exclusivity over the SEIR/severity/death chain.** Unlike hpvsim genotypes (biologically real co-infection), a COVID host has ONE exposed→infectious→recovered/dead trajectory. A per-variant-`Disease` design must prevent an agent being independently active with two variants on two separate `ti_dead` schedules — either a host-level state machine owning the chain with per-variant modules contributing only `rel_beta`/immunity/severity modifiers, or an "exclusive infection" connector that blocks the other variant modules from infecting an already-infected host. This is net-new vs. hpvsim (whose only cross-genotype state coupling was the cancer-cancellation hack); decide the mechanism in the M3 design spec.
-- Add `cv.CrossImmunity(ss.Connector)` implementing the `n_variants × n_variants` cross-immunity matrix (`get_cross_immunity`): discover the variant modules in `init_pre` (`[m for m in sim.diseases.values() if isinstance(m, cv.COVID)]`), column-stack their per-agent immunity arrays, matrix-multiply by the cross-protection matrix, and write per-variant `rel_sus` back (the `np.dot(cross_immunity, nab)` → column-stack-then-matmul refactor).
-- Add coordinated variant introduction (the staggered-import seeding from `cv.variant.apply`) as an `ss.Intervention` (or a seeding `ss.Connector` like hpvsim's `_ExclusiveSeeder`), using `ss.poisson`-style imports.
-- Add a `Total`-style analyzer that unions per-variant infection states into the familiar aggregate results (`n_infectious`, `cum_infections`) with union-counting so co-infections aren't double-counted.
-- Add tests: multi-variant prevalence + per-variant trajectories overlap a v3.1.8 multi-variant baseline.
+**Architecture (decided in the M3 design spec — Design B, single module + internal variant axis).** A scored,
+adversarially-tested design panel selected **Design B** over the "one disease instance per variant" approach
+tentatively sketched below. Rationale: a COVID host has exactly ONE SEIR chain (v3's scalar `*_variant` tag + one
+set of `ti_*` dates), so keeping a **single `cv.COVID(ss.Infection)` with an internal variant axis** makes host
+exclusivity *structural and free*, hosts M4's host-level NAb state + M6's vaccine state naturally, and maps
+directly onto v3's results structure. The N-modules-per-variant approach (Design A) would require net-new, fragile
+cross-module exclusivity logic with no hpvsim precedent (hpvsim genotypes genuinely co-infect). `cv.CrossImmunity(ss.Connector)`
+is retained but operates on the single module. **A key M3/M4 boundary finding:** v3 routes cross-immunity through
+the NAb machinery and gates both reinfection and cross-immunity behind `use_waning` (which also = NAb decay), so at
+`use_waning=False` v3 has *zero* cross-immunity — M3 therefore **synthesizes** a static, NAb-free cross-immunity
+(matrix applied directly) and hand-derives its baseline, deferring NAb time-kinetics to M4. See the spec for the
+full decision record, the adversary punch-list, and Open Questions A–F.
+
+**Sub-tasks (per the Design-B spec; supersedes the tentative sketch):**
+- Add the variant axis to the **single** `cv.COVID`: scalar per-agent `exposed_variant`/`infectious_variant`/`recovered_variant` tags, `nv`/`variant_map`/`variant_pars` (the 5 per-variant keys `rel_beta`/`rel_symp_prob`/`rel_severe_prob`/`rel_crit_prob`/`rel_death_prob` from `get_variant_pars`), and 2D `(nv, n_agents)` `sus_imm`/`symp_imm`/`sev_imm`. `nv==1` stays byte-identical to M2 (host exclusivity is structural — one SEIR chain / one `ti_dead` per host).
+- **Override `cv.COVID.infect()`** to loop over variants with per-variant beta (mirroring v3 `sim.py:622-649`), preserving the CRN `trans_rng.rvs` call verbatim; reproduce v3's sequential-loop exclusivity at the dedup step (lowest-variant-index wins). Make `set_prognoses` variant-aware (per-variant `rel_*_prob` × cross-immunity `(1-{symp,sev}_imm)`).
+- Add `cv.CrossImmunity(ss.Connector)` operating on the single module: at loop slot 6 it reads each **ever-recovered** agent's `recovered_variant` + the asymmetric `n_variants × n_variants` matrix (`get_cross_immunity`) and writes the module's 2D `sus_imm`/`symp_imm`/`sev_imm` directly (NAb-free; the NAb-weighting/`calc_VE` is M4). Split the `use_waning` entanglement via an internal `cross_immunity_active` flag (auto-on when `nv>1`), enabling reinfection + static cross-immunity without NAb decay and preserving M2 single-variant behavior.
+- Restore `cv.variant` (its v3 signature/`parse`/`initialize`/`apply`); wire `cv.Sim(variants=[...])` to register variants into the single module and seed both at t0 and mid-run (`apply` → `import_variant`), bumping the `n_imports` result.
+- Reconstruct the public results contract: the 12-key 2D `sim.results['variant']` sub-dict (bridged to v3's top-level path), with **manual** `pop_scale` scaling of the `scale=True` by_variant results, the seed-offset on `cum_infections` + wild `cum_infections_by_variant`, recomputed `incidence/prevalence_by_variant` denominators, and float dtype. Defer full flat aggregate-results / `sim.summary` compat to a later milestone.
+- Add tests: `nv==1` byte-equality of the overridden `infect()`; the host-exclusivity test (two variants, one step ⇒ one `infectious_variant`, ≤1 `ti_dead`); cross-immunity reduces heterologous reinfection by the matrix factor (same-variant = 0, documented divergence); multi-variant prevalence + per-variant trajectories overlap a v3.1.8 multi-variant baseline (slow gate, `|z|` threshold per the spec).
 
 ### M4: Waning immunity + NAbs
 
@@ -293,3 +306,6 @@ These conventions apply to every milestone; contributors should align on them fr
 
 - [`plans/2026-05-29-covasim-m0-foundation.md`](./plans/2026-05-29-covasim-m0-foundation.md) — M0 foundation implementation plan (task-by-task: CI adaptation, the `tests/regression/` harness, the `_v2_legacy` quarantine scaffold).
 - [`specs/2026-05-29-covasim-m0-foundation-design.md`](./specs/2026-05-29-covasim-m0-foundation-design.md) — M0 foundation design spec (the pinned anchor scenario, file layout, comparison/parity rules, CI integration, out-of-scope).
+- [`plans/2026-05-29-covasim-m1-basic-transmission.md`](./plans/2026-05-29-covasim-m1-basic-transmission.md) / [`specs/2026-05-29-covasim-m1-basic-transmission-design.md`](./specs/2026-05-29-covasim-m1-basic-transmission-design.md) — M1 basic-transmission plan + design spec.
+- [`plans/2026-05-29-covasim-m2-natural-history-parity.md`](./plans/2026-05-29-covasim-m2-natural-history-parity.md) / [`specs/2026-05-29-covasim-m2-natural-history-parity-design.md`](./specs/2026-05-29-covasim-m2-natural-history-parity-design.md) — M2 natural-history-parity plan + design spec.
+- [`plans/2026-05-29-covasim-m3-multivariant-cross-immunity.md`](./plans/2026-05-29-covasim-m3-multivariant-cross-immunity.md) / [`specs/2026-05-29-covasim-m3-multivariant-cross-immunity-design.md`](./specs/2026-05-29-covasim-m3-multivariant-cross-immunity-design.md) — M3 multi-variant + cross-immunity plan + design spec (Design B; the architecture decision record + adversary punch-list).
