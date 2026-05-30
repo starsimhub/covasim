@@ -189,3 +189,32 @@ without the NAb pipeline. Demo /tmp/m6_demo.png (pfizer 1500/day: 20847->836 inf
 **Deferred from M6:** historical_vaccinate_prob / historical_wave / prior_immunity (pre-t0 NAb
 imprinting) -- noted for a follow-up. Remaining milestones: M7 (calibration/Fit), M8 (multisim/
 scenarios), M9 (analyzers/TransTree/synthpops), M10 (release).
+
+---
+
+# M7 (Calibration + Fit) — partially landed (2026-05-30): Fit + flat-results bridge
+
+Scoped M7 into the contained/validatable half (this session) + the Optuna calibration (deferred,
+design captured in the spec). Spec+plan + 1 commit.
+
+- **Flat aggregate-results bridge (completes Open Q E):** cv.Sim.finalize now references every
+  top-level Result of the covid module at the sim root, so v3-style sim.results['cum_deaths'] etc.
+  resolve. Additive (references only) -> M1-M6 unaffected (verified). This was the deferred piece
+  that cv.Fit / cv.Calibration need.
+- **cv.Fit** (new covasim/analysis.py): the v3 model-vs-data fit (reconcile -> diffs -> gofs ->
+  losses -> mismatch), reading the bridged flat results + accepting a data DataFrame (date- or
+  day-indexed); reuses the already-active cv.compute_gof. Default weights cum_deaths:10/
+  cum_diagnoses:5. Validated DETERMINISTICALLY (custom-series mismatch == weight*sum(compute_gof);
+  perfect fit -> 0; date-matched on a real sim) -- the Fit logic is engine-independent, so this does
+  not need a sim-trajectory baseline.
+
+## ⏭️ Remaining M7: cv.Calibration (next session)
+
+cv.Calibration wraps ss.Calibration (Optuna, available): a build_fn applies calib_pars=dict(key=
+[best,low,high]) onto a fresh cv.Sim (dotted-path resolution into sim.pars / diseases['covid'].pars)
+and an eval returns cv.Fit(sim, data).mismatch. Design is in the M7 spec; it's a different paradigm
+(Optuna components) best done fresh. After that: M8 (multisim/scenarios), M9 (analyzers/TransTree/
+synthpops), M10 (release).
+
+**Session total: M3, M4, M5, M6 fully complete + M7 (Fit + flat bridge) — all validated against
+v3.1.8, complete suite green.**

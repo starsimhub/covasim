@@ -141,4 +141,12 @@ class Sim(ss.Sim):
         self.results['variant'] = vres
         if 'n_imports' in covid.results:
             self.results['n_imports'] = covid.results['n_imports']
+
+        # Flat aggregate-results bridge (Open Q E): reference every top-level Result of the covid
+        # module at the sim root, so v3-style sim.results['cum_deaths'] etc. resolve (used by cv.Fit /
+        # cv.Calibration). Additive -- references, no dynamics change. The nested 'variant' sub-dict is
+        # already bridged above; skip it here.
+        for key, res in covid.results.items():
+            if isinstance(res, ss.Result) and key not in self.results:
+                self.results[key] = res
         return

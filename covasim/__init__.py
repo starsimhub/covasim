@@ -35,3 +35,4 @@ from .connectors    import * # cv.CrossImmunity(ss.Connector) -- M3
 from .interventions import * # cv.Intervention / cv.test_num / cv.test_prob -- M5
 from .people        import * # cv.People(ss.People)    -- M1
 from .sim           import * # cv.Sim(ss.Sim)          -- M1
+from .analysis      import * # cv.Fit                  -- M7
