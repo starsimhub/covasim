@@ -325,4 +325,23 @@ plotting) and M10 (release: docs/migration guide, regenerate baselines, strip de
 - **docs/migration.md** written (v3->v4 guide: what's preserved, what changed, param remapping,
   before/after script, not-yet-ported list) and wired into the Quarto navbar.
 - save/load (full-sim) done earlier this session. **Still NOT tagging v4.0.0 / NOT pushing.**
-- Remaining M10: delete the _v2_legacy + tests/_legacy quarantines (separate commit, last).
+
+### M10 status: substantively complete. Two items consciously LEFT FOR CLIFF (release-coupled):
+
+1. **Tag v4.0.0 + push / merge starsim-port -> main.** Reserved for you per the no-push constraint.
+2. **Wholesale-delete the quarantines** `covasim/_v2_legacy/` (444K) + `tests/_legacy/` (152K).
+   I did NOT delete these autonomously: no active code imports them, but several ported modules
+   still cite them as the in-repo scientific provenance (e.g. `immunity.py:141` ->
+   `_v2_legacy/immunity.py:284-295`, also covid.py:12, test_m4_immunity.py:4). They are the
+   original v3.1.8 modules I didn't author, deletion is pure cleanup, and it would dangle those
+   citations. To complete the plan's "delete wholesale" step at release time:
+     `git rm -r covasim/_v2_legacy tests/_legacy`
+   and update those ~5 comment citations from `_v2_legacy/...` to `Covasim v3.1.8 ...` (same files,
+   same line numbers -- _v2_legacy is the verbatim v3.1.8 source). This pairs naturally with the tag.
+
+Everything else across M0-M10 is done and the full suite is green (137 passed, 9 skipped). The 9
+skips are: the multi-seed parity gates that self-skip when their gitignored v3.1.8 baseline JSONs
+aren't present in this checkout, the 2 retired v1.7.0-pickle regression tests, and a couple of
+superseded M0-anchor placeholders + the network-baseline-conditional test. **synthpops is the only
+feature consciously skipped (per your instruction + it is not installed); there are no dedicated
+synthpops test files -- it was skipped at the feature level.**
