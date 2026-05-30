@@ -157,6 +157,14 @@ The only required changes are the **namespaced summary key** and (optionally) dr
   is not yet ported.
 - **Loading pre-v4 pickles** — v3 `.sim`/`.scens` files will generally not unpickle under the new
   object model. Re-run from parameters, or keep v3 installed to read old files.
+- **Pre-existing immunity** (`historical_vaccinate_prob`, `prior_immunity`, `historical_wave`) — not
+  yet ported (they imprint NAbs before t=0); see `NOTES_FOR_CLIFF.md` for the implementation recipe.
+- **People-level disease state** — `sim.people.exposed`/`rel_sus`/`doses` etc. moved to the disease
+  module: use `sim.diseases.covid.<state>`.
+
+The following ARE supported in v4 (some restored after the initial port): `location=` (country age
+distributions), vaccination `subtarget=`/`booster=`, custom `nab_decay` forms, custom analyzers via a
+v3-style `apply(sim)` method, `n_imports` background importation, and the `r_eff` result.
 
 ## 6. Getting help
 

@@ -47,7 +47,7 @@ class Sim(ss.Sim):
     def __init__(self, pars=None, people=None, pop_size=None, pop_infected=None,
                  pop_type=None, n_days=None, start_day=None, end_day=None, rand_seed=None,
                  beta=None, pop_scale=None, total_pop=None, variants=None, use_waning=None,
-                 datafile=None, **kwargs):
+                 datafile=None, location=None, **kwargs):
         # Covasim accepts its parameters either as a dict (the v3 ``cv.Sim(pars)`` form) or as keyword
         # arguments; an explicit keyword overrides the same key in the dict. Pull the Covasim sim-level
         # keys out of the pars dict here -- whatever remains (verbose, interventions, ...) is forwarded
@@ -70,6 +70,7 @@ class Sim(ss.Sim):
         total_pop    = _pick('total_pop',    total_pop,    None)
         use_waning   = _pick('use_waning',   use_waning,   False)
         datafile     = _pick('datafile',     datafile,     None)
+        location     = _pick('location',     location,     None)
         if variants is None:
             variants = pars.pop('variants', None)
 
@@ -87,7 +88,14 @@ class Sim(ss.Sim):
         base_beta = _BASE_BETA if beta is None else beta
 
         if people is None:
-            people = cvppl.People(pop_size)
+            age_data = None
+            if location is not None:
+                # Use the country/region age pyramid (v3 ``location=``). get_age_distribution returns an
+                # Nx3 [age_min, age_max, fraction] table; ss.People wants Nx2 [age_lower_edge, value].
+                from . import data as cvdata
+                raw = np.asarray(cvdata.get_age_distribution(location), dtype=float)
+                age_data = raw[:, [0, 2]]
+            people = cvppl.People(pop_size, age_data=age_data)
 
         networks = kwargs.pop('networks', None)
         if networks is None:

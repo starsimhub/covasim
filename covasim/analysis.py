@@ -375,7 +375,19 @@ _SNAPSHOT_STATES = ('susceptible', 'exposed', 'infectious', 'symptomatic', 'seve
 
 
 class Analyzer(ss.Analyzer):
-    """Base class for Covasim analyzers (same public name as v3; runs at the analyzer loop slot)."""
+    """Base class for Covasim analyzers (same public name as v3; runs at the analyzer loop slot).
+
+    v3 custom analyzers define ``apply(self, sim)`` (called each step); v4/Starsim use ``step()``. For
+    backwards compatibility this base ``step()`` dispatches to ``apply(sim)`` when a subclass defines
+    it. Note: a custom analyzer must not store data under the names Starsim reserves on a module
+    (``t``, ``pars``, ``sim``, ``dists``, ``results``) -- use e.g. ``self.tvec`` instead of ``self.t``.
+    """
+
+    def step(self):
+        apply = getattr(type(self), 'apply', None)  # only a subclass-defined apply(), not an inherited one
+        if callable(apply) and apply is not getattr(ss.Analyzer, 'apply', None):
+            return apply(self, self.sim)
+        return
 
     def _covid(self):
         return list(self.sim.diseases.values())[0]

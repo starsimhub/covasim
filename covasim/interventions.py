@@ -311,6 +311,48 @@ def _check_doses(doses, interval):
     return
 
 
+def get_subtargets(subtarget, sim):
+    """Resolve a v3 subtarget into ``(inds, vals)`` (the v3 ``get_subtargets`` helper).
+
+    ``subtarget`` is a dict ``{'inds': ..., 'vals': ...}`` (or a callable ``f(sim)`` returning one).
+    ``inds`` (the target UIDs) and ``vals`` (a per-agent value, e.g. a probability) may each be a
+    callable ``f(sim)``; a scalar ``vals`` is broadcast over ``inds``. Returns ``(inds, vals)`` arrays
+    (``vals`` may be None).
+    """
+    if callable(subtarget):
+        subtarget = subtarget(sim)
+    if 'inds' not in subtarget:
+        raise ValueError(f"A subtarget must have keys 'inds' and 'vals'; got {subtarget}.")
+    inds = subtarget['inds']
+    if callable(inds):
+        inds = inds(sim)
+    inds = np.asarray(inds)
+    vals = subtarget.get('vals', None)
+    if callable(vals):
+        vals = vals(sim)
+    if vals is not None:
+        vals = np.asarray(vals, dtype=float)
+        if vals.ndim == 0:
+            vals = np.full(len(inds), float(vals))
+    return inds, vals
+
+
+def _apply_subtarget_probs(probs, pool, subtarget, sim):
+    """Override ``probs`` (aligned to ``pool`` UIDs) with the subtarget ``vals`` for matching UIDs."""
+    if subtarget is None:
+        return probs
+    inds, vals = get_subtargets(subtarget, sim)
+    if vals is None or not len(inds):
+        return probs
+    pool = np.asarray(pool)
+    sel = np.isin(inds, pool)                       # subtarget UIDs that are in the pool
+    if sel.any():
+        sorter = np.argsort(pool)
+        pos = sorter[np.searchsorted(pool, inds[sel], sorter=sorter)]
+        probs[pos] = vals[sel]
+    return probs
+
+
 class BaseVaccination(Intervention):
     """
     Base class for vaccination (the v3 ``BaseVaccination``).
@@ -327,12 +369,13 @@ class BaseVaccination(Intervention):
         booster (bool): if True, target already-vaccinated people.
     """
 
-    def __init__(self, vaccine, label=None, booster=False, **kwargs):
+    def __init__(self, vaccine, label=None, booster=False, subtarget=None, **kwargs):
         super().__init__(**kwargs)
         self.index = None       # set at init: this vaccine's index in the module registry
         self.label = label
         self.p = None           # vaccine parameters (dose pars + per-variant efficacy)
         self.booster = booster
+        self.subtarget = subtarget  # v3 {'inds':..., 'vals':...} (or f(sim)) per-agent prob override
         self._doses = None      # per-agent doses given by THIS intervention (raw-UID indexed)
         self._parse_vaccine_pars(vaccine)
         return
@@ -457,7 +500,10 @@ class vaccinate_prob(BaseVaccination):
             vaccinated = np.asarray(covid.vaccinated[alive])
             eligible = alive[vaccinated] if self.booster else alive[~vaccinated]
             if len(eligible):
-                self._select.set(p=self.prob)
+                # Per-agent probability: ``prob`` by default, overridden by any subtarget vals.
+                probs = np.full(len(eligible), float(self.prob), dtype=float)
+                probs = _apply_subtarget_probs(probs, eligible, self.subtarget, covid.sim)
+                self._select.set(p=probs)
                 first = eligible[self._select.rvs(eligible)]
                 interval = self.p['interval']
                 if interval is not None and len(first):  # schedule the second dose
@@ -545,6 +591,12 @@ class vaccinate_num(BaseVaccination):
         seq_alive = np.array([u not in dead for u in self._sequence])
         first_pool = self._sequence[elig_mask & seq_alive]
         first_pool = first_pool[~np.isin(first_pool, scheduled)]
+        if self.subtarget is not None:  # exclude subtarget UIDs with vals==0 (e.g. booster targeting)
+            s_inds, s_vals = get_subtargets(self.subtarget, covid.sim)
+            if s_vals is not None and len(s_inds):
+                exclude = np.asarray(s_inds)[s_vals == 0]
+                if len(exclude):
+                    first_pool = first_pool[~np.isin(first_pool, exclude)]
         n_first = max(0, n_agents - len(scheduled))
         first = first_pool[:n_first]
         if int(self.p['doses']) > 1 and len(first):  # schedule second doses
@@ -575,12 +627,13 @@ class simple_vaccine(Intervention):
             True=[1] (every dose at full efficacy), or an explicit list.
     """
 
-    def __init__(self, days, prob=1.0, rel_sus=0.0, rel_symp=0.0, cumulative=False, **kwargs):
+    def __init__(self, days, prob=1.0, rel_sus=0.0, rel_symp=0.0, cumulative=False, subtarget=None, **kwargs):
         super().__init__(**kwargs)
         self.days = days
         self.prob = prob
         self.rel_sus = rel_sus
         self.rel_symp = rel_symp
+        self.subtarget = subtarget  # v3 {'inds':..., 'vals':...} per-agent prob override
         if cumulative in [0, False]:
             cumulative = [1, 0]
         elif cumulative in [1, True]:
@@ -603,7 +656,9 @@ class simple_vaccine(Intervention):
             return
         covid = self._covid()
         alive = covid.sim.people.auids
-        self._select.set(p=self.prob)
+        probs = np.full(len(alive), float(self.prob), dtype=float)
+        probs = _apply_subtarget_probs(probs, alive, self.subtarget, covid.sim)
+        self._select.set(p=probs)
         vacc = alive[self._select.rvs(alive)]
         if not len(vacc):
             return

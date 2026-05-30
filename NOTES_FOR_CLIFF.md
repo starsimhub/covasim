@@ -439,10 +439,39 @@ baselines are unaffected.
   `sim.diseases.covid.results` (bridged to `sim.results`).
 - **Per-distribution CRN RNG** -> numeric results differ from v3 for the same seed (validated
   statistically by the parity gates). All the "stochastic" cell diffs in the comparison are this.
-- **Not ported:** `location=` (country demographics), `cv.Layer`/`people.contacts`/`add_layer`/
-  `reset_layer_pars`/`dynam_layer` (contact internals), precision/numba toggles, custom `nab_decay`
-  *forms* beyond the default, `vaccinate(subtarget=/booster=)`, `historical_vaccinate_prob`,
-  `prior_immunity`, and the v3 people save/load (`.ppl`) workflow.
+- **Not ported:** `cv.Layer`/`people.contacts`/`add_layer`/`reset_layer_pars`/`dynam_layer` (contact
+  internals), precision/numba toggles, and the v3 people save/load (`.ppl`) workflow.
+
+## Unported features PORTED IN the follow-up (2026-05-30)
+
+- **`location=`** (country/region demographics): `cv.Sim(location='Japan')` now draws ages from the
+  country age pyramid via `cv.data.get_age_distribution` (Japan mean age 47 vs default 38 vs
+  Bangladesh 30). Household-size-by-country is not yet wired in (age structure is the dominant effect).
+- **Vaccination `subtarget=`** on `vaccinate_prob` / `vaccinate_num` / `simple_vaccine` (and the v3
+  `get_subtargets` helper): `{'inds': fn/array, 'vals': per-agent-prob}` (or a callable). For
+  `vaccinate_num`, `vals==0` excludes those agents (the booster-targeting idiom). `booster=` already
+  existed.
+- **Custom `nab_decay` forms/params**: already supported by the waning engine
+  (`nab_growth_decay`/`nab_decay`/`exp_decay`/custom); they now route from `cv.Sim(nab_decay=...)`
+  through the disease-pars routing, so the immunity tutorial's faster-waning sim works.
+- **Custom analyzers via `apply(sim)`**: `cv.Analyzer.step()` now dispatches to a subclass-defined
+  v3-style `apply(self, sim)`. (Reserved module attribute names -- `t`, `pars`, `sim`, `dists`,
+  `results` -- still cannot be used as custom storage; use e.g. `self.tvec`.)
+- Tests: `tests/test_unported_features.py` (6).
+
+## Unported features still DEFERRED (with recipe)
+
+- **`historical_vaccinate_prob` / `prior_immunity` / `historical_wave`** (pre-t=0 immunity): the M4
+  NAb connector indexes the waning kernel by `clip(ti - t_nab_event, 0, npts-1)`, so a back-dated
+  event (e.g. `days=[-360]`) clamps to the sim-length-decayed value rather than the true 360-day
+  decay. Correct port: build `nab_kin` to cover `npts + max_historical_offset`, imprint the targeted
+  agents at init with a negative `t_nab_event` (= the historical day) + their peak NAb, and let the
+  existing connector indexing handle the decay. Needs init-ordering coordination (the kernel is built
+  in `cv.COVID.init_post`) + validation against v3's pre-t0 kinetics -- a focused follow-up.
+- **People-level disease-state access** (`sim.people.exposed`/`rel_sus`/`doses`): deliberately NOT
+  proxied -- adding a `__getattr__`/`__getitem__` to `cv.People` (an `ss.People`) to forward to the
+  disease module risks shadowing Starsim's own people internals. The v4 idiom is
+  `sim.diseases.covid.<state>`; custom functions should use that.
 
 ## Per-notebook result (v4 cells erroring, after fixes)
 
