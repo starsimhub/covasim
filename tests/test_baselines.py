@@ -8,10 +8,10 @@ import sciris as sc
 import pytest
 import covasim as cv
 
-# v4.0 Starsim port: the v3.1.8 bit-for-bit baseline/benchmark tests are skipped while
-# cv.Sim is the Starsim port (these reference the quarantined v3 engine + interventions).
-# They are regenerated/restored at M10 (MIGRATION_PLAN Open question G).
-_V4_SKIP = 'v3.1.8 bit-for-bit baseline; cv.Sim is the Starsim port now. Restored/regenerated at M10.'
+# v4.0 Starsim port: the baseline/benchmark below are now regenerated against the v4 engine (M10).
+# v4 is deterministic for a fixed seed (per-distribution CRN), so the default sim reproduces its
+# saved summary exactly. (v4 is NOT bit-for-bit identical to v3; that equivalence is checked
+# statistically by the multi-seed parity gates in tests/regression/.)
 
 do_plot = 1
 do_save = 0
@@ -84,7 +84,6 @@ def save_baseline():
     return
 
 
-@pytest.mark.skip(reason=_V4_SKIP)
 def test_baseline():
     ''' Compare the current default sim against the saved baseline '''
 
@@ -102,7 +101,6 @@ def test_baseline():
     return new
 
 
-@pytest.mark.skip(reason=_V4_SKIP)
 def test_benchmark(do_save=do_save, repeats=1, verbose=True):
     ''' Compare benchmark performance '''
 
@@ -168,9 +166,9 @@ def test_benchmark(do_save=do_save, repeats=1, verbose=True):
                 'run':        round(t_run,  n_decimals),
                 },
             'parameters': {
-                'pop_size': sim['pop_size'],
-                'pop_type': sim['pop_type'],
-                'n_days':   sim['n_days'],
+                'pop_size': sim._cv_config['pop_size'],
+                'pop_type': sim._cv_config['pop_type'],
+                'n_days':   sim._cv_config['n_days'],
                 },
             'cpu_performance': ratio,
             }

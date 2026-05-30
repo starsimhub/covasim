@@ -302,3 +302,27 @@ plotting) and M10 (release: docs/migration guide, regenerate baselines, strip de
 - Remaining M10: migration guide (v3->v4), regenerate baselines (baseline.json / benchmark.json /
   pars_v4.0.0.json), strip interim delegations, delete _v2_legacy + _legacy quarantines, version
   bump + CHANGELOG. **NOT tagging v4.0.0 and NOT pushing -- reserved for Cliff.**
+
+## M10 (continued) — backwards-compat, baselines, version bump (2026-05-30)
+
+- **`cv.Sim(pars_dict)` restored** (the canonical v3 form): the constructor pulls the Covasim
+  sim-level keys (pop_size/pop_infected/pop_type/n_days/start_day/rand_seed/beta/pop_scale/
+  total_pop/use_waning/variants) out of a pars dict; an explicit keyword overrides the dict entry;
+  the remainder (verbose, interventions, ...) forwards to ss.Sim. Byte-identity preserved: the
+  keyword form gives the IDENTICAL result, and the full suite stays green.
+- **v3-compat shims added**: `cv.Sim.initialize` (alias -> `init`), `cv.Sim.export_pars`
+  (sim-level config + COVID scalar pars -> JSON; reads `_cv_covid` so it works pre-init),
+  `cv.diff_sims` (summary-vs-summary comparison, accepts sims or dicts; has skip/skip_key_diffs).
+- **Baselines regenerated for v4** (`tests/update_baseline`): baseline.json (v4 summary),
+  benchmark.json, and **covasim/regression/pars_v4.0.0.json** (new). test_baselines.py un-skipped
+  and rewritten to v4 idioms (sim['key'] -> sim._cv_config[key]); both test_baseline +
+  test_benchmark now pass (v4 is deterministic per fixed seed -> exact summary reproduction).
+- **test_regression / test_migration retired** (kept skipped): the v1.7.0 example_regression.sim
+  pickle predates the Starsim object model. The v4 regression guard is the multi-seed parity gate
+  + test_baselines.py. Skip reasons updated to say so.
+- **Version bumped 3.1.8 -> 4.0.0** (version.py + versiondate 2026-05-30) with a full v4.0.0
+  CHANGELOG entry (Starsim port; preserved API; Regression info on the CRN/global-RNG difference).
+- **docs/migration.md** written (v3->v4 guide: what's preserved, what changed, param remapping,
+  before/after script, not-yet-ported list) and wired into the Quarto navbar.
+- save/load (full-sim) done earlier this session. **Still NOT tagging v4.0.0 / NOT pushing.**
+- Remaining M10: delete the _v2_legacy + tests/_legacy quarantines (separate commit, last).

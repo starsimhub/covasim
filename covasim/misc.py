@@ -27,7 +27,7 @@ date_range = sc.daterange
 
 #%% Loading/saving functions
 
-__all__ += ['load_data', 'load', 'save', 'savefig']
+__all__ += ['load_data', 'load', 'save', 'diff_sims', 'savefig']
 
 
 def load_data(datafile, calculate=True, check_date=True, verbose=True, start_day=None, **kwargs):
@@ -150,6 +150,56 @@ def save(*args, **kwargs):
     '''
     filepath = sc.saveobj(*args, **kwargs)
     return filepath
+
+
+def diff_sims(sim1, sim2, skip_key_diffs=False, skip=None, output=False, die=False, verbose=True, atol=1e-9, rtol=0):
+    '''
+    Compute the difference of the summaries of two simulations (the v3 ``cv.diff_sims``).
+
+    Either argument may be a run ``cv.Sim`` or an already-extracted summary dict; numeric
+    summary values are compared key-by-key.
+
+    Args:
+        sim1, sim2 (Sim/dict): the two sims (or summaries) to compare.
+        skip_key_diffs (bool): accepted for v3 compatibility; this implementation always compares only
+            the keys common to both summaries, so keys present in only one are skipped regardless.
+        skip (list): summary keys to ignore.
+        output (bool): return the dict of differences.
+        die (bool): raise if any value differs (beyond the tolerance).
+        verbose (bool): print the differing keys.
+        atol/rtol (float): absolute/relative tolerance for "equal" (default exact).
+
+    Returns:
+        The dict of differing keys (if ``output``).
+    '''
+    def _summary(s):
+        if hasattr(s, 'summary'):
+            return dict(s.summary)
+        return dict(s)
+
+    s1, s2 = _summary(sim1), _summary(sim2)
+    skip = sc.tolist(skip)
+    keys = [k for k in s1 if k in s2 and k not in skip]
+
+    diffs = {}
+    for key in keys:
+        v1, v2 = s1[key], s2[key]
+        try:
+            if not np.allclose(v1, v2, atol=atol, rtol=rtol, equal_nan=True):
+                diffs[key] = (v1, v2)
+        except (TypeError, ValueError):
+            if v1 != v2:                       # non-numeric values: exact comparison
+                diffs[key] = (v1, v2)
+
+    if diffs and verbose:
+        print('The following summary values differ between the two sims:')
+        for key, (v1, v2) in diffs.items():
+            print(f'  {key}: {v1} ≠ {v2}')
+    if diffs and die:
+        raise ValueError(f'Sims differ on {len(diffs)} key(s): {sorted(diffs.keys())}')
+    if output:
+        return diffs
+    return
 
 
 def savefig(filename=None, comments=None, fig=None, **kwargs):

@@ -11,6 +11,7 @@ Passing ``people=`` / ``networks=`` / ``diseases=`` overrides the corresponding
 default, so tests (and later milestones) can inject their own components.
 """
 import numpy as np
+import sciris as sc
 import starsim as ss
 
 from . import people as cvppl
@@ -43,9 +44,32 @@ class Sim(ss.Sim):
         kwargs: forwarded to ``ss.Sim``.
     """
 
-    def __init__(self, pars=None, people=None, pop_size=20_000, pop_infected=20,
-                 pop_type='random', n_days=60, start_day='2020-03-01', rand_seed=1,
-                 beta=None, pop_scale=None, total_pop=None, variants=None, use_waning=False, **kwargs):
+    def __init__(self, pars=None, people=None, pop_size=None, pop_infected=None,
+                 pop_type=None, n_days=None, start_day=None, rand_seed=None,
+                 beta=None, pop_scale=None, total_pop=None, variants=None, use_waning=None, **kwargs):
+        # Covasim accepts its parameters either as a dict (the v3 ``cv.Sim(pars)`` form) or as keyword
+        # arguments; an explicit keyword overrides the same key in the dict. Pull the Covasim sim-level
+        # keys out of the pars dict here -- whatever remains (verbose, interventions, ...) is forwarded
+        # to ss.Sim, which understands it.
+        pars = sc.dcp(pars) if isinstance(pars, dict) else {}
+        def _pick(key, kwarg, default):
+            if kwarg is not None:
+                pars.pop(key, None)        # explicit keyword wins; drop any dict duplicate
+                return kwarg
+            return pars.pop(key, default)  # else the dict value, else the Covasim default
+        pop_size     = int(_pick('pop_size',     pop_size,     20_000))
+        pop_infected = int(_pick('pop_infected', pop_infected, 20))
+        pop_type     = _pick('pop_type',     pop_type,     'random')
+        n_days       = _pick('n_days',       n_days,       60)
+        start_day    = _pick('start_day',    start_day,    '2020-03-01')
+        rand_seed    = _pick('rand_seed',    rand_seed,    1)
+        beta         = _pick('beta',         beta,         None)
+        pop_scale    = _pick('pop_scale',    pop_scale,    None)
+        total_pop    = _pick('total_pop',    total_pop,    None)
+        use_waning   = _pick('use_waning',   use_waning,   False)
+        if variants is None:
+            variants = pars.pop('variants', None)
+
         if pop_type not in _BETA_LAYER:
             raise ValueError(f"pop_type {pop_type!r} not supported in M1 (choices: 'random', 'hybrid').")
         base_beta = _BASE_BETA if beta is None else beta
@@ -88,7 +112,48 @@ class Sim(ss.Sim):
         super().__init__(pars=pars, people=people, networks=networks, diseases=diseases,
                          start=ss.date(start_day), dur=ss.days(n_days), dt=ss.days(1),
                          rand_seed=rand_seed, **scale_kw, **kwargs)
+
+        # Snapshot the resolved Covasim sim-level config + the COVID module (for export_pars /
+        # introspection). _cv_covid references the disease object as built here, so its pars are
+        # readable even before the sim is initialized.
+        self._cv_config = dict(pop_size=pop_size, pop_infected=pop_infected, pop_type=pop_type,
+                               n_days=n_days, start_day=str(start_day), rand_seed=rand_seed,
+                               beta=base_beta, use_waning=bool(use_waning))
+        self._cv_covid = diseases
         return
+
+    def initialize(self, *args, **kwargs):
+        """v3-compatibility alias for ``init`` (Starsim renamed ``initialize`` -> ``init``)."""
+        return self.init(*args, **kwargs)
+
+    def export_pars(self, filename=None, indent=2, **kwargs):
+        """Export the sim's parameters to a JSON-compatible dict (the v3 ``BaseSim.export_pars``).
+
+        Returns the resolved Covasim sim-level config plus the COVID module's scalar parameters; if
+        ``filename`` is given, also writes the dict to JSON. Per-distribution / array parameters are
+        summarised rather than dumped.
+
+        Args:
+            filename (str): if given, write the JSON here.
+            indent (int): JSON indent.
+        """
+        pars = dict(self._cv_config)
+        # Prefer the live in-sim disease (post-init); else the construction-time reference.
+        covid = self.diseases.get('covid') if hasattr(self, 'diseases') else None
+        if covid is None:
+            covid = getattr(self, '_cv_covid', None)
+        if covid is not None:
+            covid_pars = {}
+            for key, val in dict(covid.pars).items():
+                try:
+                    covid_pars[key] = sc.jsonify(val, die=False)  # scalars/lists/dicts; skip the rest
+                except Exception:
+                    covid_pars[key] = str(type(val).__name__)
+            pars['covid'] = covid_pars
+        pars = sc.jsonify(pars, die=False)
+        if filename is not None:
+            sc.savejson(filename, pars, indent=indent)
+        return pars
 
     # By_variant Result keys that scale with population (counts); the rest (prevalence/incidence) are rates.
     _BY_VARIANT_SCALE_KEYS = (

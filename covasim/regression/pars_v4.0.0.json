@@ -1,0 +1,222 @@
+{
+  "pop_size": 20000,
+  "pop_infected": 20,
+  "pop_type": "random",
+  "n_days": 60,
+  "start_day": "2020-03-01",
+  "rand_seed": 1,
+  "beta": 0.016,
+  "use_waning": false,
+  "covid": {
+    "init_prev": 20,
+    "beta": {
+      "a": {
+        "python_class": "<class 'starsim.time.probperday'>",
+        "_value": 0.016,
+        "_rate": 0.016129381929883644,
+        "unit": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 1
+        },
+        "default_dur": null
+      }
+    },
+    "dur_exp2inf": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 4.5
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 1.5
+        }
+      }
+    },
+    "dur_inf2sym": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 1.1
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 0.9
+        }
+      }
+    },
+    "dur_sym2sev": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 6.6
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 4.9
+        }
+      }
+    },
+    "dur_sev2crit": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 1.5
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 2.0
+        }
+      }
+    },
+    "dur_crit2die": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 10.7
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 4.8
+        }
+      }
+    },
+    "dur_asym2rec": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 8.0
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 2.0
+        }
+      }
+    },
+    "dur_mild2rec": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 8.0
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 2.0
+        }
+      }
+    },
+    "dur_sev2rec": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 18.1
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 6.3
+        }
+      }
+    },
+    "dur_crit2rec": {
+      "type": "Dist",
+      "classname": "lognorm_ex",
+      "tracestr": "<no trace>",
+      "diststr": "",
+      "pars": {
+        "mean": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 18.1
+        },
+        "std": {
+          "python_class": "<class 'starsim.time.days'>",
+          "value": 6.3
+        }
+      }
+    },
+    "rel_symp_prob": 1.0,
+    "rel_severe_prob": 1.0,
+    "rel_crit_prob": 1.0,
+    "rel_death_prob": 1.0,
+    "n_beds_hosp": null,
+    "n_beds_icu": null,
+    "no_hosp_factor": 2.0,
+    "no_icu_factor": 2.0,
+    "beta_dist": {
+      "dist": "neg_binomial",
+      "par1": 1.0,
+      "par2": 0.45,
+      "step": 0.01
+    },
+    "viral_dist": {
+      "frac_time": 0.3,
+      "load_ratio": 2,
+      "high_cap": 4
+    },
+    "asymp_factor": 1.0,
+    "use_waning": false,
+    "nab_init": {
+      "dist": "normal",
+      "par1": 0,
+      "par2": 2
+    },
+    "nab_decay": {
+      "form": "nab_growth_decay",
+      "growth_time": 21,
+      "decay_rate1": 0.013862943611198907,
+      "decay_time1": 150,
+      "decay_rate2": 0.0027725887222397813,
+      "decay_time2": 365
+    },
+    "nab_boost": 1.5,
+    "nab_eff": {
+      "alpha_inf": 1.08,
+      "alpha_inf_diff": 1.812,
+      "beta_inf": 0.967,
+      "alpha_symp_inf": -0.739,
+      "beta_symp_inf": 0.038,
+      "alpha_sev_symp": -0.014,
+      "beta_sev_symp": 0.079
+    },
+    "rel_imm_symp": {
+      "asymp": 0.85,
+      "mild": 1.0,
+      "severe": 1.5
+    },
+    "trans_redux": 0.59,
+    "quar_period": 14,
+    "iso_factor": 0.2,
+    "quar_factor": 0.3
+  }
+}

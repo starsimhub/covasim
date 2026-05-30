@@ -37,7 +37,9 @@ def make_sim(do_save=False, **kwargs):
     return sim
 
 
-@pytest.mark.skip(reason='v3.1.8 pickle/engine regression; cv.Sim is the Starsim port now. Restored at M10.')
+@pytest.mark.skip(reason='Retired in v4.0: the v1.7.0 example_regression.sim pickle predates the '
+                         'Starsim object model and cannot be unpickled. The v4 regression guard is '
+                         'the multi-seed parity gate (tests/regression/) + test_baselines.py.')
 def test_regression():
     sc.heading('Testing regression...')
 
@@ -55,7 +57,8 @@ def test_regression():
     return sim1, sim2
 
 
-@pytest.mark.skip(reason='Exercises quarantined cv.MultiSim/cv.Scenarios/cv.migrate; restored at M8/M10.')
+@pytest.mark.skip(reason='Retired in v4.0: depends on the v1.7.0 example_regression.sim pickle + the '
+                         'v3 cv.migrate object-versioning path, both obsolete under the Starsim model.')
 def test_migration():
     sc.heading('Testing migration...')
 
