@@ -104,3 +104,53 @@ def test_schedule_quarantine_machine():
     assert set(np.asarray(quar)).issubset(set(np.asarray(susc))), 'only the scheduled agents quarantine'
     _advance(sim, 8)  # cross the quarantine end
     assert not np.asarray(d.quarantined[susc]).any(), 'agents are released at the end of quarantine'
+
+
+# === Task 2: cv.Intervention base + test_prob / test_num ===
+
+def test_test_prob_produces_diagnoses():
+    """cv.test_prob tests agents and accumulates cum_tests / cum_diagnoses over the run."""
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='hybrid', n_days=80, rand_seed=2, verbose=0,
+                 interventions=cv.test_prob(symp_prob=0.1, asymp_prob=0.01, start_day=10))
+    sim.run()
+    r = sim.diseases.covid.results
+    assert float(np.asarray(r['cum_tests']).max()) > 0, 'tests were performed'
+    assert float(np.asarray(r['cum_diagnoses']).max()) > 0, 'diagnoses were made'
+    # No tests before the start day.
+    assert float(np.asarray(r['new_tests'])[:10].sum()) == 0, 'no testing before start_day'
+
+
+def test_test_prob_higher_symp_prob_more_diagnoses():
+    """A higher symptomatic test probability yields more diagnoses (monotone in symp_prob)."""
+    def diagnoses(symp_prob):
+        sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='random', n_days=80, rand_seed=4,
+                     verbose=0, interventions=cv.test_prob(symp_prob=symp_prob, start_day=5))
+        sim.run()
+        return float(np.asarray(sim.diseases.covid.results['cum_diagnoses']).max())
+    assert diagnoses(0.5) > diagnoses(0.05), 'more aggressive testing => more diagnoses'
+
+
+def test_test_num_respects_daily_budget():
+    """cv.test_num performs about daily_tests tests per active day (capped by eligibility)."""
+    daily = 200
+    start = 10
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='hybrid', n_days=60, rand_seed=2, verbose=0,
+                 interventions=cv.test_num(daily_tests=daily, start_day=start))
+    sim.run()
+    new_tests = np.asarray(sim.diseases.covid.results['new_tests'])
+    assert new_tests[:start].sum() == 0, 'no tests before start_day'
+    active = new_tests[start:]
+    assert active.max() <= daily, 'never exceeds the daily test budget'
+    assert active.sum() > 0 and (active == daily).any(), 'uses the full daily budget on busy days'
+
+
+def test_test_num_diagnoses_only_infectious():
+    """Diagnoses come only from genuinely infectious agents (test() positive only if infectious)."""
+    sim = cv.Sim(pop_size=20000, pop_infected=100, pop_type='random', n_days=60, rand_seed=3, verbose=0,
+                 interventions=cv.test_num(daily_tests=300, start_day=5))
+    sim.run()
+    d = sim.diseases.covid
+    # Everyone diagnosed must have been infected at some point (ti_infected finite).
+    diagnosed = d.diagnosed.uids
+    assert len(diagnosed) > 0
+    assert np.isfinite(np.asarray(d.ti_infected[diagnosed])).all(), 'only ever-infected agents are diagnosed'

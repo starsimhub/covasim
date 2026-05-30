@@ -565,6 +565,7 @@ class COVID(ss.Infection):
         ti = self.ti
         self.tested[uids] = True
         self.date_tested[uids] = ti
+        self._test_flow['tests'] += len(uids)
         inf = uids[np.asarray(self.infectious[uids])]          # only infectious agents can test positive
         if not len(inf):
             return ss.uids()
@@ -605,6 +606,7 @@ class COVID(ss.Infection):
         self.date_pos_test[((self.date_pos_test <= ti) & ~self.diagnosed).uids] = np.nan
         new_diag = ((self.date_diagnosed <= ti) & ~self.diagnosed).uids
         self.diagnosed[new_diag] = True
+        self._test_flow['diagnoses'] += len(new_diag)
         # check_enter_iso: anyone diagnosed this step isolates until recovery.
         if len(new_diag):
             self.isolated[new_diag] = True
@@ -641,6 +643,10 @@ class COVID(ss.Infection):
         # counted here; new_{infections,symptomatic,severe} are accumulated in set_prognoses.
         for v in self._flow_variant.values():
             v[:] = 0.0
+        if not hasattr(self, '_test_flow'):
+            self._test_flow = dict(tests=0, diagnoses=0)
+        self._test_flow['tests'] = 0
+        self._test_flow['diagnoses'] = 0
         self._introduce_variants()  # seed any variant introductions scheduled for this day
         # exposed -> infectious: tag infectious_variant from exposed_variant (v3 check_infectious),
         # count new_infectious_by_variant, then clear the `exposed` flag. The gate is `exposed &
@@ -749,6 +755,10 @@ class COVID(ss.Infection):
             R('cum_recoveries',  'Cumulative recoveries'),
             R('cum_deaths',      'Cumulative deaths'),
             R('n_imports',       'Number of imported infections'),  # bumped by import_variant (M3)
+            R('new_tests',       'New tests'),        # M5: bumped by covid.test()
+            R('cum_tests',       'Cumulative tests'),
+            R('new_diagnoses',   'New diagnoses'),    # M5: bumped in _step_testing
+            R('cum_diagnoses',   'Cumulative diagnoses'),
         )
         # M4 immunity summaries (population means -> scale=False). Filled only under use_waning.
         self.define_results(
@@ -756,6 +766,7 @@ class COVID(ss.Infection):
             ss.Result('pop_protection', dtype=float, scale=False, label='Population mean protective immunity'),
         )
         self._flow = dict(symptomatic=0, severe=0, critical=0, recoveries=0, deaths=0)
+        self._test_flow = dict(tests=0, diagnoses=0)  # M5 per-step test/diagnosis flow
 
         # The 12-key 2D by_variant sub-dict (v3 sim.results['variant']), shape (nv, npts), FLOAT dtype
         # (v3 result_float -- avoids truncation). Built as a NESTED ss.Results because define_results
@@ -793,6 +804,8 @@ class COVID(ss.Infection):
         res.new_critical[ti]    = self._flow['critical']
         res.new_recoveries[ti]  = self._flow['recoveries']
         res.new_deaths[ti]      = self._flow['deaths']
+        res.new_tests[ti]       = self._test_flow['tests']      # M5 testing flows
+        res.new_diagnoses[ti]   = self._test_flow['diagnoses']
 
         # By-variant flows (accumulated this step) + stocks (counted from the live tags).
         vres = res['variant']
@@ -829,6 +842,8 @@ class COVID(ss.Infection):
         res.cum_critical[:]    = np.cumsum(res.new_critical[:])
         res.cum_recoveries[:]  = np.cumsum(res.new_recoveries[:])
         res.cum_deaths[:]      = np.cumsum(res.new_deaths[:])
+        res.cum_tests[:]       = np.cumsum(res.new_tests[:])       # M5
+        res.cum_diagnoses[:]   = np.cumsum(res.new_diagnoses[:])
 
         # By-variant cumulatives (cumsum along the time axis). The pop_scale scaling, the wild
         # cum_infections seed-offset, and the prevalence/incidence denominators are applied at the
