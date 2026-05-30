@@ -11,6 +11,7 @@ and ``contact_tracing`` traces the newly-diagnosed agents' network contacts and 
 The selection draws use ``ss.bernoulli`` (CRN), replacing v3's global-RNG ``cvu.binomial``.
 """
 import numpy as np
+import sciris as sc
 import starsim as ss
 
 __all__ = ['Intervention', 'test_num', 'test_prob', 'contact_tracing']
@@ -247,3 +248,272 @@ class contact_tracing(Intervention):
             covid.known_contact[keep] = True
             covid.schedule_quarantine(keep, start_date=ti + this_tt, period=max(1, qp - this_tt))
         return
+
+
+# %% Vaccination interventions (M6) -----------------------------------------------------------------
+
+__all__ += ['BaseVaccination', 'vaccinate', 'vaccinate_prob', 'vaccinate_num']
+
+
+def _check_doses(doses, interval):
+    """Validate the dose count + dosing interval (v3 check_doses)."""
+    if not isinstance(doses, (int, np.integer)):
+        raise ValueError(f'Doses must be an integer, not {doses}.')
+    if interval is not None and not np.isscalar(interval):
+        raise ValueError(f"Dosing interval should be a number, not {interval!r}.")
+    if doses == 1 and interval is not None:
+        raise ValueError("Can't use a dosing interval for a single-dose vaccine.")
+    if doses == 2 and interval is None:
+        raise ValueError('Must specify a dosing interval for a 2-dose vaccine.')
+    if doses > 2:
+        raise NotImplementedError('Three or more scheduled doses are not supported; use a booster.')
+    return
+
+
+class BaseVaccination(Intervention):
+    """
+    Base class for vaccination (the v3 ``BaseVaccination``).
+
+    Confers immunity by conferring/boosting neutralizing antibodies through the shared M4 NAb pipeline
+    (so it requires ``use_waning=True``; for the non-NAb path use ``cv.simple_vaccine``). Subclasses
+    implement ``select_people()`` (the allocation strategy); this base handles vaccine-parameter
+    parsing, registration into the disease module's vaccine registry, ``target_eff`` back-calculation,
+    dose scheduling/booking, and the per-dose state + NAb update.
+
+    Args:
+        vaccine (str/dict): a predefined product ('pfizer'/'moderna'/'az'/'jj'/...) or a pars dict.
+        label (str): vaccine label if ``vaccine`` is a dict.
+        booster (bool): if True, target already-vaccinated people.
+    """
+
+    def __init__(self, vaccine, label=None, booster=False, **kwargs):
+        super().__init__(**kwargs)
+        self.index = None       # set at init: this vaccine's index in the module registry
+        self.label = label
+        self.p = None           # vaccine parameters (dose pars + per-variant efficacy)
+        self.booster = booster
+        self._doses = None      # per-agent doses given by THIS intervention (raw-UID indexed)
+        self._parse_vaccine_pars(vaccine)
+        return
+
+    def _parse_vaccine_pars(self, vaccine):
+        """Resolve a predefined product name or a pars dict into ``self.p`` (v3 _parse_vaccine_pars)."""
+        import covasim.parameters as cvpar
+        if isinstance(vaccine, str):
+            choices, mapping = cvpar.get_vaccine_choices()
+            variant_pars = cvpar.get_vaccine_variant_pars()
+            dose_pars = cvpar.get_vaccine_dose_pars()
+            label = vaccine.lower()
+            for txt in ['.', ' ', '&', '-', 'vaccine']:
+                label = label.replace(txt, '')
+            if label not in mapping:
+                raise NotImplementedError(f'Vaccine "{vaccine}" not known; choices: {sorted(choices)}')
+            label = mapping[label]
+            vaccine_pars = sc.mergedicts(variant_pars[label], dose_pars[label])
+            if self.label is None:
+                self.label = label
+        elif isinstance(vaccine, dict):
+            vaccine_pars = dict(vaccine)
+            label = vaccine_pars.pop('label', None)
+            if self.label is None:
+                self.label = label if label is not None else 'custom'
+        else:
+            raise ValueError(f'Could not understand vaccine {type(vaccine)}; use a product name or a dict.')
+        self.p = sc.objdict(vaccine_pars)
+        return
+
+    def _register(self, covid):
+        """Populate missing dose/variant pars, back-calculate target_eff, and register in the module."""
+        import covasim.parameters as cvpar
+        import covasim.immunity as cvimm
+        default_dose = cvpar.get_vaccine_dose_pars(default=True)
+        default_var  = cvpar.get_vaccine_variant_pars(default=True)
+        for key in default_dose:                       # fill missing dose pars (nab_init/nab_boost/doses/interval)
+            if key not in self.p:
+                self.p[key] = default_dose[key]
+        for key in covid.variant_map.values():         # per-variant efficacy for every variant in the sim
+            if key not in self.p:
+                self.p[key] = default_var.get(key, 1.0)
+        # target_eff -> back-calculate nab_init/nab_boost (v3 BaseVaccination.initialize)
+        if 'target_eff' in self.p:
+            if self.p['doses'] != len(self.p['target_eff']):
+                raise ValueError('target_eff length must equal the number of doses.')
+            nabs = np.arange(-8, 4, 0.1)
+            VE_symp = cvimm.calc_VE_symp(2 ** nabs, covid.pars.nab_eff)
+            peak_nab = nabs[np.argmax(VE_symp > self.p['target_eff'][0])]
+            self.p['nab_init'] = dict(dist='normal', par1=float(peak_nab), par2=2)
+            if self.p['doses'] == 2:
+                boosted = nabs[np.argmax(VE_symp > self.p['target_eff'][1])]
+                self.p['nab_boost'] = float((2 ** boosted) / (2 ** peak_nab))
+        _check_doses(int(self.p['doses']), self.p['interval'])
+        covid.vaccine_pars[self.label] = self.p
+        self.index = list(covid.vaccine_pars.keys()).index(self.label)
+        covid.vaccine_map[self.index] = self.label
+        self._doses = np.zeros(len(covid.rel_sus.raw), dtype=int)
+        return
+
+    def init_post(self):
+        super().init_post()
+        covid = self._covid()
+        if not covid.pars.use_waning:
+            raise RuntimeError(f'cv.{type(self).__name__} requires use_waning=True; else use cv.simple_vaccine().')
+        self._register(covid)
+        return
+
+    def _vaccinate(self, covid, uids):
+        """Apply a dose: skip dead / already-fully-dosed (by this vaccine), then update state + NAbs."""
+        uids = uids[~np.asarray(covid.dead[uids])]
+        if len(uids):
+            uids = uids[self._doses[np.asarray(uids)] < int(self.p['doses'])]
+        if len(uids):
+            self._doses[np.asarray(uids)] += 1
+            covid.vaccinate_agents(uids, self.label, self.index)
+        return uids
+
+    def select_people(self, covid):
+        raise NotImplementedError
+
+    def step(self):
+        covid = self._covid()
+        uids = self.select_people(covid)
+        if uids is not None and len(uids):
+            uids = self._vaccinate(covid, ss.uids(np.unique(np.asarray(uids))))
+        return uids
+
+
+class vaccinate_prob(BaseVaccination):
+    """
+    Probability-based vaccination (v3 ``vaccinate_prob``): on each day in ``days``, vaccinate eligible
+    people with probability ``prob``; schedule their second dose ``interval`` days later.
+
+    Args:
+        vaccine (str/dict): product or pars dict.
+        days (int/list): day index/indices on which first doses are offered.
+        prob (float): per-eligible-person daily probability of a first dose (default 1.0).
+        booster (bool): target the already-vaccinated.
+    """
+
+    def __init__(self, vaccine, days, label=None, prob=1.0, booster=False, **kwargs):
+        super().__init__(vaccine, label=label, booster=booster, **kwargs)
+        self.days = days
+        self.prob = prob
+        self._day_set = None
+        self._second_dose = None  # {day: [uids arrays]}
+        self._select = ss.bernoulli(p=0.0)
+        return
+
+    def init_post(self):
+        super().init_post()
+        self._day_set = set(int(round(d)) for d in sc.toarray(self.days))
+        self._second_dose = {}
+        return
+
+    def select_people(self, covid):
+        ti = covid.ti
+        first = ss.uids()
+        if ti in self._day_set:
+            alive = covid.sim.people.auids
+            vaccinated = np.asarray(covid.vaccinated[alive])
+            eligible = alive[vaccinated] if self.booster else alive[~vaccinated]
+            if len(eligible):
+                self._select.set(p=self.prob)
+                first = eligible[self._select.rvs(eligible)]
+                interval = self.p['interval']
+                if interval is not None and len(first):  # schedule the second dose
+                    nxt = ti + int(interval)
+                    self._second_dose.setdefault(nxt, []).append(np.asarray(first))
+        dose2 = self._second_dose.pop(ti, None)
+        if dose2:
+            arrs = ([np.asarray(first)] if len(first) else []) + dose2
+            return ss.uids(np.unique(np.concatenate(arrs)))
+        return first
+
+
+class vaccinate_num(BaseVaccination):
+    """
+    Number-based vaccination (v3 ``vaccinate_num``): deliver ``num_doses`` doses/day in a priority
+    ``sequence``, prioritising scheduled second doses.
+
+    Args:
+        vaccine (str/dict): product or pars dict.
+        num_doses (int/dict/callable): doses per day (scalar, {day: n}, or f(sim) -> n).
+        sequence (None/'age'/array/callable): vaccination priority order (default random).
+        booster (bool): target the already-vaccinated.
+    """
+
+    def __init__(self, vaccine, num_doses, label=None, sequence=None, booster=False, **kwargs):
+        super().__init__(vaccine, label=label, booster=booster, **kwargs)
+        self.num_doses = num_doses
+        self.sequence = sequence
+        self._sequence = None
+        self._scheduled = {}  # {day: set(uids)}
+        return
+
+    def init_post(self):
+        super().init_post()
+        if isinstance(self.num_doses, dict):  # day-index keys (string dates unsupported in M6)
+            self.num_doses = {int(k): v for k, v in self.num_doses.items()}
+        self._sequence = self._process_sequence(self.sequence)
+        return
+
+    def _process_sequence(self, sequence):
+        covid = self._covid()
+        alive = np.asarray(covid.sim.people.auids)
+        if sequence is None:
+            try:
+                base = int(self.sim.pars.rand_seed)
+            except Exception:
+                base = 0
+            rng = np.random.default_rng([base, 92])
+            order = alive.copy(); rng.shuffle(order)
+            return order
+        if sequence == 'age':
+            ages = np.asarray(covid.sim.people.age[ss.uids(alive)])
+            return alive[np.argsort(-ages)]
+        if callable(sequence):
+            return np.asarray(sequence(covid.sim.people))
+        return np.asarray(sequence)
+
+    def _n_doses_today(self, ti):
+        nd = self.num_doses
+        if callable(nd):
+            return int(nd(self.sim))
+        if isinstance(nd, dict):
+            return int(nd.get(ti, 0))
+        return int(nd)
+
+    def select_people(self, covid):
+        ti = covid.ti
+        n_doses = self._n_doses_today(ti)
+        scheduled_today = self._scheduled.pop(ti, set())
+        if n_doses <= 0:
+            if scheduled_today:
+                self._scheduled.setdefault(ti + 1, set()).update(scheduled_today)  # defer
+            return ss.uids()
+        n_agents = int(sc.randround(n_doses / float(covid.sim.pars.pop_scale)))
+        dead = set(np.asarray(covid.dead.uids).tolist())
+        # Second doses first (drop dead / fully-dosed-by-this-vaccine).
+        scheduled = np.array([u for u in scheduled_today
+                              if u not in dead and self._doses[u] < int(self.p['doses'])], dtype=int)
+        if len(scheduled) > n_agents:
+            self._scheduled.setdefault(ti + 1, set()).update(scheduled[n_agents:].tolist())
+            return ss.uids(np.sort(scheduled[:n_agents]))
+        # First doses, in priority sequence, among the (un)vaccinated as appropriate.
+        vaccinated = np.asarray(covid.vaccinated[ss.uids(self._sequence)])
+        elig_mask = vaccinated if self.booster else ~vaccinated
+        seq_alive = np.array([u not in dead for u in self._sequence])
+        first_pool = self._sequence[elig_mask & seq_alive]
+        first_pool = first_pool[~np.isin(first_pool, scheduled)]
+        n_first = max(0, n_agents - len(scheduled))
+        first = first_pool[:n_first]
+        if int(self.p['doses']) > 1 and len(first):  # schedule second doses
+            self._scheduled.setdefault(ti + int(self.p['interval']), set()).update(first.tolist())
+        out = np.concatenate([scheduled, first]) if len(scheduled) or len(first) else np.array([], dtype=int)
+        return ss.uids(np.sort(np.unique(out)))
+
+
+def vaccinate(*args, **kwargs):
+    """Wrapper: ``vaccinate_num`` if ``num_doses`` is given, else ``vaccinate_prob`` (v3 ``vaccinate``)."""
+    if 'num_doses' in kwargs:
+        return vaccinate_num(*args, **kwargs)
+    return vaccinate_prob(*args, **kwargs)
