@@ -7,10 +7,10 @@ Terminology (as v3): *difference* = sim - data per matched point; *goodness-of-f
 difference through ``compute_gof``; *loss* = gof x weight; *mismatch* = sum of losses (the scalar
 minimised during calibration).
 
-M9 adds the analyzers (``cv.Analyzer`` base + ``snapshot``/``age_histogram``/``nab_histogram``) and
-``cv.TransTree`` (built over a gated transmission log on ``cv.COVID``). Remaining M9 pieces:
-``cv.daily_age_stats``, the Covasim-specific ``sim.plot()``/``Fit.plot`` views (a plotting pass), and
-the synthpops population backend (optional dependency, not installed here).
+M9 adds the analyzers (``cv.Analyzer`` base + ``snapshot``/``age_histogram``/``daily_age_stats``/
+``nab_histogram``), ``cv.TransTree`` (over a gated transmission log on ``cv.COVID``), and the
+Covasim-specific plots (``cv.Sim.plot``, ``Fit.plot``, ``TransTree.plot``). The synthpops population
+backend (optional dependency, not installed here) is the only remaining M9 piece.
 """
 import numpy as np
 import pandas as pd
@@ -184,6 +184,27 @@ class Fit(sc.prettyobj):
             self.mismatches[key] = np.median(self.losses[key]) if use_median else np.sum(self.losses[key])
         self.mismatch = float(np.sum([v for v in self.mismatches.values()]))
         return self.mismatch
+
+    def plot(self, fig=None, **kwargs):
+        """Plot, per fitted key, the sim-vs-data paired points and the per-point loss."""
+        import matplotlib.pyplot as plt
+        keys = list(self.pair.keys())
+        if not keys:
+            return None
+        if fig is None:
+            fig, axes = plt.subplots(2, len(keys), figsize=(4.5 * len(keys), 7), squeeze=False)
+        else:
+            axes = np.array(fig.axes).reshape(2, len(keys))
+        for j, k in enumerate(keys):
+            x = np.arange(len(self.pair[k].sim))
+            axes[0, j].plot(x, self.pair[k].data, 'o-', label='data', alpha=0.7)
+            axes[0, j].plot(x, self.pair[k].sim, 's-', label='sim', alpha=0.7)
+            axes[0, j].set_title(k); axes[0, j].legend()
+            axes[1, j].bar(x, self.losses.get(k, np.zeros_like(x)))
+            axes[1, j].set_title(f'{k} loss (mismatch={self.mismatches.get(k, 0):.2f})')
+        fig.suptitle(f'Fit: total mismatch = {self.mismatch:.3f}')
+        fig.tight_layout()
+        return fig
 
     def summarize(self):
         """Print the per-key mismatches and the total."""
@@ -507,3 +528,60 @@ class TransTree(Analyzer):
         """Return a DataFrame of the transmission events (source, target, day, variant)."""
         rows = [dict(source=s, target=t, day=ti, variant=v) for s, t, ti, v in (self.infection_events or [])]
         return pd.DataFrame(rows, columns=['source', 'target', 'day', 'variant'])
+
+    def plot(self, fig=None, **kwargs):
+        """Plot the offspring distribution (secondary infections per infector) + infections over time."""
+        import matplotlib.pyplot as plt
+        if fig is None:
+            fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+        else:
+            axes = fig.axes
+        offspring = np.array(list(self.n_targets.values())) if self.n_targets else np.array([0])
+        axes[0].hist(offspring, bins=np.arange(0, offspring.max() + 2) - 0.5)
+        axes[0].set_title(f'Offspring per infector (R0={self.r0:.2f})')
+        axes[0].set_xlabel('Secondary infections'); axes[0].set_ylabel('Number of infectors')
+        days = np.array([e[2] for e in self.infection_events]) if self.infection_events else np.array([])
+        if len(days):
+            axes[1].hist(days, bins=np.arange(days.min(), days.max() + 2))
+        axes[1].set_title('Transmission events over time'); axes[1].set_xlabel('Day')
+        fig.tight_layout()
+        return fig
+
+
+__all__ += ['daily_age_stats']
+
+
+class daily_age_stats(Analyzer):
+    """
+    Record daily counts of disease states by age bin (the v3 ``cv.daily_age_stats``).
+
+    ``age_results[state]`` is an ``(npts, n_bins)`` array of the per-day count of agents in ``state`` by
+    age bin; ``bins`` are the (lower) bin edges. Useful for age-stratified time series.
+    """
+
+    def __init__(self, states=None, edges=None, **kwargs):
+        super().__init__(**kwargs)
+        self.states = states or ['exposed', 'severe', 'critical', 'dead', 'diagnosed']
+        self.edges = np.array(edges) if edges is not None else np.linspace(0, 100, 11)
+        self.bins = self.edges[:-1]
+        self.age_results = sc.objdict()  # not "results" -- that attr is locked on ss.Module
+        return
+
+    def init_post(self):
+        super().init_post()
+        npts = len(np.asarray(self.sim.t.timevec))
+        for state in self.states:
+            self.age_results[state] = np.zeros((npts, len(self.bins)))
+        return
+
+    def step(self):
+        ti = self.ti
+        covid = self._covid()
+        ages = np.asarray(self.sim.people.age)
+        for state in self.states:
+            if not hasattr(covid, state):
+                continue
+            mask = np.asarray(getattr(covid, state)).astype(bool)
+            counts, _ = np.histogram(ages[mask], bins=self.edges)
+            self.age_results[state][ti, :] = counts
+        return

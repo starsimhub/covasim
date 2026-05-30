@@ -277,3 +277,28 @@ M10 (release). **Session: M3-M8 done.**
 
 **Session: M3-M8 complete + M9 analyzers/TransTree.** Remaining for v4.0: finish M9 (synthpops +
 plotting) and M10 (release: docs/migration guide, regenerate baselines, strip delegations, tag).
+
+## M9 finish — plotting pass landed (2026-05-30)
+
+- **cv.daily_age_stats**: per-day state counts by age bin, stored on `self.age_results` (NOT
+  `self.results`, which ss.Module locks). Daily age totals sum to the matching stock series.
+- **cv.Sim.plot(keys=None)**: a Covasim-specific multi-panel headline plot (cum_infections /
+  n_infectious / cum_symptomatic / cum_severe / cum_critical / cum_deaths). Stock `ss.Sim.plot`
+  breaks on Covasim's 2D by-variant results, so cv.Sim plots the 1D module series directly.
+  `finalize()` refactored to call a `_finalize_variant_bridge(covid, vres)` helper.
+- **Fit.plot()** (data-vs-sim per key) and **TransTree.plot()** (offspring histogram + events-over-time).
+- Tests: test_m9_analyzers.py grew daily_age_stats + a plots smoke test; all green.
+- synthpops backend is the ONLY remaining M9 piece (optional dep, not installed) -> skipped per scope.
+
+## M10 (in progress) — save/load landed (2026-05-30)
+
+- **cv.Sim.save(filename, shrink=False)**: saves the FULL sim by default. cv.COVID legitimately
+  carries large per-agent + by-variant state, so the stock `ss.Sim.save` (shrink-on-run) trips
+  Starsim's module size check; full-save matches v3 `sim.save()` semantics.
+- **cv.Sim.load** (staticmethod -> cv.load) restored. **cv.load** (misc.py) now returns v4
+  (ss.Base) objects natively, bypassing the v3 migration machinery (which is for pre-v4 pickles
+  and crashed on the Starsim version string). cv.save / sc.load / cv.MultiSim load also verified.
+- Tests: tests/test_m10_saveload.py (full round-trip across all loaders; loaded sim still plots).
+- Remaining M10: migration guide (v3->v4), regenerate baselines (baseline.json / benchmark.json /
+  pars_v4.0.0.json), strip interim delegations, delete _v2_legacy + _legacy quarantines, version
+  bump + CHANGELOG. **NOT tagging v4.0.0 and NOT pushing -- reserved for Cliff.**

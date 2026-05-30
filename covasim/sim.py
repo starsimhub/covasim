@@ -137,6 +137,64 @@ class Sim(ss.Sim):
         vres['incidence_by_variant'].values[:]  = np.divide(new_inf, n_susc,  out=np.zeros_like(new_inf), where=n_susc > 0)
         vres['prevalence_by_variant'].values[:] = np.divide(new_inf, n_alive, out=np.zeros_like(new_inf), where=n_alive > 0)
 
+        self._finalize_variant_bridge(covid, vres)
+        return
+
+    def save(self, filename=None, shrink=False, **kwargs):
+        """Save the sim to disk (M10).
+
+        Covasim's ``cv.COVID`` module legitimately carries large per-agent + by-variant state, so
+        unlike the stock ``ss.Sim.save`` (which shrinks a run sim and trips Starsim's size check),
+        ``cv.Sim`` saves the *full* sim by default -- matching v3 ``sim.save()`` semantics.
+
+        Args:
+            filename (str): path to save to (defaults to the sim's ``simfile``).
+            shrink (bool): drop people/distributions before saving (default False; see above).
+            kwargs: passed through to ``ss.Sim.save`` / ``sc.makefilepath``.
+        """
+        return super().save(filename=filename, shrink=shrink, **kwargs)
+
+    @staticmethod
+    def load(filename, *args, **kwargs):
+        """Load a saved sim from disk (M10); the v3 ``cv.Sim.load`` classmethod, via ``cv.load``."""
+        from . import misc as cvm
+        return cvm.load(filename, *args, **kwargs)
+
+    def plot(self, keys=None, fig=None, **kwargs):
+        """Plot the headline COVID result panels (a Covasim-specific view; M9).
+
+        The stock ``ss.Sim.plot`` does not handle Covasim's 2D by-variant results, so ``cv.Sim`` plots
+        the key 1D burden/shape series from the disease module directly.
+
+        Args:
+            keys (list): result keys to plot (default: the standard burden/shape panels).
+            fig: an existing figure to plot into.
+        """
+        import matplotlib.pyplot as plt  # local import (plotting is an optional dependency)
+        covid = list(self.diseases.values())[0]
+        res = covid.results
+        default = ['cum_infections', 'n_infectious', 'cum_symptomatic', 'cum_severe',
+                   'cum_critical', 'cum_deaths']
+        keys = [k for k in (keys or default) if k in res]
+        t = np.arange(covid.t.npts)
+        if fig is None:
+            ncol = 3
+            nrow = int(np.ceil(len(keys) / ncol))
+            fig, axes = plt.subplots(nrow, ncol, figsize=(4.5 * ncol, 3.5 * nrow), squeeze=False)
+            axes = axes.flatten()
+        else:
+            axes = np.atleast_1d(fig.axes)
+        for ax, k in zip(axes, keys):
+            ax.plot(t, np.asarray(res[k]), lw=2)
+            ax.set_title(k)
+            ax.set_xlabel('Day')
+        for ax in axes[len(keys):]:
+            ax.set_visible(False)
+        fig.tight_layout()
+        return fig
+
+    def _finalize_variant_bridge(self, covid, vres):
+        """Attach the variant + flat result bridges at the sim top level (helper for finalize)."""
         # Bridge to the v3 top-level path so sim.results['variant'][key] / sim.results['n_imports'] work.
         self.results['variant'] = vres
         if 'n_imports' in covid.results:

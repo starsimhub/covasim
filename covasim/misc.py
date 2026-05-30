@@ -113,6 +113,11 @@ def load(*args, do_migrate=True, update=True, verbose=True, **kwargs):
         scens = cv.load(filename='school-closures.scens', folder='schools')
     '''
     obj = sc.loadobj(*args, **kwargs)
+    # v4 (Starsim-based) objects -- cv.Sim and friends -- load natively and carry the Starsim version,
+    # not a Covasim one; the legacy migration machinery below applies only to pre-v4 Covasim pickles.
+    import starsim as ss
+    if isinstance(obj, ss.Base):
+        return obj
     if hasattr(obj, 'version'):
         v_curr = cvv.__version__
         v_obj = obj.version

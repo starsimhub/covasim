@@ -1,8 +1,8 @@
-"""M9 analyzer tests: cv.snapshot / cv.age_histogram / cv.nab_histogram.
+"""M9 analyzer tests: snapshot / age_histogram / nab_histogram / daily_age_stats / TransTree + plots.
 
 Analyzers run at the analyzer loop slot and only OBSERVE state, so adding one does not change the
 sim (byte-identical). The live analyzers are on sim.analyzers (cv.Sim deep-copies inputs).
-(cv.TransTree + the synthpops backend are the remaining M9 pieces; synthpops is not installed here.)
+(The synthpops population backend is the only remaining M9 piece; it is not installed here.)
 """
 import numpy as np
 import covasim as cv
@@ -89,3 +89,27 @@ def test_transtree_off_without_analyzer_byte_identical():
     sim.run()
     d = sim.diseases.covid
     assert d._record_transmissions is False and len(d.infection_events) == 0
+
+
+# --- daily_age_stats + plots -------------------------------------------------
+
+def test_daily_age_stats_records_by_age():
+    """cv.daily_age_stats records per-day state counts by age bin; daily totals match the stocks."""
+    sim = _run([cv.daily_age_stats(states=['severe'])])
+    das = sim.analyzers['daily_age_stats']
+    sev = das.age_results['severe']
+    assert sev.shape == (sim.diseases.covid.t.npts, 10), 'shape (npts, n_bins)'
+    # The per-day total (summed over age) equals the n_severe stock at that day.
+    n_sev = np.asarray(sim.diseases.covid.results['n_severe'])
+    assert np.allclose(sev.sum(axis=1), n_sev), 'age totals match the n_severe stock each day'
+
+
+def test_plots_smoke():
+    """cv.Sim.plot, cv.Fit.plot, and cv.TransTree.plot produce figures (agg backend)."""
+    import matplotlib
+    matplotlib.use('agg')
+    sim = _run([cv.TransTree()], n_days=40)
+    assert sim.plot() is not None, 'cv.Sim.plot'
+    fit = cv.Fit(sim, custom={'cum_deaths': {'data': [10, 20.], 'sim': [11, 19.]}}, die=False)
+    assert fit.plot() is not None, 'cv.Fit.plot'
+    assert sim.analyzers['transtree'].plot() is not None, 'cv.TransTree.plot'
