@@ -5,7 +5,13 @@ the baseline results.
 
 import numpy as np
 import sciris as sc
+import pytest
 import covasim as cv
+
+# v4.0 Starsim port: the baseline/benchmark below are now regenerated against the v4 engine (M10).
+# v4 is deterministic for a fixed seed (per-distribution CRN), so the default sim reproduces its
+# saved summary exactly. (v4 is NOT bit-for-bit identical to v3; that equivalence is checked
+# statistically by the multi-seed parity gates in tests/regression/.)
 
 do_plot = 1
 do_save = 0
@@ -160,9 +166,9 @@ def test_benchmark(do_save=do_save, repeats=1, verbose=True):
                 'run':        round(t_run,  n_decimals),
                 },
             'parameters': {
-                'pop_size': sim['pop_size'],
-                'pop_type': sim['pop_type'],
-                'n_days':   sim['n_days'],
+                'pop_size': sim._cv_config['pop_size'],
+                'pop_type': sim._cv_config['pop_type'],
+                'n_days':   sim._cv_config['n_days'],
                 },
             'cpu_performance': ratio,
             }

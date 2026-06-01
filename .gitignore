@@ -141,3 +141,38 @@ dmypy.json
 
 # Node.js and NPM
 node_modules
+
+# Covasim v4.0 regression baselines (regenerate from a v3.1.8 env via tests/regression/multi_seed_v3.py)
+tests/regression/v3_seeds_n*.json
+tests/regression/v4_seeds*.json
+tests/regression/anchor_snapshot.json
+
+# M1 single-variant regression baselines (regenerate from a v3.1.8 env via multi_seed_v3.py against anchor_m1)
+tests/regression/v3_m1_*seeds*.json
+tests/regression/v4_m1_*seeds*.json
+tests/regression/v3_m1_contacts*.json
+tests/regression/anchor_m1_snapshot.json
+
+# M2 single-variant full-natural-history regression baselines
+tests/regression/v3_m2_*seeds*.json
+tests/regression/v4_m2_*seeds*.json
+tests/regression/anchor_m2_snapshot.json
+
+# M3 multi-variant + cross-immunity regression baselines
+tests/regression/v3_m3_*seeds*.json
+tests/regression/v4_m3_*seeds*.json
+tests/regression/anchor_m3_snapshot.json
+
+# M4 waning-immunity + NAb regression artifacts (M4 reuses the v3_m3 use_waning=True baseline)
+tests/regression/v4_m4_*seeds*.json
+tests/regression/anchor_m4_snapshot.json
+
+# M5 testing/tracing/quarantine regression baselines
+tests/regression/v3_m5_*seeds*.json
+tests/regression/v4_m5_*seeds*.json
+tests/regression/anchor_m5_snapshot.json
+
+# M6 vaccination regression baselines
+tests/regression/v3_m6_*seeds*.json
+tests/regression/v4_m6_*seeds*.json
+tests/regression/anchor_m6_snapshot.json

@@ -36,6 +36,7 @@ dependencies = [
     "statsmodels",
     "matplotlib",
     "sciris>=2.0.4",
+    "starsim",
 ]
 dynamic = ["version"]
 
