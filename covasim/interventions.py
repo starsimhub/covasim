@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import pylab as pl
 import sciris as sc
+import random
 import inspect
 import datetime as dt
 from . import misc as cvm
@@ -520,6 +521,89 @@ class sequence(Intervention):
         inds = find_day(self.days_arr <= sim.t, which='last')
         if len(inds):
             return self.interventions[inds[0]].apply(sim)
+
+
+#%% Socio-economic interventions 
+
+__all__ += ['introduce_greenspace']
+
+class introduce_greenspace(Intervention):
+
+    def __init__(self, pop_size,  num_greenspaces=None, custom_spaces=None, specifications=None, symp_prob_dec=0.1 , crit_prob_dec=0.1, severe_prob_dec=0.1, **kwargs):
+        super().__init__(**kwargs) # Initialize the Intervention object
+        self.specifications    = sc.dcp(specifications)
+        self.pop_size = sc.dcp(pop_size)
+        
+        self.symp_prob_dec = sc.dcp(symp_prob_dec)
+        self.crit_prob_dec = sc.dcp(crit_prob_dec)
+        self.severe_prob_dec = sc.dcp(severe_prob_dec)
+
+        #populate greenspaces
+        basic_greenspace = {
+                "daily_access": 1000,
+                "prob_daily_access": .9,
+                "max_daily_cap": 1000,
+                "daily_visits": [[]]
+            }
+       
+        if custom_spaces: self.greenspaces = custom_spaces
+        else: self.greenspaces = [basic_greenspace]
+        
+        if num_greenspaces and len(self.greenspaces) < num_greenspaces:
+            for i in range(num_greenspaces-len(self.greenspaces)): self.greenspaces.append(basic_greenspace)
+        
+        #assign IDs
+        for i in range(len(self.greenspaces)): self.greenspaces[i]['id'] = i
+        
+
+        self.fitness_improvement = [0 * pop_size]
+        self.greenspace_visits = [{} for i in range(pop_size)]       
+        self.greenspace_access = [[] for i in range(pop_size)]
+
+        for greenspace in self.greenspaces: 
+            loc = np.random.randint(self.pop_size-greenspace['daily_access'])
+            for i in range(loc,loc + greenspace['daily_access']): 
+                self.greenspace_access[i] = self.greenspace_access[i] + [greenspace['id']]
+        
+        return
+    
+    def initialize(self, sim):
+        ''' Fix days and store beta '''
+
+        super().initialize()
+
+        return
+    
+    def visit_greenspaces(self,sim):
+        ''' simulate people visiting greenspaces'''
+
+        for person in range(self.pop_size):
+            for greenspace_id in self.greenspace_access[person]:
+                
+                gpda = 0 
+                for greenspace in self.greenspaces: 
+                    if greenspace['id'] == greenspace_id: gpda = greenspace['prob_daily_access']
+                
+                person_visits_greenspace = random.choices([1,0], weights=[gpda,1-gpda], cum_weights=None, k=1)[0]
+                
+                if person_visits_greenspace and len(greenspace['daily_visits'][-1]) < greenspace['max_daily_cap']:
+                    self.greenspaces[greenspace_id]['daily_visits'][-1].append(person)
+                    break
+            
+        
+
+    def apply(self, sim):
+    
+        self.visit_greenspaces(sim)
+
+        for greenspace in self.greenspaces: 
+            for visitor_id in greenspace['daily_visits'][-1]:
+                sim.people.symp_prob[visitor_id] = sim.people.symp_prob[visitor_id] - sim.people.symp_prob[visitor_id]*self.symp_prob_dec
+                sim.people.crit_prob[visitor_id] = sim.people.crit_prob[visitor_id] - sim.people.crit_prob[visitor_id]*self.crit_prob_dec
+                sim.people.severe_prob[visitor_id] = sim.people.severe_prob[visitor_id] - sim.people.severe_prob[visitor_id]*self.severe_prob_dec
+            greenspace['daily_visits'].append([])
+
+        return
 
 
 #%% Beta interventions

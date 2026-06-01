@@ -93,7 +93,7 @@ def make_people(sim, popdict=None, die=True, reset=False, recreate=False, verbos
         people = popdict
         people.set_pars(sim.pars)
     else:
-        people = cvppl.People(sim.pars, uid=popdict['uid'], age=popdict['age'], sex=popdict['sex'], contacts=popdict['contacts']) # List for storing the people
+        people = cvppl.People(sim.pars, uid=popdict['uid'], age=popdict['age'], sex=popdict['sex'], SVI=popdict['SVI'], contacts=popdict['contacts']) # List for storing the people
 
     sc.printv(f'Created {pop_size} people, average age {people.age.mean():0.2f} years', 2, verbose)
 
@@ -140,7 +140,7 @@ def validate_popdict(popdict, pars, verbose=True):
     return
 
 
-def make_randpop(pars, use_age_data=True, use_household_data=True, sex_ratio=0.5, microstructure='random', **kwargs):
+def make_randpop(pars, use_age_data=True, use_household_data=True, sex_ratio=0.5, SVI_ratio=0.1, microstructure='random', **kwargs):
     '''
     Make a random population, with contacts.
 
@@ -192,7 +192,7 @@ def make_randpop(pars, use_age_data=True, use_household_data=True, sex_ratio=0.5
                     warnmsg = f'Could not load household size data for requested location "{location}" ({str(E)}), using default'
                     cvm.warn(warnmsg)
 
-    # Handle sexes and ages
+    # Handle sexes, ages, and SVI's
     uids           = np.arange(pop_size, dtype=cvd.default_int)
     sexes          = np.random.binomial(1, sex_ratio, pop_size)
     age_data_min   = age_data[:,0]
@@ -202,12 +202,14 @@ def make_randpop(pars, use_age_data=True, use_household_data=True, sex_ratio=0.5
     age_data_prob /= age_data_prob.sum() # Ensure it sums to 1
     age_bins       = cvu.n_multinomial(age_data_prob, pop_size) # Choose age bins
     ages           = age_data_min[age_bins] + age_data_range[age_bins]*np.random.random(pop_size) # Uniformly distribute within this age bin
+    SVIs          = np.random.binomial(1, SVI_ratio, pop_size) # SVI's
 
     # Store output
     popdict = {}
     popdict['uid'] = uids
     popdict['age'] = ages
     popdict['sex'] = sexes
+    popdict['SVI'] = SVIs
 
     # Actually create the contacts
     if microstructure == 'random':

@@ -44,6 +44,7 @@ class PeopleMeta(sc.prettyobj):
             'uid',              # Int
             'age',              # Float
             'sex',              # Float
+            'SVI',              # Int 
             'symp_prob',        # Float
             'severe_prob',      # Float
             'crit_prob',        # Float

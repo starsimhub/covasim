@@ -54,7 +54,7 @@ def make_pars(set_prognoses=False, prog_by_age=True, version=None, **kwargs):
     # Network parameters, generally initialized after the population has been constructed
     pars['contacts']        = None  # The number of contacts per layer; set by reset_layer_pars() below
     pars['dynam_layer']     = None  # Which layers are dynamic; set by reset_layer_pars() below
-    pars['beta_layer']      = None  # Transmissibility per layer; set by reset_layer_pars() below
+    pars['beta_l ayer']      = None  # Transmissibility per layer; set by reset_layer_pars() below
 
     # Basic disease transmission parameters
     pars['beta_dist']    = dict(dist='neg_binomial', par1=1.0, par2=0.45, step=0.01) # Distribution to draw individual level transmissibility; dispersion from https://www.researchsquare.com/article/rs-29548/v1
@@ -227,7 +227,7 @@ def reset_layer_pars(pars, layer_keys=None, force=False):
     return
 
 
-def get_prognoses(by_age=True, version=None):
+def get_prognoses(by_age=True,by_SVI=True, version=None):
     '''
     Return the default parameter values for prognoses
 
@@ -251,7 +251,7 @@ def get_prognoses(by_age=True, version=None):
             crit_probs    = np.array([0.04]),
             death_probs   = np.array([0.01]),
         )
-    else:
+    else :
         prognoses = dict(
             age_cutoffs   = np.array([0,       10,      20,      30,      40,      50,      60,      70,      80,      90,]),     # Age cutoffs (lower limits)
             sus_ORs       = np.array([0.34,    0.67,    1.00,    1.00,    1.00,    1.00,    1.24,    1.47,    1.47,    1.47]),    # Odds ratios for relative susceptibility -- from Zhang et al., https://science.sciencemag.org/content/early/2020/05/04/science.abb8001; 10-20 and 60-70 bins are the average across the ORs
@@ -262,6 +262,8 @@ def get_prognoses(by_age=True, version=None):
             crit_probs    = np.array([0.00003, 0.00008, 0.00036, 0.00104, 0.00216, 0.00933, 0.03639, 0.08923, 0.17420, 0.17420]), # Overall probability of developing critical symptoms (derived from Table 1 of https://www.imperial.ac.uk/media/imperial-college/medicine/mrc-gida/2020-03-16-COVID19-Report-9.pdf)
             death_probs   = np.array([0.00002, 0.00002, 0.00010, 0.00032, 0.00098, 0.00265, 0.00766, 0.02439, 0.08292, 0.16190]), # Overall probability of dying -- from O'Driscoll et al., https://www.nature.com/articles/s41586-020-2918-0; last data point from Brazeau et al., https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-34-ifr/
         )
+    
+    
     prognoses = relative_prognoses(prognoses) # Convert to conditional probabilities
 
     # If version is specified, load old parameters
