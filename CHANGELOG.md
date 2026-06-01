@@ -4,7 +4,18 @@ All notable changes to the codebase are documented in this file. Changes that ma
 
 ## Coming soon
 
-Covasim is currently being ported to [Starsim](https://starsim.org), but otherwise there are no further major releases planned. If there is a specific bugfix or feature you would like to see, please [create an issue](https://github.com/starsimhub/covasim/issues/new/choose).
+Covasim v4.0 is the [Starsim](https://starsim.org) port (see below). If there is a specific bugfix or feature you would like to see, please [create an issue](https://github.com/starsimhub/covasim/issues/new/choose).
+
+## Version 4.0 (Starsim port)
+
+### Version 4.0.0 (2026-05-30)
+
+This is a major release: Covasim is now built on the [Starsim](https://starsim.org) framework. `cv.Sim` is a subclass of `ss.Sim`, the population is an `ss.People`, contact layers are `ss.Network`s, and the COVID disease logic lives in a single `cv.COVID(ss.Infection)` module. The public Covasim API is preserved — the great majority of v3 scripts run unchanged or with minor adjustments (see the [v3 → v4 migration guide](https://docs.covasim.org/migration.html)).
+
+- **New foundation.** The natural history, multi-variant dynamics, waning/NAb immunity (`use_waning`), and cross-immunity engine are re-expressed on Starsim arrays + an `ss.Connector` that recomputes protection each step.
+- **Preserved API.** Interventions (`test_prob`, `test_num`, `contact_tracing`, `vaccinate_prob`/`vaccinate_num`/`vaccinate`/`simple_vaccine`, `change_beta`, `clip_edges`, `dynamic_pars`, `sequence`), analyzers (`snapshot`, `age_histogram`, `daily_age_stats`, `nab_histogram`, `TransTree`), and the analysis/run tools (`Fit`, `Calibration`, `MultiSim`, `Scenarios`, `parallel`) all keep their v3 signatures. `cv.Sim(pars)` (dict form) and the keyword form both work, with explicit keywords overriding the dict.
+- **Regression information.** Because Starsim uses per-distribution common random numbers rather than v3's single global RNG, **v4 results are not bit-for-bit identical to v3** for the same seed. Equivalence is validated statistically via multi-seed z-score parity gates on the headline metrics. `sim.summary` keys are now namespaced by module (e.g. `covid_cum_deaths`). `sim.initialize()` is retained as an alias for `sim.init()`.
+- **Not yet ported:** the SynthPops population backend (`pop_type='synthpops'`), dynamic rescaling, the full TransTree NetworkX graph view, and loading pre-v4 pickles. The `bin/covasim` CLI wrapper is retired.
 
 ## Latest versions (3.1.x)
 

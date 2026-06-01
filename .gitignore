@@ -157,3 +157,22 @@ tests/regression/anchor_m1_snapshot.json
 tests/regression/v3_m2_*seeds*.json
 tests/regression/v4_m2_*seeds*.json
 tests/regression/anchor_m2_snapshot.json
+
+# M3 multi-variant + cross-immunity regression baselines
+tests/regression/v3_m3_*seeds*.json
+tests/regression/v4_m3_*seeds*.json
+tests/regression/anchor_m3_snapshot.json
+
+# M4 waning-immunity + NAb regression artifacts (M4 reuses the v3_m3 use_waning=True baseline)
+tests/regression/v4_m4_*seeds*.json
+tests/regression/anchor_m4_snapshot.json
+
+# M5 testing/tracing/quarantine regression baselines
+tests/regression/v3_m5_*seeds*.json
+tests/regression/v4_m5_*seeds*.json
+tests/regression/anchor_m5_snapshot.json
+
+# M6 vaccination regression baselines
+tests/regression/v3_m6_*seeds*.json
+tests/regression/v4_m6_*seeds*.json
+tests/regression/anchor_m6_snapshot.json

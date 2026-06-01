@@ -36,8 +36,10 @@ N_DAYS       = 60
 def make_sim(pop_type='random', rand_seed=0, **kwargs):
     """Build (not run) the M1 anchor sim for the current Covasim build."""
     if _IS_V4:
+        # M1 is the no-waning scenario; set use_waning=False explicitly (cv.Sim now defaults to True,
+        # matching v3).
         pars = dict(pop_size=POP_SIZE, pop_infected=POP_INFECTED, pop_type=pop_type,
-                    n_days=N_DAYS, rand_seed=rand_seed, verbose=0)
+                    n_days=N_DAYS, rand_seed=rand_seed, use_waning=False, verbose=0)
         return cv.Sim(**sc.mergedicts(pars, kwargs))
 
     # v3.1.8: reduce Covasim to M1's transmission+recovery-only SEIR.

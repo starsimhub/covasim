@@ -35,8 +35,30 @@ class People(ss.People):
         kwargs: forwarded to ``ss.People`` (e.g. ``extra_states``).
     """
 
+    # v3 stored per-agent disease state on People; in v4 it lives on the COVID disease module. These
+    # names are proxied through to the disease so v3-style ``sim.people.exposed`` (etc.) keeps working
+    # in custom interventions/analyzers. (Reads return the live disease array, so index-assignment
+    # like ``sim.people.rel_sus[inds] = 0`` writes through to the disease.)
+    _COVID_STATE_PROXY = frozenset([
+        'susceptible', 'exposed', 'infectious', 'symptomatic', 'severe', 'critical', 'recovered',
+        'dead', 'infected', 'diagnosed', 'tested', 'known_contact', 'quarantined', 'isolated',
+        'vaccinated', 'rel_sus', 'rel_trans', 'doses', 'peak_nab', 'nab',
+    ])
+
     def __init__(self, n_agents, age_data=None, **kwargs):
         if age_data is None:
             age_data = _default_age_data()
         super().__init__(n_agents, age_data=age_data, **kwargs)
         return
+
+    def __getattr__(self, key):
+        """Proxy v3 per-agent disease-state reads through to the COVID module (see _COVID_STATE_PROXY).
+
+        ``__getattr__`` is only consulted when normal attribute lookup fails, so it cannot shadow real
+        ``People`` attributes; it falls back to the standard AttributeError for everything else.
+        """
+        if key in People._COVID_STATE_PROXY:
+            sim = self.__dict__.get('sim', None)  # __dict__ access avoids re-triggering __getattr__
+            if sim is not None and hasattr(sim, 'diseases') and 'covid' in sim.diseases:
+                return getattr(sim.diseases['covid'], key)
+        raise AttributeError(f"'People' object has no attribute '{key}'")

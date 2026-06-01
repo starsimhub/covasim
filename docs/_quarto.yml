@@ -51,6 +51,8 @@ website:
         text: Tutorials
       - href: whatsnew.md
         text: What's new
+      - href: migration.md
+        text: v3 → v4 migration
       - href: faq.md
         text: FAQ
       - href: api/index.qmd

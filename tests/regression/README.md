@@ -156,3 +156,105 @@ numba RNG + per-day viral-load discretization, irreducible without bit-for-bit
 equivalence) still reads as `|z|` up to ~3.5. `|z| < 5` admits that scientifically
 negligible band while still catching genuine regressions; see the rationale block at
 the top of `../test_m2_parity.py`.
+
+## M3 anchors (multi-variant + cross-immunity)
+
+`anchor_m3.py` adds the M3 **multi-variant** anchor for the `random` and `hybrid`
+backends: wild seeded at t0, **alpha introduced at day 10** and **delta at day 30**
+(`n_imports=20` each), `pop_size=20_000`, `n_days=120`. The same file runs under
+v3.1.8 (with **cross-immunity active**, i.e. `use_waning=True` — the realistic
+multi-variant regime, M3 design-spec Open Q D) and under v4 (`cv.Sim(variants=[...])`).
+`build_summary_m3` (in `short_summary.py`) extracts aggregate metrics
+(`cum_infections`, `cum_deaths`, `peak_n_infectious`, `peak_prevalence`) plus the
+per-variant `cum_infections_<v>` / `peak_n_infectious_<v>` for wild/alpha/delta.
+
+Generate the gitignored v3.1.8 M3 baselines from a frozen v3.1.8 env (worktree method):
+
+```bash
+git worktree add /tmp/cov-v3 main
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m3_random --n 30
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m3_hybrid --n 30
+```
+
+(`PYTHONPATH=/tmp/cov-v3` makes `import covasim` resolve to the v3.1.8 worktree, not the
+editable v4 install; the harness duck-types on `cv.COVID` to pick the v3-vs-v4 branch.)
+
+The release gate is `../test_m3_parity.py` (slow, per backend), skipping when the
+baseline is absent.
+
+**Documented static-vs-NAb divergence (the M3 acceptance boundary).** M3 ships a
+*static, NAb-free* cross-immunity: the connector writes `sus_imm = matrix[target, source]`
+directly, whereas v3 weights it by the per-agent neutralizing-antibody titre
+(`sus_imm = calc_VE(nab × matrix)`). Consequently the v4 and v3 trajectories agree where
+the static matrix suffices but diverge where NAb kinetics dominate:
+
+  - **Converges (GATED, `|z| < 5`):** `cum_infections_wild` (≈ `|z| 0`, even with
+    multi-variant reinfection feedback), `peak_n_infectious`, `peak_prevalence`. These
+    validate the core multi-variant machinery (per-variant transmission, host
+    exclusivity, the cross-immunity connector, reinfection).
+  - **Diverges (INFORMATIONAL, not gated):** the per-variant alpha/delta absolute counts
+    and aggregate `cum_infections`. The gap is largest for the **late-introduced escape
+    variant delta** (`matrix[delta, wild]=0.374`, so v4 wild-recovered are only ~37%
+    protected and delta finds a large susceptible pool): v4 has ~7–10× more delta and
+    ~55% more total infections than v3 (`|z|` up to ~46). This is by design; the NAb
+    engine (M4) re-converges these. A related divergence: same-variant reinfection is
+    **exactly 0** in M3 (`matrix[v,v]=1.0`), whereas v3's `calc_VE(nab×1.0) < 1` permits
+    a small amount.
+
+The gate therefore hard-gates only the convergent subset and prints the full per-metric
+table (`[GATE]`/`[info]`) for diagnostics; see the rationale block at the top of
+`../test_m3_parity.py` and the demo in `NOTES_FOR_CLIFF.md`.
+
+## M4 anchor (waning immunity + NAbs)
+
+`anchor_m4.py` is the M3 multi-variant anchor (wild + alpha@d10 + delta@d30) **with the NAb engine
+on** (`use_waning=True`). The v3.1.8 side is byte-for-byte the M3 anchor's v3 branch (which already
+ran `use_waning=True`), so **M4 reuses the M3 v3.1.8 baseline** (`v3_m3_<pt>_seeds_n*.json`) — no
+new baseline. `build_summary_m3` serves both milestones.
+
+The release gate is `../test_m4_parity.py` (slow, per backend). Where M3's *static* cross-immunity
+diverged from v3 on the per-variant escape dynamics (delta `|z|~25-46`, gated only on a convergent
+subset), M4's NAb-weighted cross-immunity (`sus_imm = calc_VE(nab × matrix)`) **re-converges every
+pinned metric** — aggregate burden AND per-variant wild/alpha/delta counts — to within `|z|<3.5` of
+the same v3 baseline. So M4 hard-gates the WHOLE metric set at `|z|<5`. This is the M4 acceptance:
+the documented M3 static-vs-NAb divergence closes once NAbs are wired.
+
+## M5 anchor (testing / tracing / quarantine)
+
+`anchor_m5.py` is the M2 single-variant scenario plus a `test_prob` testing intervention and a
+`contact_tracing` intervention (same public API in v3.1.8 and v4). `build_summary_m5` pins the burden
+(`cum_infections`/`cum_deaths`/`peak_n_infectious`) plus the testing/quarantine outcomes
+(`cum_tests`/`cum_diagnoses`/`peak_n_quarantined`/`peak_n_isolated`). Generate the gitignored v3.1.8
+baseline:
+
+```bash
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m5_random --n 30
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m5_hybrid --n 30
+```
+
+The release gate is `../test_m5_parity.py` (slow, per backend). Once quarantine reduces both
+transmissibility AND susceptibility (the v3 `quar_factor` semantics), **every gated metric matches
+v3 within |z|<2** (cum_infections z≈−0.1, cum_diagnoses |z|<1.3, quarantine/isolation/deaths/peak all
+< 2). `cum_tests` is **informational** (not gated): the testing volume matches to ~2%, but its
+cross-seed SE is so tiny that the residual reads as |z|~8 on the random backend — the irreducible
+Starsim-CRN-vs-v3-RNG offset (analogous to M2's documented residual). The iso/quar transmissibility
+factors are a scalar M5 approximation of v3's per-layer values (spec Open Q A; the per-layer
+refinement would tighten hybrid further but the aggregate already matches).
+
+## M6 anchor (vaccination)
+
+`anchor_m6.py` is the single-variant natural-history scenario with `use_waning=True` plus a pfizer
+vaccination campaign (`vaccinate_prob('pfizer', days=20, prob=0.05)`). `build_summary_m6` pins the
+burden (`cum_infections`/`cum_severe`/`cum_deaths`/`peak_n_infectious`) plus the vaccination outcomes
+(`cum_doses`/`cum_vaccinated`). Generate the gitignored v3.1.8 baseline:
+
+```bash
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m6_random --n 30
+PYTHONPATH=/tmp/cov-v3 python tests/regression/multi_seed_v3.py --anchor m6_hybrid --n 30
+```
+
+The release gate is `../test_m6_parity.py` (slow, per backend). Because vaccine immunity shares the
+M4 NAb pipeline (which re-converges to v3 at |z|<3.5), the vaccinated trajectory tracks v3: **every
+pinned metric matches within |z|<2.1** — burden, peak, doses, and vaccinated. (`cum_infections` counts
+infection EVENTS = sum of `cum_infections_by_variant`, matching v3's flow definition, since
+`use_waning=True` produces reinfections.) Gate threshold |z|<5 as M2-M5.
