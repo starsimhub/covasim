@@ -52,6 +52,8 @@ class People(cvb.BasePeople):
 
         # Other initialization
         self.t = 0 # Keep current simulation time
+        self.viral_load = 0 # Keep current viral load
+        self.viral_shedding = 0 # Keep current viral shedding
         self._lock = False # Prevent further modification of keys
         self.meta = cvd.PeopleMeta() # Store list of keys and dtypes
         self.contacts = None
@@ -66,7 +68,8 @@ class People(cvb.BasePeople):
                 self[key] = np.zeros(self.pars['pop_size'], dtype=cvd.default_int)
             else:
                 self[key] = np.full(self.pars['pop_size'], np.nan, dtype=cvd.default_float)
-
+        self.viral_load = np.zeros(self.pars['pop_size'], dtype=cvd.default_float)
+        self.viral_shedding = np.zeros(self.pars['pop_size'], dtype=cvd.default_float)
         # Set health states -- only susceptible is true by default -- booleans except exposed by variant which should return the variant that ind is exposed to
         for key in self.meta.states:
             val = (key in ['susceptible', 'naive']) # Default value is True for susceptible and naive, false otherwise

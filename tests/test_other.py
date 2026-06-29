@@ -78,7 +78,7 @@ def test_basepeople():
     sc.heading('Testing base.py people and contacts...')
 
     # Create a small sim for later use
-    sim = cv.Sim(pop_size=100, verbose=verbose)
+    sim = cv.Sim(pop_size=100, n_days = 20, verbose=verbose)
     sim.initialize()
 
     # BasePeople methods
