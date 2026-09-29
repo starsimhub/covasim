@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -77,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-1925958ed9d580f9af1c76e2ed2ec64a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-4041a82094a16f1fd3abfa8a6c5454e9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-1925958ed9d580f9af1c76e2ed2ec64a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-87a1b67b04f4001bca231538bd247c25.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -583,22 +586,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> sim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim 3.1.8 (2026-05-29) — © 2020-2026 by IDM
+<pre><code>Covasim 3.1.9 (2026-09-29) — © 2020-2026 by IDM
 Initializing sim with 20000 people for 60 days
-
   Running 2020-03-01 ( 0/60) (0.08 s)  ———————————————————— 2%
-
   Running 2020-03-11 (10/60) (0.11 s)  •••————————————————— 18%
-
   Running 2020-03-21 (20/60) (0.14 s)  ••••••—————————————— 34%
-
-  Running 2020-03-31 (30/60) (0.16 s)  ••••••••••—————————— 51%
-
-  Running 2020-04-10 (40/60) (0.20 s)  •••••••••••••——————— 67%
-
-  Running 2020-04-20 (50/60) (0.24 s)  ••••••••••••••••———— 84%
-
-  Running 2020-04-30 (60/60) (0.30 s)  •••••••••••••••••••• 100%
+  Running 2020-03-31 (30/60) (0.17 s)  ••••••••••—————————— 51%
+  Running 2020-04-10 (40/60) (0.21 s)  •••••••••••••——————— 67%
+  Running 2020-04-20 (50/60) (0.26 s)  ••••••••••••••••———— 84%
+  Running 2020-04-30 (60/60) (0.32 s)  •••••••••••••••••••• 100%
 
 Simulation summary:
        12,730 cumulative infections
@@ -621,7 +617,7 @@ Simulation summary:
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_intro_files/figure-html/cell-2-output-2.png" width="888" height="744" class="figure-img"></p>
+<p><img src="tut_intro_files/figure-html/cell-2-output-2.png" width="888" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -644,20 +640,13 @@ Simulation summary:
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Initializing sim with 50000 people for 61 days
-
-  Running 2020-04-01 ( 0/61) (0.18 s)  ———————————————————— 2%
-
-  Running 2020-04-11 (10/61) (0.23 s)  •••————————————————— 18%
-
-  Running 2020-04-21 (20/61) (0.29 s)  ••••••—————————————— 34%
-
-  Running 2020-05-01 (30/61) (0.36 s)  ••••••••••—————————— 50%
-
-  Running 2020-05-11 (40/61) (0.47 s)  •••••••••••••——————— 66%
-
-  Running 2020-05-21 (50/61) (0.60 s)  ••••••••••••••••———— 82%
-
-  Running 2020-05-31 (60/61) (0.75 s)  •••••••••••••••••••— 98%
+  Running 2020-04-01 ( 0/61) (0.17 s)  ———————————————————— 2%
+  Running 2020-04-11 (10/61) (0.24 s)  •••————————————————— 18%
+  Running 2020-04-21 (20/61) (0.31 s)  ••••••—————————————— 34%
+  Running 2020-05-01 (30/61) (0.41 s)  ••••••••••—————————— 50%
+  Running 2020-05-11 (40/61) (0.51 s)  •••••••••••••——————— 66%
+  Running 2020-05-21 (50/61) (0.66 s)  ••••••••••••••••———— 82%
+  Running 2020-05-31 (60/61) (0.83 s)  •••••••••••••••••••— 98%
 Simulation summary:
        41,466 cumulative infections
         3,679 cumulative reinfections
@@ -687,20 +676,13 @@ Simulation summary:
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Initializing sim with 50000 people for 61 days
-
-  Running 2020-04-01 ( 0/61) (0.18 s)  ———————————————————— 2%
-
+  Running 2020-04-01 ( 0/61) (0.17 s)  ———————————————————— 2%
   Running 2020-04-11 (10/61) (0.23 s)  •••————————————————— 18%
-
-  Running 2020-04-21 (20/61) (0.28 s)  ••••••—————————————— 34%
-
-  Running 2020-05-01 (30/61) (0.35 s)  ••••••••••—————————— 50%
-
-  Running 2020-05-11 (40/61) (0.44 s)  •••••••••••••——————— 66%
-
-  Running 2020-05-21 (50/61) (0.57 s)  ••••••••••••••••———— 82%
-
-  Running 2020-05-31 (60/61) (0.72 s)  •••••••••••••••••••— 98%
+  Running 2020-04-21 (20/61) (0.30 s)  ••••••—————————————— 34%
+  Running 2020-05-01 (30/61) (0.38 s)  ••••••••••—————————— 50%
+  Running 2020-05-11 (40/61) (0.48 s)  •••••••••••••——————— 66%
+  Running 2020-05-21 (50/61) (0.63 s)  ••••••••••••••••———— 82%
+  Running 2020-05-31 (60/61) (0.81 s)  •••••••••••••••••••— 98%
 Simulation summary:
        41,466 cumulative infections
         3,679 cumulative reinfections
@@ -729,20 +711,13 @@ Simulation summary:
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Initializing sim with 50000 people for 61 days
-
   Running 2020-04-01 ( 0/61) (0.18 s)  ———————————————————— 2%
-
-  Running 2020-04-11 (10/61) (0.22 s)  •••————————————————— 18%
-
-  Running 2020-04-21 (20/61) (0.27 s)  ••••••—————————————— 34%
-
-  Running 2020-05-01 (30/61) (0.32 s)  ••••••••••—————————— 50%
-
-  Running 2020-05-11 (40/61) (0.38 s)  •••••••••••••——————— 66%
-
-  Running 2020-05-21 (50/61) (0.44 s)  ••••••••••••••••———— 82%
-
-  Running 2020-05-31 (60/61) (0.51 s)  •••••••••••••••••••— 98%
+  Running 2020-04-11 (10/61) (0.23 s)  •••————————————————— 18%
+  Running 2020-04-21 (20/61) (0.29 s)  ••••••—————————————— 34%
+  Running 2020-05-01 (30/61) (0.36 s)  ••••••••••—————————— 50%
+  Running 2020-05-11 (40/61) (0.42 s)  •••••••••••••——————— 66%
+  Running 2020-05-21 (50/61) (0.50 s)  ••••••••••••••••———— 82%
+  Running 2020-05-31 (60/61) (0.59 s)  •••••••••••••••••••— 98%
 Simulation summary:
        10,392 cumulative infections
           128 cumulative reinfections
@@ -774,7 +749,7 @@ Simulation summary:
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_intro_files/figure-html/cell-7-output-1.png" width="888" height="744" class="figure-img"></p>
+<p><img src="tut_intro_files/figure-html/cell-7-output-1.png" width="888" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -810,7 +785,7 @@ Simulation summary:
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_intro_files/figure-html/cell-8-output-1.png" width="888" height="744" class="figure-img"></p>
+<p><img src="tut_intro_files/figure-html/cell-8-output-1.png" width="888" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1252,7 +1227,7 @@ Simulation summary:
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v3.1.8 (2026-05-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v3.1.9 (2026-09-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

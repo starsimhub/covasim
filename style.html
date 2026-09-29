@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -76,14 +79,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-1925958ed9d580f9af1c76e2ed2ec64a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-4041a82094a16f1fd3abfa8a6c5454e9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-1925958ed9d580f9af1c76e2ed2ec64a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-87a1b67b04f4001bca231538bd247c25.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -574,7 +577,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The audience for Covasim is <em>scientists</em>, not software developers. Assume that the average Covasim user dislikes coding and wants something that <em>just works</em>. Implications of this include:</p>
 <ul>
 <li>Commands should be short, simple, and obvious, e.g.&nbsp;<code>cv.Sim().run().plot()</code>.</li>
-<li>Be as flexible as possible with user inputs. If a user could only mean one thing, do that. If the user provides <code>[0, 7, 14]</code> but the function needs an array instead of a list, convert the list to an array automatically (<code>sc.toarray()</code> exists for exactly this reason).</li>
+<li>Be as flexible as possible with user inputs. If a user could only mean one thing, do that. If the user provides <code>[0, 7, 14]</code> but the function needs an array instead of a list, convert the list to an array automatically (<a href="https://docs.sciris.org/api/sc_utils.html#sciris.sc_utils.toarray" title="0"><code>sc.toarray()</code></a> exists for exactly this reason).</li>
 <li>If there’s a “sensible” default value for something, use it. Users shouldn’t <em>have</em> to think about false positivity rate or influenza-like illness prevalence if they just want to quickly add testing to their simulation via <code>cv.test_prob(0.1)</code>.</li>
 <li>However, hard-code as little as possible. For example, rather than defining a variable at the top of the function, make it a keyword argument with a default value so the user can modify it if needed. As another example, pass keyword arguments where possible – e.g., <code>to_json(..., **kwargs)</code> can pass arbitrary extra arguments via <code>json.dump(**kwargs)</code>.</li>
 <li>Ensure the logic, especially the scientific logic, of the code is as clear as possible. If something is “bad” coding style but good science, you should probably do it anyway.</li>
@@ -615,7 +618,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="type-annotated-code-gsg221">2.21 Type Annotated Code (<a href="https://google.github.io/styleguide/pyguide.html#221-type-annotated-code">GSG221</a>)</h3>
 <p><strong>Difference</strong>: Do <em>not</em> use type annotations.</p>
 <p><strong>Reason</strong>: Type annotations are useful for ensuring that simple functions do exactly what they’re supposed to as part of a complex whole. They prioritize consistency over convenience, which is the correct priority for low-level library functions, but not for functions and classes that aim to make it as easy as possible for the user.</p>
-<p>For example, in Covasim, dates can be specified as numbers (<code>22</code>), strings (<code>'2022-02-02'</code>), or date objects (<code>datetime.date(2022, 2, 2)</code>), etc. Likewise, many quantities can be specified as a scalar, list, or array. If a function <em>usually</em> only needs a single input but can optionally operate on more than one, it adds burden on the user to require them to provide e.g.&nbsp;<code>np.array([0.3])</code> rather than just <code>0.3</code>. In addition, most functions have default arguments of <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a>, in which case Covasim will use “sensible” defaults.</p>
+<p>For example, in Covasim, dates can be specified as numbers (<code>22</code>), strings (<code>'2022-02-02'</code>), or date objects (<code>datetime.date(2022, 2, 2)</code>), etc. Likewise, many quantities can be specified as a scalar, list, or array. If a function <em>usually</em> only needs a single input but can optionally operate on more than one, it adds burden on the user to require them to provide e.g.&nbsp;<code>np.array([0.3])</code> rather than just <code>0.3</code>. In addition, most functions have default arguments of <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a>, in which case Covasim will use “sensible” defaults.</p>
 <p>Attempting to apply type annotations to the flexibility Covasim gives to the user would result in monstrosities like:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_days(<span class="va">self</span>, start_day: typing.Union[<span class="va">None</span>, <span class="bu">str</span>, <span class="bu">int</span>, dt.date, dt.datetime],</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>               end_day: typing.Union[<span class="va">None</span>, <span class="bu">str</span>, <span class="bu">int</span>, dt.date, dt.datetime]) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
@@ -668,7 +671,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="blank-lines-gsg35">3.5 Blank Lines (<a href="https://google.github.io/styleguide/pyguide.html#35-blank-lines">GSG35</a>)</h3>
 <p><strong>Difference</strong>: Always use (at least) one extra blank line between levels as within a level.</p>
 <p><strong>Reason</strong>: Google’s recommendation (two blank lines between functions or classes, one blank line between methods) is appropriate for small-to-medium classes and methods. However, for large methods (e.g.&nbsp;&gt;50 lines) with multiple blank lines within them, using only a single blank line can mark it hard to tell where one method stops and the next one starts. Thus, for a method that contains blank lines within itself, use <em>two</em> blank lines between methods (and then do that consistently for the rest of the class). For separating large classes/functions (&gt;500 lines), or classes whose methods are separated by two blank lines, separating them by three blank lines is preferable.</p>
-<p>While not explicitly covered by the Google style guide, <strong>return</strong> statements should be used at the end of each function and method, even if that block returns <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a> (in which case use <code>return</code>, not <code>return None</code>). This helps delimit larger methods/functions. However, always ask whether a function/method <em>should</em> return <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a>. Following the pandas convention, many Covasim methods return <code>self</code>, which is what enables “chaining” patterns such as <code>cv.Sim().run().plot()</code>.</p>
+<p>While not explicitly covered by the Google style guide, <strong>return</strong> statements should be used at the end of each function and method, even if that block returns <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a> (in which case use <code>return</code>, not <code>return None</code>). This helps delimit larger methods/functions. However, always ask whether a function/method <em>should</em> return <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a>. Following the pandas convention, many Covasim methods return <code>self</code>, which is what enables “chaining” patterns such as <code>cv.Sim().run().plot()</code>.</p>
 </section>
 <section id="whitespace-gsg36" class="level3">
 <h3 class="anchored" data-anchor-id="whitespace-gsg36">3.6 Whitespace (<a href="https://google.github.io/styleguide/pyguide.html#36-whitespace">GSG36</a>)</h3>
@@ -786,7 +789,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="naming-gsg316" class="level3">
 <h3 class="anchored" data-anchor-id="naming-gsg316">3.16 Naming (<a href="https://google.github.io/styleguide/pyguide.html#316-naming">GSG316</a>)</h3>
 <p><strong>Difference</strong>: Names should be consistent with other libraries and with how the user interacts with the code.</p>
-<p><strong>Reason</strong>: Covasim interacts with other libraries, especially Numpy and Matplotlib, and should not redefine these libraries’ names. For example, Google naming convention would prefer <code>fig_size</code> to <code>figsize</code>, but Matplotlib uses <code>figsize</code>, so this should also be the name preferred by Covasim. (This applies if the variable name is <em>only</em> used by source libraries. If it’s used by both, e.g.&nbsp;<code>start_day</code> used both directly by Covasim and by <code>sc.date()</code>, it’s OK to use the Google style convention.)</p>
+<p><strong>Reason</strong>: Covasim interacts with other libraries, especially Numpy and Matplotlib, and should not redefine these libraries’ names. For example, Google naming convention would prefer <code>fig_size</code> to <code>figsize</code>, but Matplotlib uses <code>figsize</code>, so this should also be the name preferred by Covasim. (This applies if the variable name is <em>only</em> used by source libraries. If it’s used by both, e.g.&nbsp;<code>start_day</code> used both directly by Covasim and by <a href="https://docs.sciris.org/api/sc_datetime.html#sciris.sc_datetime.date" title="0"><code>sc.date()</code></a>, it’s OK to use the Google style convention.)</p>
 <p>If an object is technically a class but is used more like a function (e.g.&nbsp;<a href="./api/interventions.html#covasim.interventions.change_beta" title="0"><code>cv.change_beta()</code></a>), it should be named as if it were a function. A class is “used like a function” if the user is not expected to interact with it after creation, as is the case with most interventions. Thus <code>cv.BaseVaccinate</code> is a class that is intended to be used <em>as a class</em> (primarily for subclassing). <a href="./api/interventions.html#covasim.interventions.vaccinate_prob" title="0"><code>cv.vaccinate_prob()</code></a> is also a class, but intended to be used like a function; <a href="./api/interventions.html#covasim.interventions.vaccinate" title="0"><code>cv.vaccinate()</code></a> is a function which returns an instance of <a href="./api/interventions.html#covasim.interventions.vaccinate_prob" title="0"><code>cv.vaccinate_prob</code></a> or <a href="./api/interventions.html#covasim.interventions.vaccinate_num" title="0"><code>cv.vaccinate_num</code></a>. Because <a href="./api/interventions.html#covasim.interventions.vaccinate" title="0"><code>cv.vaccinate()</code></a> and <a href="./api/interventions.html#covasim.interventions.vaccinate_prob" title="0"><code>cv.vaccinate_prob()</code></a> can be used interchangeably, they are named according to the same convention.</p>
 <p>Names should be as short as they can be while being <em>memorable</em>. This is slightly less strict than being unambiguous. Think of it as: the meaning might not be clear solely from the variable name, but should be clear from the docstring and/or line comment, and from <em>that</em> point should be unambiguous. For example:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Yes</span></span>
@@ -1241,7 +1244,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v3.1.8 (2026-05-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v3.1.9 (2026-09-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -77,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6b6957c917596b414ec0b78690761e87.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-de63f62b328812d8e578a4d74e282472.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-5a1953863e1f72ef3b996ef827f01ca7.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bb62276ab45c84d9efd712f51ff97b5a.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-1925958ed9d580f9af1c76e2ed2ec64a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-4041a82094a16f1fd3abfa8a6c5454e9.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="site_libs/bootstrap/bootstrap-1925958ed9d580f9af1c76e2ed2ec64a.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-87a1b67b04f4001bca231538bd247c25.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -536,6 +539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#coming-soon" id="toc-coming-soon" class="nav-link" data-scroll-target="#coming-soon">Coming soon</a></li>
   <li><a href="#latest-versions-3.1.x" id="toc-latest-versions-3.1.x" class="nav-link" data-scroll-target="#latest-versions-3.1.x">Latest versions (3.1.x)</a>
   <ul>
+  <li><a href="#version-3.1.9-2026-09-29" id="toc-version-3.1.9-2026-09-29" class="nav-link" data-scroll-target="#version-3.1.9-2026-09-29">Version 3.1.9 (2026-09-29)</a></li>
   <li><a href="#version-3.1.8-2026-05-29" id="toc-version-3.1.8-2026-05-29" class="nav-link" data-scroll-target="#version-3.1.8-2026-05-29">Version 3.1.8 (2026-05-29)</a></li>
   <li><a href="#version-3.1.7-2026-02-18" id="toc-version-3.1.7-2026-02-18" class="nav-link" data-scroll-target="#version-3.1.7-2026-02-18">Version 3.1.7 (2026-02-18)</a></li>
   <li><a href="#version-3.1.6-2024-01-28" id="toc-version-3.1.6-2024-01-28" class="nav-link" data-scroll-target="#version-3.1.6-2024-01-28">Version 3.1.6 (2024-01-28)</a></li>
@@ -740,6 +744,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="latest-versions-3.1.x" class="level2">
 <h2 class="anchored" data-anchor-id="latest-versions-3.1.x">Latest versions (3.1.x)</h2>
+<section id="version-3.1.9-2026-09-29" class="level3">
+<h3 class="anchored" data-anchor-id="version-3.1.9-2026-09-29">Version 3.1.9 (2026-09-29)</h3>
+<ul>
+<li>Added compatibility with Python 3.14 by removing outdated SciPy pin.</li>
+<li>Fixed <a href="./api/sim.html#covasim.sim.diff_sims" title="0"><code>cv.diff_sims()</code></a> never marking values as <code>≈</code>: changes within 0.1% are now shown as approximately equal.</li>
+<li><em>GitHub info</em>: PR <a href="https://github.com/starsimhub/covasim/pull/463">463</a></li>
+</ul>
+</section>
 <section id="version-3.1.8-2026-05-29" class="level3">
 <h3 class="anchored" data-anchor-id="version-3.1.8-2026-05-29">Version 3.1.8 (2026-05-29)</h3>
 <ul>
@@ -761,7 +773,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="version-3.1.6-2024-01-28">Version 3.1.6 (2024-01-28)</h3>
 <ul>
 <li>Reverted to <code>multiprocess</code> instead of <a href="https://docs.python.org/3/library/concurrent.futures.html#module-concurrent.futures" title="1"><code>concurrent.futures</code></a> as the default parallelization method to prevent run failures on Macs. To continue using <a href="https://docs.python.org/3/library/concurrent.futures.html#module-concurrent.futures" title="1"><code>concurrent.futures</code></a>, add an argument to <code>run()</code>, e.g.&nbsp;<code>msim.run(par_args={'parallelizer':'fast'})</code> (<code>'fast'</code> defaults to <a href="https://docs.python.org/3/library/concurrent.futures.html#module-concurrent.futures" title="1"><code>concurrent.futures</code></a>, while <code>'robust'</code> defaults to <code>multiprocess</code>; see all options <a href="https://sciris.readthedocs.io/en/latest/api/_autosummary/sciris.sc_parallel.parallelize.html#sciris.sc_parallel.parallelize">here</a>).</li>
-<li><code>get_intervention()</code> and <code>get_analyzer()</code> now return a match if there is an exact match for a class name. Previously, this only used <a href="https://docs.python.org/3/library/functions.html#isinstance" title="1"><code>isinstance()</code></a>, which sometimes failed during parallel processing since these required pickling and unpickling the intervention, and upon unpickling Python would (incorrectly) consider it to be a different class.</li>
+<li><code>get_intervention()</code> and <code>get_analyzer()</code> now return a match if there is an exact match for a class name. Previously, this only used <a href="https://docs.python.org/3/builtins/functions.html#isinstance" title="1"><code>isinstance()</code></a>, which sometimes failed during parallel processing since these required pickling and unpickling the intervention, and upon unpickling Python would (incorrectly) consider it to be a different class.</li>
 <li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/covasim/pull/1439">1439</a></li>
 </ul>
 </section>
@@ -865,7 +877,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>In <a href="./api/population.html#covasim.population.make_synthpop" title="0"><code>cv.make_synthpop()</code></a>, the argument <code>population</code> has been renamed <code>popdict</code>, and will accept any SynthPops output (<code>popdict</code>, <code>Pop</code>, or <code>People</code>).</li>
 <li>Calls to <code>people.to_people()</code> and <code>people.from_people()</code> should be replaced with <code>people.to_list()</code> and <code>people.from_list()</code>, respectively.</li>
 <li>Arguments <code>font_family</code>, <code>font_size</code>, and <code>mpl_args</code> to plots should be replaced with <code>font</code>, <code>fontsize</code>, and <code>style_args</code> respectively.</li>
-<li><code>cv.date_formatter()</code> has been removed; please use <code>sc.dateformatter()</code> (for a date x-axis) or <code>sc.datenumformatter()</code> (for a numeric axis that you want to format as dates) instead.</li>
+<li><code>cv.date_formatter()</code> has been removed; please use <a href="https://docs.sciris.org/api/sc_plotting.html#sciris.sc_plotting.dateformatter" title="0"><code>sc.dateformatter()</code></a> (for a date x-axis) or <a href="https://docs.sciris.org/api/sc_plotting.html#sciris.sc_plotting.datenumformatter" title="0"><code>sc.datenumformatter()</code></a> (for a numeric axis that you want to format as dates) instead.</li>
 <li>The <code>columns</code> argument has been removed from <a href="./api/misc.html#covasim.misc.load_data" title="0"><code>cv.load_data()</code></a>. If needed, load the data as a dataframe, filter the columns, then pass it to the sim.</li>
 <li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/covasim/pull/1295">1295</a></li>
 </ul>
@@ -1298,7 +1310,7 @@ crit2die: μ =  6.2 → 10.7, σ = 1.7 → 4.8</code></pre></li>
 <h3 class="anchored" data-anchor-id="version-2.0.2-2021-02-01">Version 2.0.2 (2021-02-01)</h3>
 <ul>
 <li>Added a new option to easily turn on/off interactive plotting: e.g., simply set <code>cv.options.set(interactive=False)</code> to turn off interactive plotting. This meta-option sets the other options <code>show</code>, <code>close</code>, and <code>backend</code>.</li>
-<li>Changed the logic of <code>do_show</code>, such that <code>do_show=False</code> will never show a plot, even if <code>cv.options.show</code> is <a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a>.</li>
+<li>Changed the logic of <code>do_show</code>, such that <code>do_show=False</code> will never show a plot, even if <code>cv.options.show</code> is <a href="https://docs.python.org/3/builtins/constants.html#True" title="1"><code>True</code></a>.</li>
 <li>Added a new method, <a href="./api/sim.html#covasim.sim.diff_sims" title="0"><code>cv.diff_sims()</code></a>, that allows the differences in results between two simulations to be quickly calculated.</li>
 <li>Removed the <code>keys</code> argument from <a href="./api/analysis.html#covasim.analysis.daily_stats" title="0"><code>cv.daily_stats()</code></a>, since non-default keys are had to validate.</li>
 <li>Fixed a bug that prevented prognoses parameters from being correctly set to those from an earlier version.</li>
@@ -1433,7 +1445,7 @@ crit2die: μ =  6.2 → 10.7, σ = 1.7 → 4.8</code></pre></li>
 <li><code>Layer.members</code> returns an array of all people with interactions in the layer</li>
 <li><code>__contains__</code> is implemented so <code>uid in layer</code> can be used</li>
 </ul></li>
-<li><p><a href="./api/interventions.html#covasim.interventions.sequence.apply" title="0"><code>cv.sequence.apply()</code></a> passes on the underlying intervention’s return value rather than always returning <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a></p></li>
+<li><p><a href="./api/interventions.html#covasim.interventions.sequence.apply" title="0"><code>cv.sequence.apply()</code></a> passes on the underlying intervention’s return value rather than always returning <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a></p></li>
 <li><p><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/covasim/pull/709">709</a></p></li>
 </ul>
 </section>
@@ -1450,7 +1462,7 @@ crit2die: μ =  6.2 → 10.7, σ = 1.7 → 4.8</code></pre></li>
 <h3 class="anchored" data-anchor-id="version-1.7.3-2020-09-30">Version 1.7.3 (2020-09-30)</h3>
 <ul>
 <li>Changed <code>test_prob.apply()</code> and <code>test_num.apply()</code> to return the indices of people that were tested</li>
-<li><code>cvm.date(None)</code> returns <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a> instead of an empty list. Both <code>cvm.date()</code> and <code>cvm.day()</code> no longer raise errors if the list of inputs includes <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a> entries.</li>
+<li><code>cvm.date(None)</code> returns <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a> instead of an empty list. Both <code>cvm.date()</code> and <code>cvm.day()</code> no longer raise errors if the list of inputs includes <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a> entries.</li>
 <li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/covasim/pull/699">699</a></li>
 </ul>
 </section>
@@ -1487,7 +1499,7 @@ crit2die: μ =  6.2 → 10.7, σ = 1.7 → 4.8</code></pre></li>
 <li><a href="./api/misc.html#covasim.misc.check_version" title="0"><code>cv.check_version()</code></a> can now take a comparison, e.g.&nbsp;<code>cv.check_version('&gt;=1.7.0')</code>.</li>
 <li>A <code>People</code> object can now be created with a single number, representing the number of people. However, to be fully initialized, it still needs the other model parameters. This change lets the people and their connections be created first, and then inserted into a sim later.</li>
 <li>Additional checking is performed on interventions to ensure they are in the correct order (i.e., testing before tracing).</li>
-<li>The <code>Result</code> object used to have several scaling options, but now it simply has <a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a> (corresponding to the previous <code>'dynamic'</code>) and <a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a>. The <code>static</code> scaling option has been removed since it is no longer used by any result types.</li>
+<li>The <code>Result</code> object used to have several scaling options, but now it simply has <a href="https://docs.python.org/3/builtins/constants.html#True" title="1"><code>True</code></a> (corresponding to the previous <code>'dynamic'</code>) and <a href="https://docs.python.org/3/builtins/constants.html#False" title="1"><code>False</code></a>. The <code>static</code> scaling option has been removed since it is no longer used by any result types.</li>
 <li><em>Regression information</em>: sims that used <code>test_num</code> may now produce different results, given the changes for sample-without-replacement and dynamic rescaling. Previous behavior had the effect of artificially inflating the effectiveness of <code>test_num</code> before and during dynamic rescaling, since all tests were assigned to the modeled subpopulation. As a result, to get comparable results as before, test efficacy (loosely parameterized by <code>symp_test</code>) should increase. Although there is not an exact relationship, to give an example, a simulation with <code>symp_test=7</code> and <code>pop_scale=10</code> previously may correspond to <code>symp_test=25</code> now. This change means that <code>symp_test</code> behaves consistently across the simulation period, so whereas previously this parameter may have needed to change over time, it should now be possible to use a single value (typically the last one used).</li>
 <li><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/covasim/pull/684">684</a>, head <code>bfb9f66</code></li>
 </ul>
@@ -1499,7 +1511,7 @@ crit2die: μ =  6.2 → 10.7, σ = 1.7 → 4.8</code></pre></li>
 <h3 class="anchored" data-anchor-id="version-1.6.1-2020-09-13">Version 1.6.1 (2020-09-13)</h3>
 <ul>
 <li>Unpinned <code>numba</code> from version 0.48. Version 0.49 <a href="https://numba.pydata.org/numba-doc/latest/release-notes.html#version-0-49-0-apr-16-2020">changed the seed</a> used for <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.choice.html#np.random.choice" title="1"><code>np.random.choice()</code></a>, meaning that results from versions &gt;=0.49 will differ from versions &lt;=0.48. Version 0.49 was also significantly slower for some operations, which is why the switch was not made at the time, but this no longer appears to impact Covasim.</li>
-<li><code>People.person()</code> now populates the contacts dictionary when returning a person, so that e.g.&nbsp;<code>sim.people[0].contacts</code> is no longer <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a>.</li>
+<li><code>People.person()</code> now populates the contacts dictionary when returning a person, so that e.g.&nbsp;<code>sim.people[0].contacts</code> is no longer <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a>.</li>
 <li>There is a new <code>story()</code> method for <code>People</code> that prints a history of an individual person, e.g.&nbsp;<code>sim.people.story(35)</code>.</li>
 <li>The baseline test in <code>test_baseline.py</code> has been updated to include contact tracing, giving greater code coverage for regression changes.</li>
 <li><em>Regression information</em>: No changes to the Covasim codebase were made; however, new installations of Covasim (or if you update Numba manually) will have a different random number stream. To return previous results, use the previous version of Numba: <code>pip install numba==0.48.0</code>.</li>
@@ -1533,7 +1545,7 @@ crit2die: μ =  6.2 → 10.7, σ = 1.7 → 4.8</code></pre></li>
 <li>An <code>AlreadyRunError</code> is now raised if <code>sim.run()</code> is called in such a way that no timesteps will be taken. This error is a distinct type so that it can be safely caught and ignored if required, but it is anticipated that most of the time, calling <code>run()</code> and not taking any timesteps, would be an inadvertent error.</li>
 <li>If the simulation has reached the end, <code>sim.run()</code> (and <code>sim.step()</code>) will now raise an <code>AlreadyRunError</code>.</li>
 <li><code>sim.run()</code> now only validates parameters as part of initialization. Parameters will always be validated in the normal workflow where <code>sim.initialize()</code> is called via <code>sim.run()</code>. However, the use case for modifying parameters during a split run or otherwise modifying parameters after initialization suggests that the user should have maximum control over the parameters at this point, so in this specialist workflow, the user is responsible for setting the parameter values correctly and in return, <code>sim.run()</code> is guaranteed not to change them.</li>
-<li>Added a <code>sim.complete</code> attribute, which is <a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a> if all timesteps have been executed. This is independent of finalizing results, since if <code>sim.step()</code> is being called externally, then finalizing the results may happen separately.</li>
+<li>Added a <code>sim.complete</code> attribute, which is <a href="https://docs.python.org/3/builtins/constants.html#True" title="1"><code>True</code></a> if all timesteps have been executed. This is independent of finalizing results, since if <code>sim.step()</code> is being called externally, then finalizing the results may happen separately.</li>
 <li><em>GitHub info</em>: : PR <a href="https://github.com/amath-idm/covasim/pull/654">654</a>, head <code>d84b5f97</code></li>
 </ul>
 </section>
@@ -1704,7 +1716,7 @@ pars['quar_factor'] = dict(h=0.8, s=0.0, w=0.0, c=0.3)</code></pre></li>
 <h4 class="anchored" data-anchor-id="parameter-changes">Parameter changes</h4>
 <ul>
 <li>Removed the parameter <code>interv_func</code>; instead, intervention functions can now be appended to <code>sim['interventions']</code>.</li>
-<li>Changed the default for the <code>rescale</code> parameter from <a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a> to <a href="https://docs.python.org/3/library/constants.html#True" title="1"><code>True</code></a>. To return to previous behavior, define <code>sim['rescale'] = False</code> explicitly.</li>
+<li>Changed the default for the <code>rescale</code> parameter from <a href="https://docs.python.org/3/builtins/constants.html#False" title="1"><code>False</code></a> to <a href="https://docs.python.org/3/builtins/constants.html#True" title="1"><code>True</code></a>. To return to previous behavior, define <code>sim['rescale'] = False</code> explicitly.</li>
 </ul>
 </section>
 <section id="other-changes-4" class="level4">
@@ -1986,7 +1998,7 @@ crit_probs   = np.array([0.00004, 0.00011, 0.00050, 0.00123, 0.00214, 0.00800, 0
 <li><p>Reordered results dictionary to start with cumulative counts.</p></li>
 <li><p><code>sim.export_pars()</code> now accepts a filename to save to.</p></li>
 <li><p>Added a <code>tests/regression</code> folder with previous versions of default parameter values.</p></li>
-<li><p>Changed <code>pars['n_beds']</code> to interpret 0 or <a href="https://docs.python.org/3/library/constants.html#None" title="1"><code>None</code></a> as no bed constraint.</p></li>
+<li><p>Changed <code>pars['n_beds']</code> to interpret 0 or <a href="https://docs.python.org/3/builtins/constants.html#None" title="1"><code>None</code></a> as no bed constraint.</p></li>
 <li><p><em>GitHub info</em>: PR <a href="https://github.com/amath-idm/covasim/pull/480">480</a>, head <code>029585f</code>, previous head <code>c7171f8</code></p></li>
 </ul>
 </section>
@@ -2020,7 +2032,7 @@ crit_probs   = np.array([0.00004, 0.00011, 0.00050, 0.00123, 0.00214, 0.00800, 0
 <ul>
 <li>Added <code>end_day</code> as a parameter, allowing an end date to be specified instead of a number of days.</li>
 <li><code>Sim.run()</code> now displays the date being simulated.</li>
-<li>Added a <code>par_args</code> argument to <code>multi_run()</code>, allowing arguments (e.g.&nbsp;<code>ncpus</code>) to be passed to <code>sc.parallelize()</code>.</li>
+<li>Added a <code>par_args</code> argument to <code>multi_run()</code>, allowing arguments (e.g.&nbsp;<code>ncpus</code>) to be passed to <a href="https://docs.sciris.org/api/sc_parallel.html#sciris.sc_parallel.parallelize" title="0"><code>sc.parallelize()</code></a>.</li>
 <li>Added a <code>compare()</code> method to multisims and stopped people from being saved by default.</li>
 <li>Fixed bug whereby intervention were not getting initialized if they were added to a sim after it was initialized.</li>
 </ul>
@@ -2054,14 +2066,14 @@ crit_probs   = np.array([0.00004, 0.00011, 0.00050, 0.00123, 0.00214, 0.00800, 0
 <ul>
 <li>New functions <code>cv.date()</code> and <code>cv.daydiff()</code> have been added, to ease handling of dates of different formats.</li>
 <li>Defaults are now functions rather than dictionaries, specifically: <code>cv.default_sim_plots</code> is now <code>cv.get_sim_plots()</code>; <code>cv.default_scen_plots</code> is now <code>cv.get_scen_plots()</code>; and <code>cv.default_colors</code> is now <code>cv.get_colors()</code>.</li>
-<li>Interventions now have a <code>do_plot</code> kwarg, which if <a href="https://docs.python.org/3/library/constants.html#False" title="1"><code>False</code></a> will disable their plotting.</li>
+<li>Interventions now have a <code>do_plot</code> kwarg, which if <a href="https://docs.python.org/3/builtins/constants.html#False" title="1"><code>False</code></a> will disable their plotting.</li>
 <li>The example scenario (<code>examples/run_scenario.py</code>) has been rewritten to include a test-trace-quarantine example.</li>
 </ul>
 </section>
 <section id="version-0.29.6-2020-04-27" class="level3">
 <h3 class="anchored" data-anchor-id="version-0.29.6-2020-04-27">Version 0.29.6 (2020-04-27)</h3>
 <ul>
-<li>Updated to use Sciris v0.17.0, to fix JSON export issues and improve <a href="https://docs.python.org/3/library/exceptions.html#KeyError" title="1"><code>KeyError</code></a> messages.</li>
+<li>Updated to use Sciris v0.17.0, to fix JSON export issues and improve <a href="https://docs.python.org/3/builtins/exceptions.html#KeyError" title="1"><code>KeyError</code></a> messages.</li>
 </ul>
 </section>
 <section id="version-0.29.5-2020-04-26" class="level3">
@@ -2572,7 +2584,7 @@ crit_probs   = np.array([0.00004, 0.00011, 0.00050, 0.00123, 0.00214, 0.00800, 0
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v3.1.8 (2026-05-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v3.1.9 (2026-09-29).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
