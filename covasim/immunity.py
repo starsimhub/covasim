@@ -313,7 +313,7 @@ def check_immunity(people, variants=None):
 
     # Handle parameters and indices
     pars = people.pars
-    nab_eff = pars['nab_eff']
+    default_nab_eff = pars['nab_eff']
     if variants is None:
         variants = range(pars['n_variants'])
 
@@ -343,9 +343,25 @@ def check_immunity(people, variants=None):
         # Calculate overall immunity
         imm = np.maximum(natural_imm, vaccine_imm)  # Use the larger of natural immunity or vaccine immunity
         effective_nabs = people.nab * imm
-        people.sus_imm[variant, :]  = calc_VE(effective_nabs, 'sus', nab_eff)
-        people.symp_imm[variant, :] = calc_VE(effective_nabs, 'symp', nab_eff)
-        people.sev_imm[variant, :]  = calc_VE(effective_nabs, 'sev', nab_eff)
+        sus_imm  = calc_VE(effective_nabs, 'sus',  default_nab_eff)
+        symp_imm = calc_VE(effective_nabs, 'symp', default_nab_eff)
+        sev_imm  = calc_VE(effective_nabs, 'sev',  default_nab_eff)
+
+        # Apply vaccine-specific nab_eff curves where the vaccine defines one,
+        # so a custom vaccine's nab_eff actually affects efficacy (issue #388)
+        if len(is_vacc) and len(pars['vaccine_pars']):
+            for num, key in vx_map.items():
+                vx_nab_eff = vx_pars[key].get('nab_eff', None)
+                if vx_nab_eff is not None:
+                    vx_inds = is_vacc[vacc_source == num]
+                    if len(vx_inds):
+                        sus_imm[vx_inds]  = calc_VE(effective_nabs[vx_inds], 'sus',  vx_nab_eff)
+                        symp_imm[vx_inds] = calc_VE(effective_nabs[vx_inds], 'symp', vx_nab_eff)
+                        sev_imm[vx_inds]  = calc_VE(effective_nabs[vx_inds], 'sev',  vx_nab_eff)
+
+        people.sus_imm[variant, :]  = sus_imm
+        people.symp_imm[variant, :] = symp_imm
+        people.sev_imm[variant, :]  = sev_imm
 
     return
 

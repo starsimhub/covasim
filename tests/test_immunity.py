@@ -328,6 +328,80 @@ def test_vaccine_target_eff():
     return sim
 
 
+def test_vaccine_nab_eff():
+    ''' Check that a custom vaccine's nab_eff actually affects efficacy (issue #388) '''
+    import covasim.immunity as cvi
+
+    sc.heading('Testing vaccine-specific nab_eff...')
+
+    nab_eff_default = dict(alpha_inf=1.08, alpha_inf_diff=1.812, beta_inf=0.967,
+                           alpha_symp_inf=-0.739, beta_symp_inf=0.038,
+                           alpha_sev_symp=-0.014, beta_sev_symp=0.079)
+    nab_eff_stronger = dict(alpha_inf=2.0, alpha_inf_diff=2.0, beta_inf=2.0,
+                            alpha_symp_inf=-1.0, beta_symp_inf=1.0,
+                            alpha_sev_symp=-0.1, beta_sev_symp=1.0)
+
+    def make_vacc_pars(nab_eff):
+        return dict(
+            nab_eff   = nab_eff,
+            nab_init  = dict(dist='normal', par1=-1, par2=2),
+            nab_boost = 4,
+            doses     = 2,
+            interval  = 21,
+        )
+
+    # 1) Per-person check: vaccinated people's immunity must use the vaccine's
+    # nab_eff curve, not the global one
+    vacc = cv.vaccinate_prob(vaccine=make_vacc_pars(nab_eff_stronger), days=[0], prob=1.0)
+    sim = cv.Sim(pars=dict(pop_size=200, pop_infected=0, n_days=10, use_waning=True,
+                           rand_seed=1, verbose=-1),
+                 interventions=vacc)
+    sim.run()
+
+    ppl = sim.people
+    is_vacc = cv.true(ppl.vaccinated)
+    assert len(is_vacc) > 0, 'No one was vaccinated'
+    variant = 0
+    var_key = sim['variant_map'][variant]
+    vx_map = sim['vaccine_map']
+    vx_pars = sim['vaccine_pars']
+    assert len(vx_map) == 1, 'Expected exactly one vaccine'
+    label = vx_map[0]
+    cvi.check_immunity(ppl)  # Recompute immunity from the current NAb levels
+    imm_arr = np.zeros(max(vx_map.keys()) + 1)
+    for num, key in vx_map.items():
+        imm_arr[num] = vx_pars[key][var_key]
+    vacc_source = ppl.vaccine_source[is_vacc]
+    vaccine_imm = imm_arr[vacc_source]
+    effective_nabs = ppl.nab[is_vacc] * vaccine_imm
+    expected = cvi.calc_VE(effective_nabs, 'sus', vx_pars[label]['nab_eff'])
+    actual = ppl.sus_imm[variant, is_vacc]
+    np.testing.assert_allclose(actual, expected, rtol=1e-6, atol=1e-8,
+                               err_msg='Vaccinated people are not using the vaccine-specific nab_eff curve')
+
+    # 2) Behavioral check: two sims identical except for nab_eff must diverge
+    def make_sim(nab_eff):
+        vacc = cv.vaccinate_prob(vaccine=make_vacc_pars(nab_eff), days=[range(20, 60)], prob=0.5)
+        s = cv.Sim(pars=dict(pop_size=5e3, pop_infected=100, n_days=120, use_waning=True,
+                             rand_seed=1, verbose=-1),
+                   interventions=vacc)
+        s.run()
+        return s
+
+    sim_a = make_sim(nab_eff_default)
+    sim_b = make_sim(nab_eff_stronger)
+    cum_a = sim_a.results['cum_infections'][-1]
+    cum_b = sim_b.results['cum_infections'][-1]
+    print(f'cum_infections with default nab_eff: {cum_a:.0f}, with stronger nab_eff: {cum_b:.0f}')
+    assert cum_a != cum_b, 'Changing nab_eff had no effect on simulation results'
+
+    # 3) Determinism control: identical nab_eff must give identical results
+    sim_a2 = make_sim(nab_eff_default)
+    assert sim_a2.results['cum_infections'][-1] == cum_a, 'Same-seed runs with the same nab_eff should be identical'
+
+    return sim_a, sim_b
+
+
 def test_decays(do_plot=False):
     sc.heading('Testing decay parameters...')
 

@@ -1386,7 +1386,8 @@ class BaseVaccination(Intervention):
             if self.p['doses'] == len(self.p['target_eff']):
                 # determine efficacy of first dose (assume efficacy supplied is against symptomatic disease)
                 nabs = np.arange(-8, 4, 0.1) # Pick a range of trial NAbs to use
-                VE_symp = cvi.calc_VE_symp(2**nabs, sim.pars['nab_eff'])
+                nab_eff = self.p.get('nab_eff', sim.pars['nab_eff']) # Use the vaccine's own nab_eff if supplied
+                VE_symp = cvi.calc_VE_symp(2**nabs, nab_eff)
                 peak_nab = nabs[np.argmax(VE_symp>self.p['target_eff'][0])]
                 self.p['nab_init'] = dict(dist='normal', par1=peak_nab, par2=2)
                 if self.p['doses'] == 2:
