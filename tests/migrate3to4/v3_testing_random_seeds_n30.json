@@ -1,0 +1,302 @@
+[
+  {
+    "cum_infections": 10409.0,
+    "cum_deaths": 81.0,
+    "peak_n_infectious": 2104.0,
+    "cum_tests": 21296.0,
+    "cum_diagnoses": 4223.0,
+    "peak_n_quarantined": 6798.0,
+    "peak_n_isolated": 535.0,
+    "_seed": 0
+  },
+  {
+    "cum_infections": 9952.0,
+    "cum_deaths": 64.0,
+    "peak_n_infectious": 2196.0,
+    "cum_tests": 21143.0,
+    "cum_diagnoses": 4109.0,
+    "peak_n_quarantined": 7123.0,
+    "peak_n_isolated": 589.0,
+    "_seed": 1
+  },
+  {
+    "cum_infections": 10342.0,
+    "cum_deaths": 65.0,
+    "peak_n_infectious": 2070.0,
+    "cum_tests": 21494.0,
+    "cum_diagnoses": 4346.0,
+    "peak_n_quarantined": 6895.0,
+    "peak_n_isolated": 552.0,
+    "_seed": 2
+  },
+  {
+    "cum_infections": 10224.0,
+    "cum_deaths": 77.0,
+    "peak_n_infectious": 1859.0,
+    "cum_tests": 21235.0,
+    "cum_diagnoses": 4237.0,
+    "peak_n_quarantined": 6345.0,
+    "peak_n_isolated": 520.0,
+    "_seed": 3
+  },
+  {
+    "cum_infections": 10455.0,
+    "cum_deaths": 89.0,
+    "peak_n_infectious": 2010.0,
+    "cum_tests": 21290.0,
+    "cum_diagnoses": 4283.0,
+    "peak_n_quarantined": 6596.0,
+    "peak_n_isolated": 516.0,
+    "_seed": 4
+  },
+  {
+    "cum_infections": 10328.0,
+    "cum_deaths": 79.0,
+    "peak_n_infectious": 1932.0,
+    "cum_tests": 21482.0,
+    "cum_diagnoses": 4288.0,
+    "peak_n_quarantined": 6229.0,
+    "peak_n_isolated": 495.0,
+    "_seed": 5
+  },
+  {
+    "cum_infections": 10114.0,
+    "cum_deaths": 70.0,
+    "peak_n_infectious": 2111.0,
+    "cum_tests": 21401.0,
+    "cum_diagnoses": 4117.0,
+    "peak_n_quarantined": 6869.0,
+    "peak_n_isolated": 556.0,
+    "_seed": 6
+  },
+  {
+    "cum_infections": 10223.0,
+    "cum_deaths": 85.0,
+    "peak_n_infectious": 2170.0,
+    "cum_tests": 21091.0,
+    "cum_diagnoses": 4234.0,
+    "peak_n_quarantined": 6946.0,
+    "peak_n_isolated": 567.0,
+    "_seed": 7
+  },
+  {
+    "cum_infections": 10334.0,
+    "cum_deaths": 82.0,
+    "peak_n_infectious": 2065.0,
+    "cum_tests": 21436.0,
+    "cum_diagnoses": 4261.0,
+    "peak_n_quarantined": 6650.0,
+    "peak_n_isolated": 564.0,
+    "_seed": 8
+  },
+  {
+    "cum_infections": 10283.0,
+    "cum_deaths": 69.0,
+    "peak_n_infectious": 1903.0,
+    "cum_tests": 21328.0,
+    "cum_diagnoses": 4206.0,
+    "peak_n_quarantined": 6468.0,
+    "peak_n_isolated": 516.0,
+    "_seed": 9
+  },
+  {
+    "cum_infections": 10164.0,
+    "cum_deaths": 65.0,
+    "peak_n_infectious": 2105.0,
+    "cum_tests": 21331.0,
+    "cum_diagnoses": 4294.0,
+    "peak_n_quarantined": 6728.0,
+    "peak_n_isolated": 567.0,
+    "_seed": 10
+  },
+  {
+    "cum_infections": 10238.0,
+    "cum_deaths": 79.0,
+    "peak_n_infectious": 2235.0,
+    "cum_tests": 21340.0,
+    "cum_diagnoses": 4292.0,
+    "peak_n_quarantined": 7232.0,
+    "peak_n_isolated": 590.0,
+    "_seed": 11
+  },
+  {
+    "cum_infections": 10605.0,
+    "cum_deaths": 75.0,
+    "peak_n_infectious": 2308.0,
+    "cum_tests": 21331.0,
+    "cum_diagnoses": 4360.0,
+    "peak_n_quarantined": 7160.0,
+    "peak_n_isolated": 615.0,
+    "_seed": 12
+  },
+  {
+    "cum_infections": 10045.0,
+    "cum_deaths": 56.0,
+    "peak_n_infectious": 1939.0,
+    "cum_tests": 21251.0,
+    "cum_diagnoses": 4169.0,
+    "peak_n_quarantined": 6524.0,
+    "peak_n_isolated": 512.0,
+    "_seed": 13
+  },
+  {
+    "cum_infections": 10351.0,
+    "cum_deaths": 50.0,
+    "peak_n_infectious": 1999.0,
+    "cum_tests": 21302.0,
+    "cum_diagnoses": 4256.0,
+    "peak_n_quarantined": 6595.0,
+    "peak_n_isolated": 523.0,
+    "_seed": 14
+  },
+  {
+    "cum_infections": 10258.0,
+    "cum_deaths": 62.0,
+    "peak_n_infectious": 2223.0,
+    "cum_tests": 21257.0,
+    "cum_diagnoses": 4212.0,
+    "peak_n_quarantined": 7061.0,
+    "peak_n_isolated": 574.0,
+    "_seed": 15
+  },
+  {
+    "cum_infections": 10366.0,
+    "cum_deaths": 61.0,
+    "peak_n_infectious": 2133.0,
+    "cum_tests": 21463.0,
+    "cum_diagnoses": 4278.0,
+    "peak_n_quarantined": 6950.0,
+    "peak_n_isolated": 600.0,
+    "_seed": 16
+  },
+  {
+    "cum_infections": 10531.0,
+    "cum_deaths": 58.0,
+    "peak_n_infectious": 1880.0,
+    "cum_tests": 21629.0,
+    "cum_diagnoses": 4357.0,
+    "peak_n_quarantined": 6157.0,
+    "peak_n_isolated": 507.0,
+    "_seed": 17
+  },
+  {
+    "cum_infections": 10623.0,
+    "cum_deaths": 88.0,
+    "peak_n_infectious": 1987.0,
+    "cum_tests": 21411.0,
+    "cum_diagnoses": 4405.0,
+    "peak_n_quarantined": 6375.0,
+    "peak_n_isolated": 513.0,
+    "_seed": 18
+  },
+  {
+    "cum_infections": 10628.0,
+    "cum_deaths": 75.0,
+    "peak_n_infectious": 2265.0,
+    "cum_tests": 21262.0,
+    "cum_diagnoses": 4446.0,
+    "peak_n_quarantined": 7464.0,
+    "peak_n_isolated": 609.0,
+    "_seed": 19
+  },
+  {
+    "cum_infections": 10427.0,
+    "cum_deaths": 61.0,
+    "peak_n_infectious": 1919.0,
+    "cum_tests": 21671.0,
+    "cum_diagnoses": 4258.0,
+    "peak_n_quarantined": 6250.0,
+    "peak_n_isolated": 511.0,
+    "_seed": 20
+  },
+  {
+    "cum_infections": 10341.0,
+    "cum_deaths": 74.0,
+    "peak_n_infectious": 2316.0,
+    "cum_tests": 21205.0,
+    "cum_diagnoses": 4283.0,
+    "peak_n_quarantined": 7417.0,
+    "peak_n_isolated": 623.0,
+    "_seed": 21
+  },
+  {
+    "cum_infections": 10109.0,
+    "cum_deaths": 71.0,
+    "peak_n_infectious": 1967.0,
+    "cum_tests": 21377.0,
+    "cum_diagnoses": 4260.0,
+    "peak_n_quarantined": 6643.0,
+    "peak_n_isolated": 525.0,
+    "_seed": 22
+  },
+  {
+    "cum_infections": 10166.0,
+    "cum_deaths": 62.0,
+    "peak_n_infectious": 2199.0,
+    "cum_tests": 21122.0,
+    "cum_diagnoses": 4165.0,
+    "peak_n_quarantined": 7026.0,
+    "peak_n_isolated": 578.0,
+    "_seed": 23
+  },
+  {
+    "cum_infections": 9993.0,
+    "cum_deaths": 72.0,
+    "peak_n_infectious": 2136.0,
+    "cum_tests": 21215.0,
+    "cum_diagnoses": 4194.0,
+    "peak_n_quarantined": 6963.0,
+    "peak_n_isolated": 583.0,
+    "_seed": 24
+  },
+  {
+    "cum_infections": 10338.0,
+    "cum_deaths": 60.0,
+    "peak_n_infectious": 2114.0,
+    "cum_tests": 21271.0,
+    "cum_diagnoses": 4281.0,
+    "peak_n_quarantined": 7132.0,
+    "peak_n_isolated": 562.0,
+    "_seed": 25
+  },
+  {
+    "cum_infections": 10143.0,
+    "cum_deaths": 62.0,
+    "peak_n_infectious": 2080.0,
+    "cum_tests": 21123.0,
+    "cum_diagnoses": 4183.0,
+    "peak_n_quarantined": 6852.0,
+    "peak_n_isolated": 551.0,
+    "_seed": 26
+  },
+  {
+    "cum_infections": 10352.0,
+    "cum_deaths": 66.0,
+    "peak_n_infectious": 2000.0,
+    "cum_tests": 21450.0,
+    "cum_diagnoses": 4295.0,
+    "peak_n_quarantined": 6581.0,
+    "peak_n_isolated": 526.0,
+    "_seed": 27
+  },
+  {
+    "cum_infections": 9921.0,
+    "cum_deaths": 64.0,
+    "peak_n_infectious": 1965.0,
+    "cum_tests": 21212.0,
+    "cum_diagnoses": 4101.0,
+    "peak_n_quarantined": 6700.0,
+    "peak_n_isolated": 550.0,
+    "_seed": 28
+  },
+  {
+    "cum_infections": 10170.0,
+    "cum_deaths": 71.0,
+    "peak_n_infectious": 2232.0,
+    "cum_tests": 21426.0,
+    "cum_diagnoses": 4164.0,
+    "peak_n_quarantined": 6989.0,
+    "peak_n_isolated": 555.0,
+    "_seed": 29
+  }
+]

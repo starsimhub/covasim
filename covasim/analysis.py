@@ -1,143 +1,723 @@
-'''
-Additional analysis functions that are not part of the core Covasim workflow,
-but which are useful for particular investigations.
-'''
+"""
+Analysis tools for Covasim on the Starsim base.
 
-import os
+``cv.Fit`` is the model-vs-data goodness-of-fit class (v3 ``analysis.Fit``). It is used
+post-run as ``cv.Fit(sim, data=...)`` and uses ``cv.compute_gof`` (misc.py). ``cv.Calibration``
+calibrates a sim to data, built on ``ss.Calibration``.
+Terminology (as v3): *difference* = sim - data per matched point; *goodness-of-fit (gof)* = the
+difference through ``compute_gof``; *loss* = gof x weight; *mismatch* = sum of losses (the scalar
+minimised during calibration).
+
+The analyzers (``cv.Analyzer`` base + ``snapshot``/``age_histogram``/``daily_age_stats``/``daily_stats``/
+``nab_histogram``) and ``cv.TransTree`` follow the v3 API. They read the per-agent states from the COVID
+module as full-length arrays indexed by agent (``cv.PeopleSnapshot``), so agents who have died are
+included, as in v3. ``cv.TransTree`` is made from the transmission log that ``cv.COVID`` always records.
+"""
+import tempfile
 import numpy as np
-import pylab as pl
 import pandas as pd
 import sciris as sc
-from . import utils as cvu
+import starsim as ss
+import matplotlib.pyplot as plt
+
 from . import misc as cvm
+from . import compat as cvc
+from . import plotting as cvplt
+from . import settings as cvset
 from . import interventions as cvi
-from . import plotting as cvpl
 from . import run as cvr
-from .settings import options as cvo # For setting global options
+
+# Lazy import (do not import unless actually used, since it is slow to load)
+sns = sc.importbyname('seaborn', lazy=True)
+
+__all__ = ['Fit', 'Calibration']
 
 
-__all__ = ['Analyzer', 'snapshot', 'age_histogram', 'daily_age_stats', 'daily_stats', 'nab_histogram',
-           'Fit', 'Calibration', 'TransTree']
+def _to_daykey(d):
+    """Normalise a date/day to a hashable key for matching data to sim time points.
+
+    Integers (and integer-like) are treated as day offsets; everything else (date strings,
+    datetimes, ss.date) is normalised to an ISO 'YYYY-MM-DD' string.
+    """
+    if isinstance(d, (int, np.integer)):
+        return int(d)
+    try:
+        return pd.Timestamp(d).strftime('%Y-%m-%d')
+    except Exception:
+        return str(d)
 
 
-class Analyzer(sc.prettyobj):
-    '''
-    Base class for analyzers. Based on the Intervention class. Analyzers are used
-    to provide more detailed information about a simulation than is available by
-    default -- for example, pulling states out of sim.people on a particular timestep
-    before it gets updated in the next timestep.
-
-    To retrieve a particular analyzer from a sim, use sim.get_analyzer().
+class Fit(sc.prettyobj):
+    """
+    Calculate the fit (mismatch) between a model run and data (the v3 ``cv.Fit``).
 
     Args:
-        label (str): a label for the Analyzer (used for ease of identification)
-    '''
+        sim (cv.Sim): a run sim (results ready). Its bridged top-level results are read.
+        data (DataFrame): data to fit, indexed by date (or integer day offset), with columns named
+            like the sim result keys (e.g. ``cum_deaths``). Falls back to ``sim.data`` if not given.
+        weights (dict): relative weight per result (default cum_deaths:10, cum_diagnoses:5, else 1).
+        keys (list): which result keys to fit (default: the cumulative keys present in both).
+        custom (dict): extra series to fit, ``{name: {'data': [...], 'sim': [...], 'weight': w}}``.
+        compute (bool): compute the mismatch immediately.
+        die (bool): raise (vs warn) if no data are supplied / no points match.
 
-    def __init__(self, label=None):
-        if label is None:
-            label = self.__class__.__name__ # Use the class name if no label is supplied
-        self.label = label # e.g. "Record ages"
-        self.initialized = False
-        self.finalized = False
+    Attributes (after compute): ``diffs``/``gofs``/``losses``/``mismatches`` (per key) and the scalar
+    ``mismatch``.
+    """
+
+    def __init__(self, sim, data=None, weights=None, keys=None, custom=None, compute=True, die=True,
+                 **gof_kwargs):
+        self.weights    = sc.mergedicts({'cum_deaths': 10, 'cum_diagnoses': 5}, weights)
+        self.user_keys  = keys
+        self.custom     = sc.mergedicts(custom)
+        self.die        = die
+        self.gof_kwargs = gof_kwargs
+
+        # Data: a DataFrame indexed by date/day, columns = result keys.
+        data = data if data is not None else getattr(sim, 'data', None)
+        if data is None or (hasattr(data, '__len__') and len(data) == 0):
+            if self.die and not self.custom:
+                raise RuntimeError('cv.Fit requires data (a DataFrame) or custom series.')
+            data = pd.DataFrame()
+        self.data = data
+
+        # Sim results (the bridged flat top-level Results) + the sim date vector.
+        self.sim_results = sc.objdict()
+        for key in sim.results.keys():
+            res = sim.results[key]
+            arr = getattr(res, 'values', None)
+            if arr is not None and np.ndim(arr) == 1:  # 1D top-level Results only (skip nested 'variant')
+                self.sim_results[key] = np.asarray(arr)
+        self.sim_daykeys = [_to_daykey(d) for d in np.asarray(sim.t.timevec)]
+        self.sim_npts = len(self.sim_daykeys)
+
+        # Populated during compute.
+        self.keys = None
+        self.custom_keys = list(self.custom.keys())
+        self.inds   = sc.objdict(sim=sc.objdict(), data=sc.objdict())
+        self.pair   = sc.objdict()
+        self.diffs  = sc.objdict()
+        self.gofs   = sc.objdict()
+        self.losses = sc.objdict()
+        self.mismatches = sc.objdict()
+        self.mismatch = None
+
+        if compute:
+            self.compute()
         return
 
+    def compute(self):
+        """Run the full pipeline: reconcile -> diffs -> gofs -> losses -> mismatch."""
+        self.reconcile_inputs()
+        self.compute_diffs()
+        self.compute_gofs()
+        self.compute_losses()
+        self.compute_mismatch()
+        return self.mismatch
 
-    def __call__(self, *args, **kwargs):
-        # Makes Analyzer(sim) equivalent to Analyzer.apply(sim)
-        if not self.initialized:
-            errormsg = f'Analyzer (label={self.label}, {type(self)}) has not been initialized'
-            raise RuntimeError(errormsg)
-        return self.apply(*args, **kwargs)
-
-
-    def initialize(self, sim=None):
-        '''
-        Initialize the analyzer, e.g. convert date strings to integers.
-        '''
-        self.initialized = True
-        self.finalized = False
-        return
-
-
-    def finalize(self, sim=None):
-        '''
-        Finalize analyzer
-
-        This method is run once as part of `sim.finalize()` enabling the analyzer to perform any
-        final operations after the simulation is complete (e.g. rescaling)
-        '''
-        if self.finalized:
-            raise RuntimeError('Analyzer already finalized')  # Raise an error because finalizing multiple times has a high probability of producing incorrect results e.g. applying rescale factors twice
-        self.finalized = True
-        return
-
-
-    def apply(self, sim):
-        '''
-        Apply analyzer at each time point. The analyzer has full access to the
-        sim object, and typically stores data/results in itself. This is the core
-        method which each analyzer object needs to implement.
-
-        Args:
-            sim: the Sim instance
-        '''
-        raise NotImplementedError
-
-
-    def shrink(self, in_place=False):
-        '''
-        Remove any excess stored data from the intervention; for use with sim.shrink().
-
-        Args:
-            in_place (bool): whether to shrink the intervention (else shrink a copy)
-        '''
-        if in_place:
-            return self
+    def reconcile_inputs(self):
+        """Pair sim and data points by matching dates/days (v3 reconcile_inputs)."""
+        data_cols = list(self.data.columns) if len(self.data) else []
+        if self.user_keys is None:
+            sim_cum = [k for k in self.sim_results.keys() if k.startswith('cum_')]
+            self.keys = [k for k in sim_cum if k in data_cols]  # cumulative keys present in both
         else:
-            return sc.dcp(self)
+            self.keys = list(self.user_keys)
+            missing = [k for k in self.keys if k not in data_cols]
+            if missing and self.die:
+                raise sc.KeyNotFoundError(f'Requested keys not in data: {missing}')
+
+        # Map each data row (by date/day key) to a sim time index.
+        daykey_to_simind = {dk: i for i, dk in enumerate(self.sim_daykeys)}
+        matches = 0
+        for key in self.keys:
+            sim_inds, data_inds = [], []
+            series = self.data[key]
+            for pos, (idx, datum) in enumerate(series.items()):
+                if np.isfinite(datum):
+                    dk = _to_daykey(idx)
+                    if dk in daykey_to_simind:
+                        sim_inds.append(daykey_to_simind[dk])
+                        data_inds.append(pos)
+            self.inds.sim[key] = np.array(sim_inds, dtype=int)
+            self.inds.data[key] = np.array(data_inds, dtype=int)
+            self.pair[key] = sc.objdict(
+                sim=np.array([self.sim_results[key][i] for i in sim_inds], dtype=float),
+                data=np.array([series.values[j] for j in data_inds], dtype=float),
+            )
+            matches += len(sim_inds)
+
+        # Custom series: paired directly (no date matching).
+        for key, custom in self.custom.items():
+            if 'sim' not in custom or 'data' not in custom:
+                raise sc.KeyNotFoundError(f'Custom input {key!r} must have "sim" and "data" keys.')
+            c_sim, c_data = np.asarray(custom['sim'], dtype=float), np.asarray(custom['data'], dtype=float)
+            if len(c_sim) != len(c_data):
+                raise ValueError(f'Custom {key!r}: sim and data must be the same length.')
+            self.pair[key] = sc.objdict(sim=c_sim, data=c_data)
+            self.weights[key] = custom.get('weights', custom.get('weight', 1.0))
+            matches += len(c_sim)
+
+        if matches == 0:
+            msg = 'No paired data points found between data and sim; check the dates/keys.'
+            if self.die:
+                raise ValueError(msg)
+            cvm.warn(msg)
+        return
+
+    def compute_diffs(self, absolute=False):
+        """sim - data per matched point."""
+        for key in self.pair.keys():
+            d = self.pair[key].sim - self.pair[key].data
+            self.diffs[key] = np.abs(d) if absolute else d
+        return
+
+    def compute_gofs(self, **kwargs):
+        """Goodness-of-fit per key via cv.compute_gof."""
+        kwargs = sc.mergedicts(self.gof_kwargs, kwargs)
+        for key in self.pair.keys():
+            self.gofs[key] = cvm.compute_gof(self.pair[key].data, self.pair[key].sim, **kwargs)
+        return
+
+    def compute_losses(self):
+        """Weighted goodness-of-fit per key."""
+        for key in self.gofs.keys():
+            weight = self.weights.get(key, 1.0)
+            if sc.isiterable(weight):
+                weight = np.asarray(weight)
+                if len(weight) == self.sim_npts:           # weight given over the full sim -> trim to matches
+                    weight = weight[self.inds.sim[key]]
+            self.losses[key] = self.gofs[key] * weight
+        return
+
+    def compute_mismatch(self, use_median=False):
+        """Sum the losses into per-key mismatches and the scalar total mismatch."""
+        for key in self.losses.keys():
+            self.mismatches[key] = np.median(self.losses[key]) if use_median else np.sum(self.losses[key])
+        self.mismatch = float(np.sum([v for v in self.mismatches.values()]))
+        return self.mismatch
+
+    def plot(self, fig=None, **kwargs):
+        """Plot, per fitted key, the sim-vs-data paired points and the per-point loss."""
+        keys = list(self.pair.keys())
+        if not keys:
+            return None
+        if fig is None:
+            fig, axes = plt.subplots(2, len(keys), figsize=(4.5 * len(keys), 7), squeeze=False)
+        else:
+            axes = np.array(fig.axes).reshape(2, len(keys))
+        for j, k in enumerate(keys):
+            x = np.arange(len(self.pair[k].sim))
+            axes[0, j].plot(x, self.pair[k].data, 'o-', label='data', alpha=0.7)
+            axes[0, j].plot(x, self.pair[k].sim, 's-', label='sim', alpha=0.7)
+            axes[0, j].set_title(k); axes[0, j].legend()
+            axes[1, j].bar(x, self.losses.get(k, np.zeros_like(x)))
+            axes[1, j].set_title(f'{k} loss (mismatch={self.mismatches.get(k, 0):.2f})')
+        fig.suptitle(f'Fit: total mismatch = {self.mismatch:.3f}')
+        fig.tight_layout()
+        return fig
+
+    def summarize(self):
+        """Print the per-key mismatches and the total."""
+        if self.mismatch is not None:
+            print('Mismatch values by key:')
+            print(self.mismatches)
+            print(f'\nTotal mismatch: {self.mismatch}')
+        else:
+            print('Mismatch not yet computed.')
+        return
 
 
-    def to_json(self):
-        '''
-        Return JSON-compatible representation
+class Calibration(ss.Calibration):
+    """
+    A class to handle calibration of Covasim simulations (the v3 ``cv.Calibration``). Uses the Optuna
+    hyperparameter optimization library (optuna.org), via Starsim's ``ss.Calibration``.
 
-        Custom classes can't be directly represented in JSON. This method is a
-        one-way export to produce a JSON-compatible representation of the
-        intervention. This method will attempt to JSONify each attribute of the
-        intervention, skipping any that fail.
+    Each trial copies the sim, sets the trial's parameter values (via ``sim[key] = value``), runs it,
+    and computes the fit to the data (``sim.compute_fit()``); Optuna then minimizes the mismatch.
+
+    Note: running a calibration does not guarantee a good fit! You must ensure that
+    you run for a sufficient number of iterations, have enough free parameters, and
+    that the parameters have wide enough bounds. Please see the tutorial on calibration
+    for more information.
+
+    Args:
+        sim          (Sim)  : the simulation to calibrate (ideally not yet initialized, so that parameters used during initialization, such as pop_infected, can be calibrated)
+        calib_pars   (dict) : a dictionary of the parameters to calibrate of the format dict(key1=[best, low, high])
+        fit_args     (dict) : a dictionary of options that are passed to sim.compute_fit() to calculate the goodness-of-fit (e.g. data, weights, keys)
+        custom_fn    (func) : a custom function for modifying the simulation; receives the sim and calib_pars as inputs, should return the modified sim. The sim has been initialized, so e.g. sim.get_intervention() can be used; calib_pars keys that are sim parameters have already been set.
+        par_samplers (dict) : an optional mapping from parameters to the Optuna sampler to use for choosing new points for each; by default, suggest_float
+        n_trials     (int)  : the number of trials per worker (default 20)
+        n_workers    (int)  : the number of parallel workers (default: the number of CPUs)
+        total_trials (int)  : if supplied, the total number of trials, divided between the workers (overrides n_trials)
+        name         (str)  : the name of the Optuna study (default: 'covasim_calibration')
+        db_name      (str)  : the name of the database file (default: a file in a temporary folder, or f'{name}.db' if name is supplied)
+        keep_db      (bool) : whether to keep the database after calibration (default: false)
+        storage      (str)  : the location of the database (default: sqlite)
+        label        (str)  : a label for this calibration object
+        die          (bool) : whether to stop if an exception is encountered (default: false)
+        verbose      (bool) : whether to print details of the calibration
+        data         (df)   : v4 shortcut for fit_args['data']: the data to fit to (default: the sim's data)
+        weights      (dict) : v4 shortcut for fit_args['weights']: the weight of each result key
+        fit_kw       (dict) : v4 alias for fit_args
+        reseed       (bool) : whether to use a different random seed for each trial (default: false, as in v3)
+
+    **Example**::
+
+        sim = cv.Sim(datafile='data.csv')
+        calib_pars = dict(beta=[0.015, 0.010, 0.020])
+        calib = cv.Calibration(sim, calib_pars, total_trials=100)
+        calib.calibrate()
+        calib.plot_sims()
+    """
+
+    def __init__(self, sim, calib_pars=None, fit_args=None, custom_fn=None, par_samplers=None,
+                 n_trials=None, n_workers=None, total_trials=None, name=None, db_name=None,
+                 keep_db=None, storage=None, label=None, die=False, verbose=True,
+                 data=None, weights=None, fit_kw=None, reseed=False):
+
+        # Handle run arguments: v3 specified the number of trials per worker, Starsim the total number
+        if n_trials  is None: n_trials  = 20
+        if n_workers is None: n_workers = sc.cpu_count()
+        if db_name is None and name is None: # Use a temporary folder by default, so calibrations run at the same time don't clash
+            db_name = sc.path(tempfile.mkdtemp()) / 'covasim_calibration.db'
+        if name      is None: name      = 'covasim_calibration'
+        if total_trials is None:
+            total_trials = n_trials*n_workers
+        super().__init__(sim, calib_pars=calib_pars, n_workers=n_workers, total_trials=total_trials, reseed=reseed,
+                         label=label, study_name=name, db_name=db_name, keep_db=keep_db, storage=storage,
+                         die=die, verbose=verbose)
+        self.run_args.name = name # The v3 name for study_name
+
+        # Handle other inputs
+        self.fit_args     = sc.mergedicts(fit_kw, fit_args)
+        if data    is not None: self.fit_args['data']    = data
+        if weights is not None: self.fit_args['weights'] = weights
+        self.par_samplers = sc.mergedicts(par_samplers)
+        self.custom_fn    = custom_fn
+
+        # As in v3, if the sim has already been initialized, use a copy of it from before initialization
+        if self.sim.initialized:
+            orig_sim = getattr(self.sim, '_orig_sim', None)
+            if orig_sim is None:
+                errormsg = 'Sim has already been initialized and cannot be reset; please use a sim that has not been initialized'
+                raise RuntimeError(errormsg)
+            warnmsg = 'Sim has already been initialized; using a copy of it from before initialization, but in future, use a sim that has not been initialized'
+            cvm.warn(warnmsg)
+            self.sim = sc.loadstr(orig_sim)
+        return
+
+    def run_sim(self, calib_pars, label=None, return_sim=False):
+        """
+        Create and run a simulation with the supplied parameter values, and compute its fit.
+
+        Args:
+            calib_pars (dict): the parameter values to use, e.g. dict(beta=0.015)
+            label (str): if supplied, the label of the sim
+            return_sim (bool): whether to return the sim (with its fit in sim.fit) rather than the mismatch
 
         Returns:
-            JSON-serializable representation
-        '''
-        # Set the name
-        json = {}
-        json['analyzer_name'] = self.label if hasattr(self, 'label') else None
-        json['analyzer_class'] = self.__class__.__name__
+            The mismatch (or the sim if return_sim=True); inf (or None) if the sim could not be run
+        """
+        sim = self.sim.copy()
+        if label: sim.label = label
 
-        # Loop over the attributes and try to process
-        attrs = self.__dict__.keys()
-        for attr in attrs:
+        # Set the parameters of the sim (before initialization, so parameters such as pop_infected can be calibrated)
+        valid_pars = {}
+        for key,val in calib_pars.items():
             try:
-                data = getattr(self, attr)
+                sim[key] = val
+                valid_pars[key] = val
+            except KeyError: # Not a sim parameter
+                pass
+        sim.init()
+
+        # Apply any other parameters using the custom function
+        if self.custom_fn:
+            sim = self.custom_fn(sim, calib_pars)
+        elif len(valid_pars) != len(calib_pars):
+            extra = set(calib_pars.keys()) - set(valid_pars.keys())
+            errormsg = f'The following parameters are not part of the sim, nor is a custom function specified to use them: {sc.strjoin(extra)}'
+            raise ValueError(errormsg)
+
+        # Run the sim and compute the fit
+        try:
+            sim.run()
+            sim.compute_fit(**self.fit_args)
+            if return_sim:
+                return sim
+            else:
+                return sim.fit.mismatch
+        except Exception as E:
+            if self.die:
+                raise E
+            else:
+                warnmsg = f'Encountered error running sim!\nParameters:\n{valid_pars}\nTraceback:\n{sc.traceback()}'
+                cvm.warn(warnmsg)
+                output = None if return_sim else np.inf
+                return output
+
+    def run_trial(self, trial):
+        """ Define the objective for Optuna: sample the parameters, and return the mismatch """
+        pars = {}
+        for key, (best,low,high) in self.calib_pars.items():
+            if key in self.par_samplers: # If a custom sampler is used, get it now
                 try:
-                    attjson = sc.jsonify(data)
-                    json[attr] = attjson
+                    sampler_fn = getattr(trial, self.par_samplers[key])
                 except Exception as E:
-                    json[attr] = f'Could not jsonify "{attr}" ({type(data)}): "{str(E)}"'
-            except Exception as E2:
-                json[attr] = f'Could not jsonify "{attr}": "{str(E2)}"'
-        return json
+                    errormsg = 'The requested sampler function is not found: ensure it is a valid attribute of an Optuna Trial object'
+                    raise AttributeError(errormsg) from E
+            else:
+                sampler_fn = trial.suggest_float
+            pars[key] = sampler_fn(key, low, high) # Sample from values within this range
+        if self.reseed:
+            pars['rand_seed'] = trial.suggest_int('rand_seed', 0, 1_000_000) # Choose a random seed
+        mismatch = self.run_sim(pars)
+        return mismatch
+
+    def calibrate(self, calib_pars=None, verbose=True, **kwargs):
+        """
+        Actually perform calibration.
+
+        Args:
+            calib_pars (dict): if supplied, overwrite stored calib_pars
+            verbose (bool): whether to print a summary of the results
+            kwargs (dict): if supplied, overwrite stored run_args (n_trials, n_workers, etc.)
+        """
+        # Load and validate calibration parameters
+        if calib_pars is not None:
+            self.calib_pars = calib_pars
+        if self.calib_pars is None:
+            errormsg = 'You must supply calibration parameters either when creating the calibration object or when calling calibrate().'
+            raise ValueError(errormsg)
+        if 'name' in kwargs: # The v3 name for study_name
+            kwargs['study_name'] = kwargs['name']
+
+        # Run the optimization (in Starsim)
+        super().calibrate(**kwargs)
+
+        # Compare the results
+        self.initial_pars = sc.objdict({k:v[0] for k,v in self.calib_pars.items()})
+        self.par_bounds   = sc.objdict({k:np.array([v[1], v[2]]) for k,v in self.calib_pars.items()})
+        self.before = self.run_sim(calib_pars=self.initial_pars, label='Before calibration', return_sim=True)
+        self.after  = self.run_sim(calib_pars=self.best_pars,    label='After calibration',  return_sim=True)
+        if verbose:
+            self.summarize()
+        return self
+
+    def summarize(self):
+        """ Print out results from the calibration """
+        if self.calibrated:
+            print(f'Calibration for {self.run_args.n_workers*self.run_args.n_trials} total trials completed in {self.elapsed:0.1f} s.')
+            before = self.before.fit.mismatch
+            after = self.after.fit.mismatch
+            print('\nInitial parameter values:')
+            print(self.initial_pars)
+            print('\nBest parameter values:')
+            print(self.best_pars)
+            print(f'\nMismatch before calibration: {before:n}')
+            print(f'Mismatch after calibration:  {after:n}')
+            print(f'Percent improvement:         {((before-after)/before)*100:0.1f}%')
+            return before, after
+        else:
+            print('Calibration not yet run; please run calib.calibrate()')
+            return
+
+    def parse_study(self, study=None):
+        """
+        Parse the study into a data frame (self.df), in the order the trials were run -- called automatically.
+
+        Args:
+            study (Study): the Optuna study to parse (default: self.study)
+        """
+        if study is not None:
+            self.study = study
+        best = sc.objdict(self.study.best_params)
+        self.best_pars = best
+
+        if self.verbose: print('Making results structure...')
+        results = []
+        n_trials = len(self.study.trials)
+        failed_trials = []
+        for trial in self.study.trials:
+            data = {'index':trial.number, 'mismatch': trial.value}
+            for key,val in trial.params.items():
+                data[key] = val
+            if data['mismatch'] is None:
+                failed_trials.append(data['index'])
+            else:
+                results.append(data)
+        if self.verbose: print(f'Processed {n_trials} trials; {len(failed_trials)} failed')
+
+        keys = ['index', 'mismatch'] + list(best.keys())
+        data = sc.objdict().make(keys=keys, vals=[])
+        for i,r in enumerate(results):
+            for key in keys:
+                if key not in r:
+                    warnmsg = f'Key {key} is missing from trial {i}, replacing with default'
+                    cvm.warn(warnmsg)
+                    r[key] = best[key]
+                data[key].append(r[key])
+        self.data = data # As in v3; also stored as study_data, as in Starsim
+        self.study_data = data
+        self.df = pd.DataFrame.from_dict(data)
+        return
+
+    def plot_sims(self, **kwargs):
+        """
+        Plot sims, before and after calibration.
+
+        Args:
+            kwargs (dict): passed to MultiSim.plot(), e.g. to_plot
+        """
+        msim = cvr.MultiSim([self.before, self.after])
+        fig = msim.plot(**kwargs)
+        return cvplt.handle_show_return(fig=fig)
+
+    def plot(self, **kwargs):
+        """ Alias to plot_sims() """
+        return self.plot_sims(**kwargs)
+
+    def plot_trend(self, best_thresh=2):
+        """
+        Plot the trend in best mismatch over time.
+
+        Args:
+            best_thresh (float): in the lower panel, show the trials with a mismatch within this factor of the best mismatch
+        """
+        mismatch = sc.dcp(self.df['mismatch'].values)
+        best_mismatch = np.zeros(len(mismatch))
+        for i in range(len(mismatch)):
+            best_mismatch[i] = mismatch[:i+1].min()
+        smoothed_mismatch = sc.smooth(mismatch)
+        fig = plt.figure(figsize=(16,12), dpi=120)
+
+        ax1 = plt.subplot(2,1,1)
+        plt.plot(mismatch, alpha=0.2, label='Original')
+        plt.plot(smoothed_mismatch, lw=3, label='Smoothed')
+        plt.plot(best_mismatch, lw=3, label='Best')
+
+        ax2 = plt.subplot(2,1,2)
+        max_mismatch = mismatch.min()*best_thresh
+        inds = sc.findinds(mismatch<=max_mismatch)
+        plt.plot(best_mismatch, lw=3, label='Best')
+        plt.scatter(inds, mismatch[inds], c=mismatch[inds], label='Usable indices')
+        for ax in [ax1, ax2]:
+            plt.sca(ax)
+            plt.grid(True)
+            plt.legend()
+            sc.setylim()
+            sc.setxlim()
+            plt.xlabel('Trial number')
+            plt.ylabel('Mismatch')
+        return cvplt.handle_show_return(fig=fig)
+
+    def plot_all(self): # pragma: no cover
+        """ Plot every point in the calibration. Warning, very slow for more than a few hundred trials. """
+        g = pairplotpars(self.data, color_column='mismatch', bounds=self.par_bounds)
+        return g
+
+    def plot_best(self, best_thresh=2): # pragma: no cover
+        """
+        Plot only the points with lowest mismatch.
+
+        Args:
+            best_thresh (float): plot the trials with a mismatch within this factor of the best mismatch
+        """
+        max_mismatch = self.df['mismatch'].min()*best_thresh
+        inds = sc.findinds(self.df['mismatch'].values <= max_mismatch)
+        g = pairplotpars(self.data, inds=inds, color_column='mismatch', bounds=self.par_bounds)
+        return g
+
+    def plot_stride(self, npts=200): # pragma: no cover
+        """
+        Plot a fixed number of points in order across the results.
+
+        Args:
+            npts (int): the number of points to plot
+        """
+        npts = min(len(self.df), npts)
+        inds = np.linspace(0, len(self.df)-1, npts).round()
+        g = pairplotpars(self.data, inds=inds, color_column='mismatch', bounds=self.par_bounds)
+        return g
+
+
+def pairplotpars(data, inds=None, color_column=None, bounds=None, cmap='parula', bins=None, edgecolor='w', facecolor='#F8A493', figsize=(20,16)): # pragma: no cover
+    """ Plot scatterplots, histograms, and kernel densities for calibration results (requires Seaborn) """
+    data = sc.odict(sc.dcp(data))
+
+    # Create the dataframe
+    df = pd.DataFrame.from_dict(data)
+    if inds is not None:
+        df = df.iloc[inds,:].copy()
+
+    # Choose the colors
+    if color_column:
+        colors = sc.vectocolor(df[color_column].values, cmap=cmap)
+    else:
+        colors = [facecolor for i in range(len(df))]
+    df['color_column'] = [sc.rgb2hex(rgba[:-1]) for rgba in colors]
+
+    # Make the plot
+    grid = sns.PairGrid(df)
+    grid = grid.map_lower(plt.scatter, **{'facecolors':df['color_column']})
+    grid = grid.map_diag(plt.hist, bins=bins, edgecolor=edgecolor, facecolor=facecolor)
+    grid = grid.map_upper(sns.kdeplot)
+    grid.fig.set_size_inches(figsize)
+    grid.fig.tight_layout()
+
+    # Set bounds
+    if bounds:
+        for ax in grid.axes.flatten():
+            xlabel = ax.get_xlabel()
+            ylabel = ax.get_ylabel()
+            if xlabel in bounds:
+                ax.set_xlim(bounds[xlabel])
+            if ylabel in bounds:
+                ax.set_ylim(bounds[ylabel])
+
+    return grid
+
+
+# %% Analyzers ---------------------------------------------------------------------------------------
+
+__all__ += ['Analyzer', 'PeopleSnapshot', 'snapshot', 'age_histogram', 'daily_age_stats', 'daily_stats', 'nab_histogram', 'TransTree']
+
+
+class Analyzer(cvc.V3Module, ss.Analyzer):
+    """Base class for Covasim analyzers (same public name as v3; thin over ``ss.Analyzer``).
+
+    As in v3, an analyzer can define ``initialize(self, sim)``, ``apply(self, sim)`` (called on each
+    timestep), and ``finalize(self, sim)``; or the Starsim equivalents ``init_post()``, ``step()``, and
+    ``finalize()``.
+
+    Note: a custom analyzer must not store data under the names Starsim reserves on a module
+    (``t``, ``pars``, ``sim``, ``dists``, ``results``) -- use e.g. ``self.tvec`` instead of ``self.t``.
+    """
+    pass
+
+
+# The v3 per-agent boolean states (v3 ``defaults.PeopleMeta.states``)
+_V3_STATES = ['susceptible', 'naive', 'exposed', 'infectious', 'symptomatic', 'severe', 'critical', 'tested', 'diagnosed',
+              'recovered', 'known_dead', 'dead', 'known_contact', 'quarantined', 'isolated', 'vaccinated']
+
+
+class PeopleSnapshot(sc.prettyobj):
+    """
+    A copy of the per-agent states of ``sim.people`` at one point in time (what v3 ``cv.snapshot`` stored).
+
+    Every array is full length and indexed by agent (UID), as in v3: agents who have died keep their
+    last values (with ``dead=True`` and ``alive=False``), so snapshots from different days can be compared
+    elementwise. States are available as attributes or keys, e.g. ``people.exposed`` or ``people['age']``,
+    including the v3 names ``date_exposed``, ``date_symptomatic``, etc. (the v4 ``ti_*`` time indices, since
+    the timestep is one day).
+
+    Args:
+        sim (Sim): the sim to take the snapshot from
+        copy (bool): whether to copy the arrays (default); if False, the stored states are not copied, so only use the snapshot on the current timestep
+    """
+
+    def __init__(self, sim, copy=True):
+        people = sim.people
+        covid = sim.diseases.covid
+        n = len(people.uid.raw) # Number of agents ever created (UIDs are 0..n-1, since Covasim has no births)
+        self.t = sim.ti
+        self._keys = []
+
+        def add(key, arr):
+            arr = np.asarray(arr)[:n]
+            setattr(self, key, arr.copy() if copy else arr)
+            if key not in self._keys:
+                self._keys.append(key)
+            return
+
+        # People states (age, sex, alive, ...), then the disease states from the COVID module
+        add('uid', people.uid.raw)
+        for key, state in people.states.items():
+            if '.' not in key: # Module states appear on People as e.g. "covid.exposed"; these are added below
+                add(key, state.raw)
+        for state in covid.state_list:
+            add(state.name, state.raw)
+
+        # v3 states that are derived rather than stored in v4 (e.g. "infectious"); agents who have died get the default (False/NaN)
+        auids = np.asarray(people.auids)
+        add('sex', (~people.female.raw).astype(int)) # v3: 0 for female, 1 for male
+        for key in _V3_STATES:
+            state = getattr(covid, key, None)
+            if key not in self._keys and isinstance(state, ss.Arr):
+                values = np.asarray(state.values)
+                full = np.zeros(n, dtype=values.dtype) if values.dtype == bool else np.full(n, np.nan)
+                full[auids] = values
+                add(key, full)
+
+        # The v3 date names, e.g. date_exposed for ti_exposed
+        for key in list(self._keys):
+            if key.startswith('ti_'):
+                datekey = 'date_' + key[3:] # e.g. ti_exposed -> date_exposed
+                if datekey not in self._keys:
+                    setattr(self, datekey, getattr(self, key))
+                    self._keys.append(datekey)
+        return
+
+    def __getitem__(self, key):
+        """ Allow people['age'] as well as people.age """
+        return getattr(self, key)
+
+    def __contains__(self, key):
+        """ Allow 'age' in people """
+        return key in self._keys
+
+    def __len__(self):
+        return len(self.uid)
+
+    def keys(self):
+        """ The names of the stored states """
+        return list(self._keys)
+
+    def true(self, key):
+        """ The indices of people for whom this state is true """
+        return sc.findinds(self[key])
+
+    def false(self, key):
+        """ The indices of people for whom this state is false """
+        return sc.findinds(~self[key].astype(bool))
+
+    def defined(self, key):
+        """ The indices of people for whom this state is not NaN """
+        return sc.findinds(~np.isnan(self[key]))
+
+    def undefined(self, key):
+        """ The indices of people for whom this state is NaN """
+        return sc.findinds(np.isnan(self[key]))
+
+    def count(self, key):
+        """ The number of people for whom this state is true """
+        return np.count_nonzero(self[key])
+
+
+def _process_days(sim, days):
+    """
+    Convert days (day indices, date strings, or dates; 'end' or -1 for the last day) to a sorted array of
+    day indices, plus the matching date strings (the v3 ``process_days(..., return_dates=True)``).
+    """
+    days = sc.tolist(days)
+    for d, day in enumerate(days):
+        if day in ['end', -1]:
+            day = sim.npts - 1
+        days[d] = sim.day(day)
+    days = np.sort(np.array(days, dtype=int))
+    dates = [sim.date(day) for day in days]
+    return days, dates
 
 
 def validate_recorded_dates(sim, requested_dates, recorded_dates, die=True):
-    '''
-    Helper method to ensure that dates recorded by an analyzer match the ones
-    requested.
-    '''
+    """
+    Helper method to ensure that dates recorded by an analyzer match the ones requested.
+    """
     requested_dates = sorted(list(requested_dates))
     recorded_dates = sorted(list(recorded_dates))
     if recorded_dates != requested_dates: # pragma: no cover
-        errormsg = f'The dates {requested_dates} were requested but only {recorded_dates} were recorded: please check the dates fall between {sim.date(sim["start_day"])} and {sim.date(sim["start_day"])} and the sim was actually run'
+        errormsg = f'The dates {requested_dates} were requested but only {recorded_dates} were recorded: please check the dates fall between {sim.date(0)} and {sim.date(sim.npts-1)} and the sim was actually run'
         if die:
             raise RuntimeError(errormsg)
         else:
@@ -145,12 +725,14 @@ def validate_recorded_dates(sim, requested_dates, recorded_dates, die=True):
     return
 
 
-
 class snapshot(Analyzer):
-    '''
+    """
     Analyzer that takes a "snapshot" of the sim.people array at specified points
     in time, and saves them to itself. To retrieve them, you can either access
     the dictionary directly, or use the get() method.
+
+    Each snapshot is a ``cv.PeopleSnapshot``: full-length per-agent arrays, indexed by agent, with the
+    same names as in v3 (e.g. ``people.exposed``, ``people.age``, ``people.date_symptomatic``).
 
     Args:
         days   (list): list of ints/strings/date objects, the days on which to take the snapshot
@@ -158,18 +740,17 @@ class snapshot(Analyzer):
         die    (bool): whether or not to raise an exception if a date is not found (default true)
         kwargs (dict): passed to Analyzer()
 
-
     **Example**::
 
         sim = cv.Sim(analyzers=cv.snapshot('2020-04-04', '2020-04-14'))
         sim.run()
-        snapshot = sim['analyzers'][0]
+        snapshot = sim.get_analyzer()
         people = snapshot.snapshots[0]            # Option 1
         people = snapshot.snapshots['2020-04-04'] # Option 2
         people = snapshot.get('2020-04-14')       # Option 3
         people = snapshot.get(34)                 # Option 4
         people = snapshot.get()                   # Option 5
-    '''
+    """
 
     def __init__(self, days, *args, die=True, **kwargs):
         super().__init__(**kwargs) # Initialize the Analyzer object
@@ -182,33 +763,29 @@ class snapshot(Analyzer):
         self.snapshots = sc.odict() # Store the actual snapshots
         return
 
-
     def initialize(self, sim):
-        self.start_day = sim['start_day'] # Store the simulation start day
-        self.days, self.dates = cvi.process_days(sim, self.days, return_dates=True) # Ensure days are in the right format
+        self.start_day = sim.date(0) # Store the simulation start day
+        self.days, self.dates = _process_days(sim, self.days) # Ensure days are in the right format
         max_snapshot_day = self.days[-1]
-        max_sim_day = sim.day(sim['end_day'])
+        max_sim_day = sim.npts - 1
         if max_snapshot_day > max_sim_day: # pragma: no cover
-            errormsg = f'Cannot create snapshot for {self.dates[-1]} (day {max_snapshot_day}) because the simulation ends on {self.end_day} (day {max_sim_day})'
+            errormsg = f'Cannot create snapshot for {self.dates[-1]} (day {max_snapshot_day}) because the simulation ends on {sim.date(max_sim_day)} (day {max_sim_day})'
             raise ValueError(errormsg)
-        self.initialized = True
         return
 
-
     def apply(self, sim):
-        for ind in cvi.find_day(self.days, sim.t):
+        for ind in cvi.find_day(self.days, sim.ti):
             date = self.dates[ind]
-            self.snapshots[date] = sc.dcp(sim.people) # Take snapshot!
-
+            self.snapshots[date] = PeopleSnapshot(sim) # Take snapshot!
+        return
 
     def finalize(self, sim):
         super().finalize()
         validate_recorded_dates(sim, requested_dates=self.dates, recorded_dates=self.snapshots.keys(), die=self.die)
         return
 
-
     def get(self, key=None):
-        ''' Retrieve a snapshot from the given key (int, str, or date) '''
+        """ Retrieve a snapshot from the given key (int, str, or date) """
         if key is None:
             key = self.days[0]
         day  = sc.day(key, start_date=self.start_day)
@@ -222,14 +799,17 @@ class snapshot(Analyzer):
         return snapshot
 
 
-
 class age_histogram(Analyzer):
-    '''
+    """
     Calculate statistics across age bins, including histogram plotting functionality.
+
+    For each state, the histogram counts the people for whom that state's date is defined (e.g.
+    ``date_exposed``), i.e. the cumulative number of people who have been (or are scheduled to be) in
+    that state, as in v3.
 
     Args:
         days    (list): list of ints/strings/date objects, the days on which to calculate the histograms (default: last day)
-        states  (list): which states of people to record (default: exposed, tested, diagnosed, dead)
+        states  (list): which states of people to record (default: exposed, severe, dead, tested, diagnosed)
         edges   (list): edges of age bins to use (default: 10 year bins from 0 to 100)
         datafile (str): the name of the data file to load in for comparison, or a dataframe of data (optional)
         sim      (Sim): only used if the analyzer is being used after a sim has already been run
@@ -244,7 +824,7 @@ class age_histogram(Analyzer):
         agehist = sim.get_analyzer()
         agehist = cv.age_histogram(sim=sim) # Alternate method
         agehist.plot()
-    '''
+    """
 
     def __init__(self, days=None, states=None, edges=None, datafile=None, sim=None, die=True, **kwargs):
         super().__init__(**kwargs) # Initialize the Analyzer object
@@ -263,9 +843,8 @@ class age_histogram(Analyzer):
             self.from_sim(sim)
         return
 
-
     def from_sim(self, sim):
-        ''' Create an age histogram from an already run sim '''
+        """ Create an age histogram from an already run sim """
         if self.days is not None: # pragma: no cover
             errormsg = 'If a simulation is being analyzed post-run, no day can be supplied: only the last day of the simulation is available'
             raise ValueError(errormsg)
@@ -273,18 +852,16 @@ class age_histogram(Analyzer):
         self.apply(sim)
         return
 
-
     def initialize(self, sim):
-        super().initialize()
 
         # Handle days
-        self.start_day = sc.date(sim['start_day'], as_date=False) # Get the start day, as a string
-        self.end_day   = sc.date(sim['end_day'],   as_date=False) # Get the start day, as a string
+        self.start_day = sim.date(0) # Get the start day, as a string
+        self.end_day   = sim.date(sim.npts-1) # Get the end day, as a string
         if self.days is None:
             self.days = self.end_day # If no day is supplied, use the last day
-        self.days, self.dates = cvi.process_days(sim, self.days, return_dates=True) # Ensure days are in the right format
+        self.days, self.dates = _process_days(sim, self.days) # Ensure days are in the right format
         max_hist_day = self.days[-1]
-        max_sim_day = sim.day(self.end_day)
+        max_sim_day = sim.npts - 1
         if max_hist_day > max_sim_day: # pragma: no cover
             errormsg = f'Cannot create histogram for {self.dates[-1]} (day {max_hist_day}) because the simulation ends on {self.end_day} (day {max_sim_day})'
             raise ValueError(errormsg)
@@ -308,30 +885,28 @@ class age_histogram(Analyzer):
             else:
                 self.data = self.datafile # Use it directly
                 self.datafile = None
-
         return
 
-
     def apply(self, sim):
-        for ind in cvi.find_day(self.days, sim.t):
+        for ind in cvi.find_day(self.days, sim.ti):
             date = self.dates[ind] # Find the date for this index
             self.hists[date] = sc.objdict() # Initialize the dictionary
-            scale  = sim.rescale_vec[sim.t] # Determine current scale factor
-            age    = sim.people.age # Get the age distribution,since used heavily
+            scale  = sim.current_scale # Determine current scale factor
+            people = PeopleSnapshot(sim, copy=False) # All agents, including those who have died
+            age    = people.age # Get the age distribution, since used heavily
             self.hists[date]['bins'] = self.bins # Copy here for convenience
             for state in self.states: # Loop over each state
-                inds = sim.people.defined(f'date_{state}') # Pull out people for which this state is defined
+                inds = people.defined(f'date_{state}') # Pull out people for which this state is defined
                 self.hists[date][state] = np.histogram(age[inds], bins=self.edges)[0]*scale # Actually count the people
-
+        return
 
     def finalize(self, sim):
         super().finalize()
         validate_recorded_dates(sim, requested_dates=self.dates, recorded_dates=self.hists.keys(), die=self.die)
         return
 
-
     def get(self, key=None):
-        ''' Retrieve a specific histogram from the given key (int, str, or date) '''
+        """ Retrieve a specific histogram from the given key (int, str, or date) """
         if key is None:
             key = self.days[0]
         day  = sc.day(key, start_date=self.start_day)
@@ -344,9 +919,8 @@ class age_histogram(Analyzer):
             raise sc.KeyNotFoundError(errormsg)
         return hists
 
-
     def compute_windows(self):
-        ''' Convert cumulative histograms to windows '''
+        """ Convert cumulative histograms to windows """
         if len(self.hists)<2:
             errormsg = 'You must have at least two dates specified to compute a window'
             raise ValueError(errormsg)
@@ -363,12 +937,10 @@ class age_histogram(Analyzer):
                 self.window_hists[datekey]['bins'] = self.hists[end_date]['bins']
                 for state in self.states: # Loop over each state
                     self.window_hists[datekey][state] = self.hists[end_date][state] - self.hists[start_date][state]
-
         return
 
-
     def plot(self, windows=False, width=0.8, color='#F8A493', fig_args=None, axis_args=None, data_args=None, **kwargs):
-        '''
+        """
         Simple method for plotting the histograms.
 
         Args:
@@ -379,7 +951,10 @@ class age_histogram(Analyzer):
             axis_args (dict): passed to pl.subplots_adjust()
             data_args (dict): 'width', 'color', and 'offset' arguments for the data
             kwargs (dict): passed to ``cv.options.with_style()``; see that function for choices
-        '''
+
+        Returns:
+            A list of figures, one per day
+        """
 
         # Handle inputs
         fig_args = sc.mergedicts(dict(figsize=(12,8)), fig_args)
@@ -388,7 +963,7 @@ class age_histogram(Analyzer):
 
         # Initialize
         n_plots = len(self.states)
-        n_rows, n_cols = sc.get_rows_cols(n_plots)
+        n_rows, n_cols = sc.getrowscols(n_plots)
         figs = []
 
         # Handle windows and what to plot
@@ -399,20 +974,20 @@ class age_histogram(Analyzer):
         else:
             histsdict = self.hists
         if not len(histsdict): # pragma: no cover
-            errormsg = f'Cannot plot since no histograms were recorded (schuled days: {self.days})'
+            errormsg = f'Cannot plot since no histograms were recorded (scheduled days: {self.days})'
             raise ValueError(errormsg)
 
         # Make the figure(s)
-        with cvo.with_style(**kwargs):
+        with cvset.options.with_style(**kwargs):
             for date,hists in histsdict.items():
-                figs += [pl.figure(**fig_args)]
-                pl.subplots_adjust(**axis_args)
+                figs += [plt.figure(**fig_args)]
+                plt.subplots_adjust(**axis_args)
                 bins = hists['bins']
                 barwidth = width*(bins[1] - bins[0]) # Assume uniform width
                 for s,state in enumerate(self.states):
-                    ax = pl.subplot(n_rows, n_cols, s+1)
+                    ax = plt.subplot(n_rows, n_cols, s+1)
                     ax.bar(bins, hists[state], width=barwidth, facecolor=color, label=f'Number {state}')
-                    if self.data and state in self.data:
+                    if self.data is not None and state in self.data:
                         data = self.data[state]
                         ax.bar(bins+d_args.offset, data, width=barwidth*d_args.width, facecolor=d_args.color, label='Data')
                     ax.set_xlabel('Age')
@@ -422,45 +997,44 @@ class age_histogram(Analyzer):
                     preposition = 'from' if windows else 'by'
                     ax.set_title(f'Number of people {state} {preposition} {date}')
 
-        return cvpl.handle_show_return(figs=figs)
+        return cvplt.handle_show_return(figs=figs)
 
 
 class daily_age_stats(Analyzer):
-    '''
+    """
     Calculate daily counts by age, saving for each day of the simulation. Can
     plot either time series by age or a histogram over all time.
 
+    The counts are stored in ``age_results`` (v3: ``results``, which is reserved by Starsim for
+    time-series results): ``age_results[date][state]`` is the number of people in each age bin whose
+    ``date_{state}`` is that day.
+
     Args:
-        states  (list): which states of people to record (default: ['diagnoses', 'deaths', 'tests', 'severe'])
+        states  (list): which states of people to record (default: exposed, severe, dead, tested, diagnosed)
         edges   (list): edges of age bins to use (default: 10 year bins from 0 to 100)
         kwargs  (dict): passed to Analyzer()
 
     **Examples**::
 
         sim = cv.Sim(analyzers=cv.daily_age_stats())
-        sim = cv.Sim(pars, analyzers=daily_age)
         sim.run()
         daily_age = sim.get_analyzer()
         daily_age.plot()
         daily_age.plot(total=True)
-
-    '''
+    """
 
     def __init__(self, states=None, edges=None, **kwargs):
         super().__init__(**kwargs)
         self.edges = edges
         self.bins = None  # Age bins, calculated from edges
         self.states = states
-        self.results = sc.odict()
+        self.age_results = sc.odict()
         self.start_day = None
         self.df = None
         self.total_df = None
         return
 
-
     def initialize(self, sim):
-        super().initialize()
-
         if self.states is None:
             self.states = ['exposed', 'severe', 'dead', 'tested', 'diagnosed']
 
@@ -469,26 +1043,25 @@ class daily_age_stats(Analyzer):
             self.edges = np.linspace(0, 100, 11)
         self.bins = self.edges[:-1]  # Don't include the last edge in the bins
 
-        self.start_day = sim['start_day']
-
+        self.start_day = sim.date(0)
         return
 
-
     def apply(self, sim):
+        people = PeopleSnapshot(sim, copy=False) # All agents, including those who have died
         df_entry = {}
         for state in self.states:
-            inds = sc.findinds(sim.people[f'date_{state}'], sim.t)
-            b, _ = np.histogram(sim.people.age[inds], self.edges)
-            df_entry.update({state: b * sim.rescale_vec[sim.t]})
-        df_entry.update({'day':sim.t, 'age': self.bins})
-        self.results.update({sim.date(sim.t): df_entry})
-
+            inds = sc.findinds(people[f'date_{state}'], sim.ti)
+            b, _ = np.histogram(people.age[inds], self.edges)
+            df_entry.update({state: b * sim.current_scale})
+        df_entry.update({'day':sim.ti, 'age': self.bins})
+        self.age_results.update({sim.date(sim.ti): df_entry})
+        return
 
     def to_df(self):
-        '''Create dataframe totals for each day'''
+        """ Create dataframe totals for each day """
         mapper = {f'{k}': f'new_{k}' for k in self.states}
         df = pd.DataFrame()
-        for date, k in self.results.items():
+        for date, k in self.age_results.items():
             df_ = pd.DataFrame(k)
             df_['date'] = date
             df_.rename(mapper, inplace=True, axis=1)
@@ -498,9 +1071,8 @@ class daily_age_stats(Analyzer):
         self.df = df[cols]
         return self.df
 
-
     def to_total_df(self):
-        ''' Create dataframe totals across days '''
+        """ Create dataframe totals across days """
         if self.df is None:
             self.to_df()
         cols = list(self.df.columns)
@@ -519,10 +1091,9 @@ class daily_age_stats(Analyzer):
         self.total_df = df
         return df
 
-
     def plot(self, total=False, do_show=None, fig_args=None, axis_args=None, plot_args=None,
              dateformat=None, width=0.8, color='#F8A493', **kwargs):
-        '''
+        """
         Plot the results.
 
         Args:
@@ -535,7 +1106,7 @@ class daily_age_stats(Analyzer):
             width    (float): width of bars (only used for histograms)
             color  (hex/rgb): the color of the bars (only used for histograms)
             kwargs    (dict): passed to ``cv.options.with_style()``
-        '''
+        """
         if self.df is None:
             self.to_df()
         if self.total_df is None:
@@ -545,11 +1116,11 @@ class daily_age_stats(Analyzer):
         axis_args = sc.mergedicts(dict(left=0.05, right=0.95, bottom=0.05, top=0.95, wspace=0.25, hspace=0.4), axis_args)
         plot_args = sc.mergedicts(dict(lw=2, alpha=0.5, marker='o'), plot_args)
 
-        with cvo.with_style(**kwargs):
+        with cvset.options.with_style(**kwargs):
             nplots = len(self.states)
-            nrows, ncols = sc.get_rows_cols(nplots)
-            fig, axs = pl.subplots(nrows=nrows, ncols=ncols, **fig_args)
-            pl.subplots_adjust(**axis_args)
+            nrows, ncols = sc.getrowscols(nplots)
+            fig, axs = plt.subplots(nrows=nrows, ncols=ncols, squeeze=False, **fig_args)
+            plt.subplots_adjust(**axis_args)
 
             for count,state in enumerate(self.states):
                 row,col = np.unravel_index(count, (nrows,ncols))
@@ -564,7 +1135,7 @@ class daily_age_stats(Analyzer):
                     for a,age in enumerate(ages):
                         label = f'Age {age}'
                         df = self.df[self.df.age==age]
-                        ax.plot(df.date, df[f'new_{state}'], c=colors[a], label=label)
+                        ax.plot(pd.to_datetime(df.date), df[f'new_{state}'], c=colors[a], label=label, **plot_args)
                         has_data = has_data or len(df)
                     if has_data:
                         ax.legend()
@@ -581,11 +1152,36 @@ class daily_age_stats(Analyzer):
                     ax.set_ylabel('Count')
                     ax.set_xticks(ticks=df.age)
 
-        return cvpl.handle_show_return(fig=fig, do_show=do_show)
+        return cvplt.handle_show_return(fig=fig, do_show=do_show)
+
+
+def make_infection_log(sim):
+    """
+    Return the sim's transmission log in the v3 format: a list of dicts with keys ``source`` (None for a
+    seed infection or importation), ``target``, ``date`` (the day index), ``layer``, and ``variant``
+    (the variant label). This is built from Starsim's infection log (``sim.diseases.covid.infection_log``,
+    an ``ss.InfectionLog``; use its ``to_df()`` method for a dataframe).
+
+    Args:
+        sim (Sim): a sim that has been run
+    """
+    covid = sim.diseases.covid
+    df = covid.infection_log.to_df()
+    infection_log = []
+    for source, target, day, layer, variant in zip(df.source.tolist(), df.target.tolist(), df.day.tolist(), df.network.tolist(), df.variant.tolist()):
+        entry = dict(
+            source  = None if (pd.isna(source) or source < 0) else source, # Seed infections and importations have no source
+            target  = target,
+            date    = day,
+            layer   = layer,
+            variant = covid.variant_map[variant],
+        )
+        infection_log.append(entry)
+    return infection_log
 
 
 class daily_stats(Analyzer):
-    '''
+    """
     Print out daily statistics about the simulation. Note that this analyzer takes
     a considerable amount of time, so should be used primarily for debugging, not
     in production code. To keep the intervention but toggle it off, pass an empty
@@ -603,8 +1199,8 @@ class daily_stats(Analyzer):
 
         sim = cv.Sim(analyzers=cv.daily_stats())
         sim.run()
-        sim['analyzers'][0].plot()
-    '''
+        sim.get_analyzer().plot()
+    """
 
     def __init__(self, days=None, verbose=True, reporter=None, save_inds=False, **kwargs):
         super().__init__(**kwargs) # Initialize the Analyzer object
@@ -616,26 +1212,23 @@ class daily_stats(Analyzer):
         self.reports   = sc.objdict() # Textual representation of the statistics
         return
 
-
     def initialize(self, sim):
-        super().initialize()
         if self.days is None:
-            self.days = sc.dcp(sim.tvec)
+            self.days = np.arange(sim.npts)
         else:
-            self.days = sim.day(self.days)
+            self.days = cvi.process_days(sim, self.days)
 
         self.keys =  ['exposed', 'infectious', 'symptomatic', 'severe', 'critical', 'known_contact', 'quarantined', 'diagnosed', 'recovered', 'dead']
         self.basekeys = ['stocks', 'trans', 'source', 'test', 'quar'] # Categories of things to plot
         self.extrakeys = ['layer_counts', 'extra']
         return
 
-
     def intersect(self, *args):
-        '''
+        """
         Compute the intersection between arrays of indices, handling either keys
         to precomputed indices or lists of indices. With two array inputs, simply
         performs np.intersect1d(arr1, arr2).
-        '''
+        """
         # Optionally pull precomputed indices
         args = list(args) # Convert from tuple to list
         for i,inds in enumerate(args):
@@ -649,12 +1242,12 @@ class daily_stats(Analyzer):
 
         return output
 
-
     def apply(self, sim):
-        for ind in cvi.find_day(self.days, sim.t):
+        for ind in cvi.find_day(self.days, sim.ti):
 
             # Initialize
-            ppl = sim.people
+            t = sim.ti
+            ppl = PeopleSnapshot(sim, copy=False) # All agents, including those who have died
             all_inds = np.arange(len(ppl))
             stats = sc.objdict()
             stats.empty = sc.objdict()
@@ -672,7 +1265,7 @@ class daily_stats(Analyzer):
                 stats.stocks[key] = len(self.inds[key])
 
             # Transmission stats
-            newinfs = cvu.true(ppl.date_exposed == sim.t)
+            newinfs = sc.findinds(ppl.date_exposed == t)
             stats.trans.new_infections = len(newinfs)
             for key in ['known_contact', 'quarantined']:
                 stats.trans[key] = len(self.intersect(newinfs, key))
@@ -680,8 +1273,8 @@ class daily_stats(Analyzer):
                     stats.empty.trans.append(key)
 
             # Source stats
-            inflog = sim.people.infection_log
-            infloginds = [i for i,e in enumerate(inflog) if (e['date']==sim.t and e['source'] is not None)] # Person was infected today and was not a seed infection
+            inflog = make_infection_log(sim)
+            infloginds = [i for i,e in enumerate(inflog) if (e['date']==t and e['source'] is not None)] # Person was infected today and was not a seed infection
             sourceinds = list(set([inflog[i]['source'] for i in infloginds]))
             stats.source.new_sources = len(sourceinds)
             for key in self.keys:
@@ -690,7 +1283,7 @@ class daily_stats(Analyzer):
                     stats.empty.source.append(key)
 
             # Testing stats
-            newtests = cvu.true(ppl.date_tested == sim.t)
+            newtests = sc.findinds(ppl.date_tested == t)
             stats.test.new_tests = len(newtests)
             for key in self.keys:
                 stats.test[key] = len(self.intersect(newtests,key))
@@ -698,9 +1291,9 @@ class daily_stats(Analyzer):
                     stats.empty.test.append(key)
 
             # Quarantine stats
-            q_inds = np.union1d(self.inds['quarantined'], cvu.true(ppl.date_end_quarantine == sim.t)) # Append people who finished quarantine today
-            eq_inds = cvu.true(ppl.date_quarantined == sim.t-1) # People entering quarantine the day before (their first full day of quarantine)
-            fq_inds = cvu.true(ppl.date_end_quarantine == sim.t+1) # People finishing quarantine; +1 since on the date of quarantine end, they are released back and can get infected at normal rates
+            q_inds = np.union1d(self.inds['quarantined'], sc.findinds(ppl.date_end_quarantine == t)) # Append people who finished quarantine today
+            eq_inds = sc.findinds(ppl.date_quarantined == t-1) # People entering quarantine the day before (their first full day of quarantine)
+            fq_inds = sc.findinds(ppl.date_end_quarantine == t+1) # People finishing quarantine; +1 since on the date of quarantine end, they are released back and can get infected at normal rates
             stats.quar.in_quarantine = len(q_inds) # Similar to stats.quar.quarantined, but slightly more
             stats.quar.entered_quar  = len(eq_inds)
             stats.quar.finished_quar = len(fq_inds)
@@ -760,7 +1353,7 @@ class daily_stats(Analyzer):
                 report = self.make_report(sim, stats)
 
             # Save
-            today = sim.date(sim.t)
+            today = sim.date(t)
             self.stats[today] = stats
             self.reports[today] = report
 
@@ -769,21 +1362,19 @@ class daily_stats(Analyzer):
 
         return
 
-
     def report(self, day=None):
-        ''' Print out one or all reports -- take a date string or an int '''
+        """ Print out one or all reports -- take a date string or an int """
         if day is None:
             print(self.reports)
         else:
             print(self.reports[day])
         return
 
-
     def make_report(self, sim, stats, show_empty='count'):
-        ''' Turn the statistics into a report '''
+        """ Turn the statistics into a report """
 
         def make_entry(basekey, show_empty=show_empty):
-            ''' For each key, print the key and the count if the count is >0, and optionally any empty states '''
+            """ For each key, print the key and the count if the count is >0, and optionally any empty states """
             string  = '\n'.join([f'  {k:13s} = {v}' for k,v in stats[basekey].items() if v>0])
             if show_empty is True:
                 string += f'\n  Empty states: {stats.empty[basekey]}'
@@ -792,7 +1383,7 @@ class daily_stats(Analyzer):
             string = '\n' + string + '\n'
             return string
 
-        datestr = f'day {sim.t} ({sim.date(sim.t)})'
+        datestr = f'day {sim.ti} ({sim.date(sim.ti)})'
         report  = f'*** Statistics report for {datestr} ***\n\n'
         report += 'Overall stocks:'
         report += make_entry('stocks', show_empty=False)
@@ -838,9 +1429,8 @@ class daily_stats(Analyzer):
 
         return report
 
-
     def transpose(self, keys=None):
-        ''' Transpose the data from a list-of-dicts-of-dicts to a dict-of-dicts-of-lists '''
+        """ Transpose the data from a list-of-dicts-of-dicts to a dict-of-dicts-of-lists """
         if keys is None:
             keys = self.basekeys + self.extrakeys
 
@@ -859,9 +1449,8 @@ class daily_stats(Analyzer):
 
         return data
 
-
     def plot(self, fig_args=None, axis_args=None, plot_args=None, do_show=None, **kwargs):
-        '''
+        """
         Plot the daily statistics recorded. Some overlap with e.g. ``sim.plot(to_plot='overview')``.
 
         Args:
@@ -870,7 +1459,7 @@ class daily_stats(Analyzer):
             plot_args (dict): passed to pl.plot()
             do_show   (bool): whether to show the plot
             kwargs    (dict): passed to ``cv.options.with_style()``
-        '''
+        """
 
         fig_args  = sc.mergedicts(dict(figsize=(18,11)), fig_args)
         axis_args = sc.mergedicts(dict(left=0.05, right=0.95, bottom=0.05, top=0.95, wspace=0.25, hspace=0.4), axis_args)
@@ -880,11 +1469,11 @@ class daily_stats(Analyzer):
         data = self.transpose()
 
         # Do the plotting
-        with cvo.with_style(**kwargs):
+        with cvset.options.with_style(**kwargs):
             nplots = sum([len(data[k].keys()) for k in data.keys()]) # Figure out how many plots there are
-            nrows,ncols = sc.get_rows_cols(nplots)
-            fig, axs = pl.subplots(nrows=nrows, ncols=ncols, **fig_args)
-            pl.subplots_adjust(**axis_args)
+            nrows,ncols = sc.getrowscols(nplots)
+            fig, axs = plt.subplots(nrows=nrows, ncols=ncols, squeeze=False, **fig_args)
+            plt.subplots_adjust(**axis_args)
 
             count = -1
             for k1 in data.keys():
@@ -896,11 +1485,11 @@ class daily_stats(Analyzer):
                     ax.plot(y, **plot_args)
                     ax.set_title(f'{k1}: {k2}')
 
-        return cvpl.handle_show_return(fig=fig, do_show=do_show)
+        return cvplt.handle_show_return(fig=fig, do_show=do_show)
 
 
 class nab_histogram(Analyzer):
-    '''
+    """
     Store histogram of log_{10}(NAb) distribution
 
     Args:
@@ -914,54 +1503,50 @@ class nab_histogram(Analyzer):
         sim.get_analyzer().plot()
 
     New in version 3.1.0.
-    '''
+    """
     def __init__(self, days=None, edges=None, **kwargs):
         super().__init__(**kwargs)  # Initialize the Analyzer object
         self.days = days  # To be converted to integer representations
         self.edges = edges  # Edges of age bins in log10
         self.hists = sc.odict()  # Store the actual snapshots
-
+        return
 
     def initialize(self, sim):
 
         # Check that the simulation parameters are correct
-        if not sim['use_waning']:
+        if not sim.diseases.covid.pars.use_waning:
             errormsg = 'The cv.nab_histogram() analyzer requires use_waning=True. Please enable waning.'
             raise RuntimeError(errormsg)
 
-        super().initialize()
-
         # Handle days
-        self.start_day = sc.date(sim['start_day'], as_date=False)  # Get the start day, as a string
-        self.end_day = sc.date(sim['end_day'], as_date=False)  # Get the start day, as a string
+        self.start_day = sim.date(0) # Get the start day, as a string
+        self.end_day   = sim.date(sim.npts-1) # Get the end day, as a string
         if self.days is None:
             self.days = self.end_day  # If no day is supplied, use the last day
-        self.days, self.dates = cvi.process_days(sim, self.days,
-                                                 return_dates=True)  # Ensure days are in the right format
+        self.days, self.dates = _process_days(sim, self.days) # Ensure days are in the right format
 
         # Handle edges and nab bins
         if self.edges is None:  # Default  bins
             self.edges = np.arange(-4, 3)
         self.bins = self.edges[:-1]  # Don't include the last edge in the bins
-
         return
 
-
     def apply(self, sim):
-        nonzero = sim.people.nab > 0
-        log_nabs = np.log10(sim.people.nab[nonzero])
-        for ind in cvi.find_day(self.days, sim.t):
+        nab = PeopleSnapshot(sim, copy=False).nab # All agents, including those who have died
+        nonzero = nab > 0
+        log_nabs = np.log10(nab[nonzero])
+        for ind in cvi.find_day(self.days, sim.ti):
             date = self.dates[ind]  # Find the date for this index
             self.hists[date] = sc.objdict()  # Initialize the dictionary
-            scale = sim.rescale_vec[sim.t]  # Determine current scale factor
+            scale = sim.current_scale  # Determine current scale factor
             self.hists[date]['bins'] = self.bins  # Copy here for convenience
             self.hists[date]['n'] = np.histogram(log_nabs, bins=self.edges)[0] * scale  # Actually count the people
             self.hists[date]['s'] = np.std(log_nabs)    # keep the std
             self.hists[date]['m'] = np.mean(log_nabs)   # keep the mean
-
+        return
 
     def plot(self, fig_args=None, axis_args=None, plot_args=None, do_show=None, **kwargs):
-        '''
+        """
         Plot the results
 
         Args:
@@ -970,820 +1555,43 @@ class nab_histogram(Analyzer):
             plot_args (dict): passed to pl.plot()
             do_show   (bool): whether to show the plot
             kwargs    (dict): passed to ``cv.options.with_style()``
-        '''
+        """
 
         fig_args  = sc.mergedicts(dict(figsize=(9,5)), fig_args)
         axis_args = sc.mergedicts(dict(left=0.10, right=0.95, bottom=0.10, top=0.95, wspace=0.25, hspace=0.4), axis_args)
         plot_args = sc.mergedicts(dict(lw=2), plot_args)
 
-        with cvo.with_style(**kwargs):
-            fig, axs = pl.subplots(nrows=1, ncols=1, **fig_args)
-            pl.subplots_adjust(**axis_args)
+        with cvset.options.with_style(**kwargs):
+            fig, axs = plt.subplots(nrows=1, ncols=1, **fig_args)
+            plt.subplots_adjust(**axis_args)
             for date, hist in self.hists.items():
                 axs.stairs(hist['n'], edges=self.edges, label=date, **plot_args)
             axs.set_xlabel('Log10(NAb)')
             axs.set_ylabel('Count')
             axs.legend()
 
-        return cvpl.handle_show_return(fig=fig, do_show=do_show)
-
-
-class Fit(Analyzer):
-    '''
-    A class for calculating the fit between the model and the data. Note the
-    following terminology is used here:
-
-        - fit: nonspecific term for how well the model matches the data
-        - difference: the absolute numerical differences between the model and the data (one time series per result)
-        - goodness-of-fit: the result of passing the difference through a statistical function, such as mean squared error
-        - loss: the goodness-of-fit for each result multiplied by user-specified weights (one time series per result)
-        - mismatches: the sum of all the losses (a single scalar value per time series)
-        - mismatch: the sum of the mismatches -- this is the value to be minimized during calibration
-
-    Args:
-        sim (Sim): the sim object
-        weights (dict): the relative weight to place on each result (by default: 10 for deaths, 5 for diagnoses, 1 for everything else)
-        keys (list): the keys to use in the calculation
-        custom (dict): a custom dictionary of additional data to fit; format is e.g. {'my_output':{'data':[1,2,3], 'sim':[1,2,4], 'weights':2.0}}
-        compute (bool): whether to compute the mismatch immediately
-        verbose (bool): detail to print
-        die (bool): whether to raise an exception if no data are supplied
-        label (str): the label for the analyzer
-        kwargs (dict): passed to cv.compute_gof() -- see this function for more detail on goodness-of-fit calculation options
-
-    **Example**::
-
-        sim = cv.Sim(datafile='my-data-file.csv')
-        sim.run()
-        fit = sim.compute_fit()
-        fit.plot()
-    '''
-
-    def __init__(self, sim, weights=None, keys=None, custom=None, compute=True, verbose=False, die=True, label=None, **kwargs):
-        super().__init__(label=label) # Initialize the Analyzer object
-
-        # Handle inputs
-        self.weights    = weights
-        self.custom     = sc.mergedicts(custom)
-        self.verbose    = verbose
-        self.weights    = sc.mergedicts({'cum_deaths':10, 'cum_diagnoses':5}, weights)
-        self.keys       = keys
-        self.gof_kwargs = kwargs
-        self.die        = die
-
-        # Copy data
-        if sim.data is None: # pragma: no cover
-            errormsg = 'Model fit cannot be calculated until data are loaded'
-            if self.die:
-                raise RuntimeError(errormsg)
-            else:
-                cvm.warn(errormsg)
-                sim.data = pd.DataFrame() # Use an empty dataframe
-        self.data = sim.data
-
-        # Copy sim results
-        if not sim.results_ready: # pragma: no cover
-            errormsg = 'Model fit cannot be calculated until results are run'
-            if self.die: raise RuntimeError(errormsg)
-            else:        cvm.warn(errormsg)
-        self.sim_results = sc.objdict()
-        for key in sim.result_keys() + ['t', 'date']:
-            self.sim_results[key] = sim.results[key]
-        self.sim_npts = sim.npts # Number of time points in the sim
-
-        # Copy other things
-        self.sim_dates = sim.datevec.tolist()
-
-        # These are populated during initialization
-        self.inds         = sc.objdict() # To store matching indices between the data and the simulation
-        self.inds.sim     = sc.objdict() # For storing matching indices in the sim
-        self.inds.data    = sc.objdict() # For storing matching indices in the data
-        self.date_matches = sc.objdict() # For storing matching dates, largely for plotting
-        self.pair         = sc.objdict() # For storing perfectly paired points between the data and the sim
-        self.diffs        = sc.objdict() # Differences between pairs
-        self.gofs         = sc.objdict() # Goodness-of-fit for differences
-        self.losses       = sc.objdict() # Weighted goodness-of-fit
-        self.mismatches   = sc.objdict() # Final mismatch values
-        self.mismatch     = None # The final value
-
-        if compute:
-            self.compute()
-
-        return
-
-
-    def compute(self):
-        ''' Perform all required computations '''
-        self.reconcile_inputs() # Find matching values
-        self.compute_diffs() # Perform calculations
-        self.compute_gofs()
-        self.compute_losses()
-        self.compute_mismatch()
-        return self.mismatch
-
-
-    def reconcile_inputs(self):
-        ''' Find matching keys and indices between the model and the data '''
-
-        data_cols = self.data.columns
-        if self.keys is None:
-            sim_keys = [k for k in self.sim_results.keys() if k.startswith('cum_')] # Default sim keys, only keep cumulative keys if no keys are supplied
-            intersection = list(set(sim_keys).intersection(data_cols)) # Find keys in both the sim and data
-            self.keys = [key for key in sim_keys if key in intersection] # Maintain key order
-            if not len(self.keys): # pragma: no cover
-                errormsg = f'No matches found between simulation result keys:\n{sc.strjoin(sim_keys)}\n\nand data columns:\n{sc.strjoin(data_cols)}'
-                if self.die: raise sc.KeyNotFoundError(errormsg)
-                else:        cvm.warn(errormsg)
-        mismatches = [key for key in self.keys if key not in data_cols]
-        if len(mismatches): # pragma: no cover
-            mismatchstr = ', '.join(mismatches)
-            errormsg = f'The following requested key(s) were not found in the data: {mismatchstr}'
-            if self.die: raise sc.KeyNotFoundError(errormsg)
-            else:        cvm.warn(errormsg)
-
-        for key in self.keys: # For keys present in both the results and in the data
-            self.inds.sim[key]  = []
-            self.inds.data[key] = []
-            self.date_matches[key] = []
-            count = -1
-            for d, datum in self.data[key].items():
-                count += 1
-                if np.isfinite(datum):
-                    if d in self.sim_dates:
-                        self.date_matches[key].append(d)
-                        self.inds.sim[key].append(self.sim_dates.index(d))
-                        self.inds.data[key].append(count)
-            self.inds.sim[key]  = np.array(self.inds.sim[key])
-            self.inds.data[key] = np.array(self.inds.data[key])
-
-        # Convert into paired points
-        matches = 0 # Count how many data points match
-        for key in self.keys:
-            self.pair[key] = sc.objdict()
-            sim_inds = self.inds.sim[key]
-            data_inds = self.inds.data[key]
-            n_inds = len(sim_inds)
-            self.pair[key].sim  = np.zeros(n_inds)
-            self.pair[key].data = np.zeros(n_inds)
-            for i in range(n_inds):
-                matches += 1
-                self.pair[key].sim[i]  = self.sim_results[key].values[sim_inds[i]]
-                self.pair[key].data[i] = self.data[key].values[data_inds[i]]
-
-        # Process custom inputs
-        self.custom_keys = list(self.custom.keys())
-        for key in self.custom.keys():
-            matches += 1 # If any of these exist, count it as  amatch
-
-            # Initialize and do error checking
-            custom = self.custom[key]
-            c_keys = list(custom.keys())
-            if 'sim' not in c_keys or 'data' not in c_keys:
-                errormsg = f'Custom input must have "sim" and "data" keys, not {c_keys}'
-                raise sc.KeyNotFoundError(errormsg)
-            c_data = custom['data']
-            c_sim  = custom['sim']
-            try:
-                assert len(c_data) == len(c_sim)
-            except: # pragma: no cover
-                errormsg = f'Custom data and sim must be arrays, and be of the same length: data = {c_data}, sim = {c_sim} could not be processed'
-                raise ValueError(errormsg)
-            if key in self.pair: # pragma: no cover
-                errormsg = f'You cannot use a custom key "{key}" that matches one of the existing keys: {self.pair.keys()}'
-                raise ValueError(errormsg)
-
-            # If all tests pass, simply copy the data
-            self.pair[key] = sc.objdict()
-            self.pair[key].sim  = c_sim
-            self.pair[key].data = c_data
-
-            # Process weight, if available
-            wt = custom.get('weight', 1.0) # Attempt to retrieve key 'weight', or use the default if not provided
-            wt = custom.get('weights', wt) # ...but also try "weights"
-            self.weights[key] = wt # Set the weight
-
-        if matches == 0:
-            errormsg = 'No paired data points were found between the supplied data and the simulation; please check the dates for each'
-            if self.die: raise ValueError(errormsg)
-            else:        cvm.warn(errormsg)
-
-        return
-
-
-    def compute_diffs(self, absolute=False):
-        ''' Find the differences between the sim and the data '''
-        for key in self.pair.keys():
-            self.diffs[key] = self.pair[key].sim - self.pair[key].data
-            if absolute:
-                self.diffs[key] = np.abs(self.diffs[key])
-        return
-
-
-    def compute_gofs(self, **kwargs):
-        ''' Compute the goodness-of-fit '''
-        kwargs = sc.mergedicts(self.gof_kwargs, kwargs)
-        for key in self.pair.keys():
-            actual    = sc.dcp(self.pair[key].data)
-            predicted = sc.dcp(self.pair[key].sim)
-            self.gofs[key] = cvm.compute_gof(actual, predicted, **kwargs)
-        return
-
-
-    def compute_losses(self):
-        ''' Compute the weighted goodness-of-fit '''
-        for key in self.gofs.keys():
-            if key in self.weights:
-                weight = self.weights[key]
-                if sc.isiterable(weight): # It's an array
-                    len_wt = len(weight)
-                    len_sim = self.sim_npts
-                    len_match = len(self.gofs[key])
-                    if len_wt == len_match: # If the weight already is the right length, do nothing
-                        pass
-                    elif len_wt == len_sim: # Most typical case: it's the length of the simulation, must trim
-                        weight = weight[self.inds.sim[key]] # Trim to matching indices
-                    else: # pragma: no cover
-                        errormsg = f'Could not map weight array of length {len_wt} onto simulation of length {len_sim} or data-model matches of length {len_match}'
-                        raise ValueError(errormsg)
-            else:
-                weight = 1.0
-            self.losses[key] = self.gofs[key]*weight
-        return
-
-
-    def compute_mismatch(self, use_median=False):
-        ''' Compute the final mismatch '''
-        for key in self.losses.keys():
-            if use_median:
-                self.mismatches[key] = np.median(self.losses[key])
-            else:
-                self.mismatches[key] = np.sum(self.losses[key])
-        self.mismatch = self.mismatches[:].sum()
-        return self.mismatch
-
-
-    def summarize(self):
-        ''' Print out results from the fit '''
-        if self.mismatch is not None:
-            print('Mismatch values for:')
-            print(self.mismatches)
-            print('\nTotal mismatch value:')
-            print(self.mismatch)
-        else:
-            print('Mismatch values not yet calculated; please run sim.compute_fit().')
-        return
-
-
-    def plot(self, keys=None, width=0.8, fig_args=None, axis_args=None, plot_args=None,
-             date_args=None, do_show=None, fig=None, **kwargs):
-        '''
-        Plot the fit of the model to the data. For each result, plot the data
-        and the model; the difference; and the loss (weighted difference). Also
-        plots the loss as a function of time.
-
-        Args:
-            keys      (list):  which keys to plot (default, all)
-            width     (float): bar width
-            fig_args  (dict):  passed to ``pl.figure()``
-            axis_args (dict):  passed to ``pl.subplots_adjust()``
-            plot_args (dict):  passed to ``pl.plot()``
-            date_args (dict):  passed to ``cv.plotting.reset_ticks()`` (handle date format, rotation, etc.)
-            do_show   (bool):  whether to show the plot
-            fig       (fig):   if supplied, use this figure to plot in
-            kwargs    (dict):  passed to ``cv.options.with_style()``
-
-        Returns:
-            Figure object
-        '''
-
-        fig_args  = sc.mergedicts(dict(figsize=(18,11)), fig_args)
-        axis_args = sc.mergedicts(dict(left=0.05, right=0.95, bottom=0.05, top=0.95, wspace=0.3, hspace=0.3), axis_args)
-        plot_args = sc.mergedicts(dict(lw=2, alpha=0.5, marker='o'), plot_args)
-        date_args = sc.mergedicts(sc.objdict(as_dates=True, dateformat=None, rotation=None, start=None, end=None), date_args)
-
-        if keys is None:
-            keys = self.keys + self.custom_keys
-        n_keys = len(keys)
-
-        loss_ax = None
-        colors = sc.gridcolors(n_keys)
-        n_rows = 4
-
-        # Plot
-        with cvo.with_style(**kwargs):
-            if fig is None:
-                fig = pl.figure(**fig_args)
-            pl.subplots_adjust(**axis_args)
-            main_ax1 = pl.subplot(n_rows, 2, 1)
-            main_ax2 = pl.subplot(n_rows, 2, 2)
-            bottom = sc.objdict() # Keep track of the bottoms for plotting cumulative
-            bottom.daily = np.zeros(self.sim_npts)
-            bottom.cumul = np.zeros(self.sim_npts)
-            for k,key in enumerate(keys):
-                if key in self.keys: # It's a time series, plot with days and dates
-                    days      = self.inds.sim[key] # The "days" axis (or not, for custom keys)
-                    daylabel  = 'Date'
-                else: #It's custom, we don't know what it is
-                    days      = np.arange(len(self.losses[key])) # Just use indices
-                    daylabel  = 'Index'
-
-                # Cumulative totals can't mix daily and non-daily inputs, so skip custom keys
-                if key in self.keys:
-                    for i,ax in enumerate([main_ax1, main_ax2]):
-
-                        if i == 0:
-                            data = self.losses[key]
-                            ylabel = 'Daily mismatch'
-                            title = 'Daily total mismatch'
-                        else:
-                            data = np.cumsum(self.losses[key])
-                            ylabel = 'Cumulative mismatch'
-                            title = f'Cumulative mismatch: {self.mismatch:0.3f}'
-
-                        dates = self.sim_results['date'][days] # Show these with dates, rather than days, as a reference point
-                        ax.bar(dates, data, width=width, bottom=bottom[i][self.inds.sim[key]], color=colors[k], label=f'{key}')
-
-                        if i == 0:
-                            bottom.daily[self.inds.sim[key]] += self.losses[key]
-                        else:
-                            bottom.cumul = np.cumsum(bottom.daily)
-
-                        if k == len(self.keys)-1:
-                            ax.set_xlabel('Date')
-                            ax.set_ylabel(ylabel)
-                            ax.set_title(title)
-                            cvpl.reset_ticks(ax=ax, date_args=date_args, start_day=self.sim_results['date'][0])
-                            ax.legend()
-
-                ts_ax = pl.subplot(n_rows, n_keys, k+1*n_keys+1)
-                ts_ax.plot(days, self.pair[key].data, c='k', label='Data', **plot_args)
-                ts_ax.plot(days, self.pair[key].sim, c=colors[k], label='Simulation', **plot_args)
-                ts_ax.set_title(key)
-                if k == 0:
-                    ts_ax.set_ylabel('Time series (counts)')
-                    ts_ax.legend()
-
-                diff_ax = pl.subplot(n_rows, n_keys, k+2*n_keys+1)
-                diff_ax.bar(days, self.diffs[key], width=width, color=colors[k], label='Difference')
-                diff_ax.axhline(0, c='k')
-                if k == 0:
-                    diff_ax.set_ylabel('Differences (counts)')
-                    diff_ax.legend()
-
-                loss_ax = pl.subplot(n_rows, n_keys, k+3*n_keys+1, sharey=loss_ax)
-                loss_ax.bar(days, self.losses[key], width=width, color=colors[k], label='Losses')
-                loss_ax.set_xlabel(daylabel)
-                loss_ax.set_title(f'Total loss: {self.losses[key].sum():0.3f}')
-                if k == 0:
-                    loss_ax.set_ylabel('Losses')
-                    loss_ax.legend()
-
-                if daylabel == 'Date':
-                    for ax in [ts_ax, diff_ax, loss_ax]:
-                        cvpl.reset_ticks(ax=ax, date_args=date_args, start_day=self.sim_results['date'][0])
-
-        return cvpl.handle_show_return(fig=fig, do_show=do_show)
-
-
-def import_optuna():
-    ''' A helper function to import Optuna, which is an optional dependency '''
-    try:
-        import optuna as op # Import here since it's slow
-    except ModuleNotFoundError as E: # pragma: no cover
-        errormsg = f'Optuna import failed ({str(E)}), please install first (pip install optuna)'
-        raise ModuleNotFoundError(errormsg)
-    return op
-
-
-class Calibration(Analyzer):
-    '''
-    A class to handle calibration of Covasim simulations. Uses the Optuna hyperparameter
-    optimization library (optuna.org), which must be installed separately (via
-    pip install optuna).
-
-    Note: running a calibration does not guarantee a good fit! You must ensure that
-    you run for a sufficient number of iterations, have enough free parameters, and
-    that the parameters have wide enough bounds. Please see the tutorial on calibration
-    for more information.
-
-    Args:
-        sim          (Sim)  : the simulation to calibrate
-        calib_pars   (dict) : a dictionary of the parameters to calibrate of the format dict(key1=[best, low, high])
-        fit_args     (dict) : a dictionary of options that are passed to sim.compute_fit() to calculate the goodness-of-fit
-        par_samplers (dict) : an optional mapping from parameters to the Optuna sampler to use for choosing new points for each; by default, suggest_float
-        custom_fn    (func) : a custom function for modifying the simulation; receives the sim and calib_pars as inputs, should return the modified sim
-        n_trials     (int)  : the number of trials per worker
-        n_workers    (int)  : the number of parallel workers (default: maximum
-        total_trials (int)  : if n_trials is not supplied, calculate by dividing this number by n_workers)
-        name         (str)  : the name of the database (default: 'covasim_calibration')
-        db_name      (str)  : the name of the database file (default: 'covasim_calibration.db')
-        keep_db      (bool) : whether to keep the database after calibration (default: false)
-        storage      (str)  : the location of the database (default: sqlite)
-        label        (str)  : a label for this calibration object
-        die          (bool) : whether to stop if an exception is encountered (default: false)
-        verbose      (bool) : whether to print details of the calibration
-        kwargs       (dict) : passed to cv.Calibration()
-
-    Returns:
-        A Calibration object
-
-    **Example**::
-
-        sim = cv.Sim(datafile='data.csv')
-        calib_pars = dict(beta=[0.015, 0.010, 0.020])
-        calib = cv.Calibration(sim, calib_pars, total_trials=100)
-        calib.calibrate()
-        calib.plot()
-
-    New in version 3.0.3.
-    '''
-
-    def __init__(self, sim, calib_pars=None, fit_args=None, custom_fn=None, par_samplers=None,
-                 n_trials=None, n_workers=None, total_trials=None, name=None, db_name=None,
-                 keep_db=None, storage=None, label=None, die=False, verbose=True):
-        super().__init__(label=label) # Initialize the Analyzer object
-
-        import multiprocessing as mp # Import here since it's also slow
-
-        # Handle run arguments
-        if n_trials  is None: n_trials  = 20
-        if n_workers is None: n_workers = mp.cpu_count()
-        if name      is None: name      = 'covasim_calibration'
-        if db_name   is None: db_name   = f'{name}.db'
-        if keep_db   is None: keep_db   = False
-        if storage   is None: storage   = f'sqlite:///{db_name}'
-        if total_trials is not None: n_trials = np.ceil(total_trials/n_workers)
-        self.run_args   = sc.objdict(n_trials=int(n_trials), n_workers=int(n_workers), name=name, db_name=db_name, keep_db=keep_db, storage=storage)
-
-        # Handle other inputs
-        self.sim          = sim
-        self.calib_pars   = calib_pars
-        self.fit_args     = sc.mergedicts(fit_args)
-        self.par_samplers = sc.mergedicts(par_samplers)
-        self.custom_fn    = custom_fn
-        self.die          = die
-        self.verbose      = verbose
-        self.calibrated   = False
-
-        # Handle if the sim has already been run
-        if self.sim.complete:
-            warnmsg = 'Sim has already been run; re-initializing, but in future, use a sim that has not been run'
-            cvm.warn(warnmsg)
-            self.sim = self.sim.copy()
-            self.sim.initialize()
-
-        return
-
-
-    def run_sim(self, calib_pars, label=None, return_sim=False):
-        ''' Create and run a simulation '''
-        sim = self.sim.copy()
-        if label: sim.label = label
-        valid_pars = {k:v for k,v in calib_pars.items() if k in sim.pars}
-        sim.update_pars(valid_pars)
-        if self.custom_fn:
-            sim = self.custom_fn(sim, calib_pars)
-        else:
-            if len(valid_pars) != len(calib_pars):
-                extra = set(calib_pars.keys()) - set(valid_pars.keys())
-                errormsg = f'The following parameters are not part of the sim, nor is a custom function specified to use them: {sc.strjoin(extra)}'
-                raise ValueError(errormsg)
-        try:
-            sim.run()
-            sim.compute_fit(**self.fit_args)
-            if return_sim:
-                return sim
-            else:
-                return sim.fit.mismatch
-        except Exception as E:
-            if self.die:
-                raise E
-            else:
-                warnmsg = f'Encountered error running sim!\nParameters:\n{valid_pars}\nTraceback:\n{sc.traceback()}'
-                cvm.warn(warnmsg)
-                output = None if return_sim else np.inf
-                return output
-
-
-    def run_trial(self, trial):
-        ''' Define the objective for Optuna '''
-        pars = {}
-        for key, (best,low,high) in self.calib_pars.items():
-            if key in self.par_samplers: # If a custom sampler is used, get it now
-                try:
-                    sampler_fn = getattr(trial, self.par_samplers[key])
-                except Exception as E:
-                    errormsg = 'The requested sampler function is not found: ensure it is a valid attribute of an Optuna Trial object'
-                    raise AttributeError(errormsg) from E
-            else:
-                sampler_fn = trial.suggest_float
-            pars[key] = sampler_fn(key, low, high) # Sample from values within this range
-        mismatch = self.run_sim(pars)
-        return mismatch
-
-
-    def worker(self):
-        ''' Run a single worker '''
-        op = import_optuna()
-        if self.verbose:
-            op.logging.set_verbosity(op.logging.DEBUG)
-        else:
-            op.logging.set_verbosity(op.logging.ERROR)
-        study = op.load_study(storage=self.run_args.storage, study_name=self.run_args.name)
-        output = study.optimize(self.run_trial, n_trials=self.run_args.n_trials)
-        return output
-
-
-    def run_workers(self):
-        ''' Run multiple workers in parallel '''
-        if self.run_args.n_workers > 1: # Normal use case: run in parallel
-            output = sc.parallelize(self.worker, iterarg=self.run_args.n_workers)
-        else: # Special case: just run one
-            output = [self.worker()]
-        return output
-    
-    
-    def remove_db(self):
-        '''
-        Remove the database file if keep_db is false and the path exists.
-
-        New in version 3.1.0.
-        '''
-        try:
-            op = import_optuna()
-            op.delete_study(study_name=self.run_args.name, storage=self.run_args.storage)
-            if self.verbose:
-                print(f'Deleted study {self.run_args.name} in {self.run_args.storage}')
-        except Exception as E:
-            print('Could not delete study, skipping...')
-            print(str(E))
-        if os.path.exists(self.run_args.db_name):
-            os.remove(self.run_args.db_name)
-            if self.verbose:
-                print(f'Removed existing calibration {self.run_args.db_name}')
-        return
-    
-
-
-    def make_study(self):
-        ''' Make a study, deleting one if it already exists '''
-        op = import_optuna()
-        if not self.run_args.keep_db:
-            self.remove_db()
-        output = op.create_study(storage=self.run_args.storage, study_name=self.run_args.name)
-        return output
-
-
-    def calibrate(self, calib_pars=None, verbose=True, **kwargs):
-        '''
-        Actually perform calibration.
-
-        Args:
-            calib_pars (dict): if supplied, overwrite stored calib_pars
-            verbose (bool): whether to print output from each trial
-            kwargs (dict): if supplied, overwrite stored run_args (n_trials, n_workers, etc.)
-        '''
-        op = import_optuna()
-
-        # Load and validate calibration parameters
-        if calib_pars is not None:
-            self.calib_pars = calib_pars
-        if self.calib_pars is None:
-            errormsg = 'You must supply calibration parameters either when creating the calibration object or when calling calibrate().'
-            raise ValueError(errormsg)
-        self.run_args.update(kwargs) # Update optuna settings
-
-        # Run the optimization
-        t0 = sc.tic()
-        self.make_study()
-        self.run_workers()
-        self.study = op.load_study(storage=self.run_args.storage, study_name=self.run_args.name)
-        self.best_pars = sc.objdict(self.study.best_params)
-        self.elapsed = sc.toc(t0, output=True)
-
-        # Compare the results
-        self.initial_pars = sc.objdict({k:v[0] for k,v in self.calib_pars.items()})
-        self.par_bounds   = sc.objdict({k:np.array([v[1], v[2]]) for k,v in self.calib_pars.items()})
-        self.before = self.run_sim(calib_pars=self.initial_pars, label='Before calibration', return_sim=True)
-        self.after  = self.run_sim(calib_pars=self.best_pars,    label='After calibration',  return_sim=True)
-        self.parse_study()
-
-        # Tidy up
-        self.calibrated = True
-        if not self.run_args.keep_db:
-            self.remove_db()
-        if verbose:
-            self.summarize()
-
-        return self
-
-
-    def summarize(self):
-        ''' Print out results from the calibration '''
-        if self.calibrated:
-            print(f'Calibration for {self.run_args.n_workers*self.run_args.n_trials} total trials completed in {self.elapsed:0.1f} s.')
-            before = self.before.fit.mismatch
-            after = self.after.fit.mismatch
-            print('\nInitial parameter values:')
-            print(self.initial_pars)
-            print('\nBest parameter values:')
-            print(self.best_pars)
-            print(f'\nMismatch before calibration: {before:n}')
-            print(f'Mismatch after calibration:  {after:n}')
-            print(f'Percent improvement:         {((before-after)/before)*100:0.1f}%')
-            return before, after
-        else:
-            print('Calibration not yet run; please run calib.calibrate()')
-            return
-
-
-    def parse_study(self):
-        '''Parse the study into a data frame -- called automatically '''
-        best = self.best_pars
-
-        print('Making results structure...')
-        results = []
-        n_trials = len(self.study.trials)
-        failed_trials = []
-        for trial in self.study.trials:
-            data = {'index':trial.number, 'mismatch': trial.value}
-            for key,val in trial.params.items():
-                data[key] = val
-            if data['mismatch'] is None:
-                failed_trials.append(data['index'])
-            else:
-                results.append(data)
-        print(f'Processed {n_trials} trials; {len(failed_trials)} failed')
-
-        keys = ['index', 'mismatch'] + list(best.keys())
-        data = sc.objdict().make(keys=keys, vals=[])
-        for i,r in enumerate(results):
-            for key in keys:
-                if key not in r:
-                    warnmsg = f'Key {key} is missing from trial {i}, replacing with default'
-                    cvm.warn(warnmsg)
-                    r[key] = best[key]
-                data[key].append(r[key])
-        self.data = data
-        self.df = pd.DataFrame.from_dict(data)
-
-        return
-
-
-    def to_json(self, filename=None):
-        '''
-        Convert the data to JSON.
-
-        New in version 3.1.1.
-        '''
-        order = np.argsort(self.df['mismatch'])
-        json = []
-        for o in order:
-            row = self.df.iloc[o,:].to_dict()
-            rowdict = dict(index=row.pop('index'), mismatch=row.pop('mismatch'), pars={})
-            for key,val in row.items():
-                rowdict['pars'][key] = val
-            json.append(rowdict)
-        if filename:
-            sc.savejson(filename, json, indent=2)
-        else:
-            return json
-
-
-    def plot_sims(self, **kwargs):
-        '''
-        Plot sims, before and after calibration.
-
-        New in version 3.1.1: renamed from plot() to plot_sims().
-        '''
-        msim = cvr.MultiSim([self.before, self.after])
-        fig = msim.plot(**kwargs)
-        return cvpl.handle_show_return(fig=fig)
-
-
-    def plot_trend(self, best_thresh=2):
-        '''
-        Plot the trend in best mismatch over time.
-
-        New in version 3.1.1.
-        '''
-        mismatch = sc.dcp(self.df['mismatch'].values)
-        best_mismatch = np.zeros(len(mismatch))
-        for i in range(len(mismatch)):
-            best_mismatch[i] = mismatch[:i+1].min()
-        smoothed_mismatch = sc.smooth(mismatch)
-        fig = pl.figure(figsize=(16,12), dpi=120)
-
-        ax1 = pl.subplot(2,1,1)
-        pl.plot(mismatch, alpha=0.2, label='Original')
-        pl.plot(smoothed_mismatch, lw=3, label='Smoothed')
-        pl.plot(best_mismatch, lw=3, label='Best')
-
-        ax2 = pl.subplot(2,1,2)
-        max_mismatch = mismatch.min()*best_thresh
-        inds = sc.findinds(mismatch<=max_mismatch)
-        pl.plot(best_mismatch, lw=3, label='Best')
-        pl.scatter(inds, mismatch[inds], c=mismatch[inds], label='Usable indices')
-        for ax in [ax1, ax2]:
-            pl.sca(ax)
-            pl.grid(True)
-            pl.legend()
-            sc.setylim()
-            sc.setxlim()
-            pl.xlabel('Trial number')
-            pl.ylabel('Mismatch')
-        return cvpl.handle_show_return(fig=fig)
-
-
-    def plot_all(self): # pragma: no cover
-        '''
-        Plot every point in the calibration. Warning, very slow for more than a few hundred trials.
-
-        New in version 3.1.1.
-        '''
-        g = pairplotpars(self.data, color_column='mismatch', bounds=self.par_bounds)
-        return g
-
-
-    def plot_best(self, best_thresh=2): # pragma: no cover
-        ''' Plot only the points with lowest mismatch. New in version 3.1.1. '''
-        max_mismatch = self.df['mismatch'].min()*best_thresh
-        inds = sc.findinds(self.df['mismatch'].values <= max_mismatch)
-        g = pairplotpars(self.data, inds=inds, color_column='mismatch', bounds=self.par_bounds)
-        return g
-
-
-    def plot_stride(self, npts=200): # pragma: no cover
-        '''
-        Plot a fixed number of points in order across the results.
-
-        New in version 3.1.1.
-        '''
-        npts = min(len(self.df), npts)
-        inds = np.linspace(0, len(self.df)-1, npts).round()
-        g = pairplotpars(self.data, inds=inds, color_column='mismatch', bounds=self.par_bounds)
-        return g
-
-
-def pairplotpars(data, inds=None, color_column=None, bounds=None, cmap='parula', bins=None, edgecolor='w', facecolor='#F8A493', figsize=(20,16)): # pragma: no cover
-    ''' Plot scatterplots, histograms, and kernel densities for calibration results '''
-    try:
-        import seaborn as sns # Optional import
-    except ModuleNotFoundError as E:
-        errormsg = 'Calibration plotting requires Seaborn; please install with "pip install seaborn"'
-        raise ModuleNotFoundError(errormsg) from E
-
-    data = sc.odict(sc.dcp(data))
-
-    # Create the dataframe
-    df = pd.DataFrame.from_dict(data)
-    if inds is not None:
-        df = df.iloc[inds,:].copy()
-
-    # Choose the colors
-    if color_column:
-        colors = sc.vectocolor(df[color_column].values, cmap=cmap)
-    else:
-        colors = [facecolor for i in range(len(df))]
-    df['color_column'] = [sc.rgb2hex(rgba[:-1]) for rgba in colors]
-
-    # Make the plot
-    grid = sns.PairGrid(df)
-    grid = grid.map_lower(pl.scatter, **{'facecolors':df['color_column']})
-    grid = grid.map_diag(pl.hist, bins=bins, edgecolor=edgecolor, facecolor=facecolor)
-    grid = grid.map_upper(sns.kdeplot)
-    grid.fig.set_size_inches(figsize)
-    grid.fig.tight_layout()
-
-    # Set bounds
-    if bounds:
-        for ax in grid.axes.flatten():
-            xlabel = ax.get_xlabel()
-            ylabel = ax.get_ylabel()
-            if xlabel in bounds:
-                ax.set_xlim(bounds[xlabel])
-            if ylabel in bounds:
-                ax.set_ylim(bounds[ylabel])
-
-    return grid
-
+        return cvplt.handle_show_return(fig=fig, do_show=do_show)
 
 
 class TransTree(Analyzer):
-    '''
+    """
     A class for holding a transmission tree. There are several different representations
-    of the transmission tree: "infection_log" is copied from the people object and is the
-    simplest representation. "detailed h" includes additional attributes about the source
+    of the transmission tree: "infection_log" is copied from the sim and is the
+    simplest representation. "detailed" includes additional attributes about the source
     and target. If NetworkX is installed (required for most methods), "graph" includes an
     NX representation of the transmission tree.
 
+    The transmission log is always recorded by the COVID module (``sim.diseases.covid.infection_log``),
+    so the tree can be made from any sim after it has run. It can also be added as an analyzer
+    (``analyzers=cv.TransTree()``), in which case it is made when the sim finishes.
+
     Args:
-        sim (Sim): the sim object
+        sim (Sim): the sim object (if None, make the tree at the end of the run the analyzer is part of)
         to_networkx (bool): whether to convert the graph to a NetworkX object
 
     **Example**::
 
-        sim = cv.Sim().run()
+        sim = cv.Sim()
         sim.run()
         tt = sim.make_transtree()
         tt.plot()
@@ -1791,32 +1599,42 @@ class TransTree(Analyzer):
 
     New in version 2.1.0: ``tt.detailed`` is a dataframe rather than a list of dictionaries;
     for the latter, use ``tt.detailed.to_dict('records')``.
-    '''
+    """
 
-    def __init__(self, sim, to_networkx=False, **kwargs):
+    def __init__(self, sim=None, to_networkx=False, **kwargs):
         super().__init__(**kwargs) # Initialize the Analyzer object
+        self.to_networkx = to_networkx
+        self.infection_log = None
+        if sim is not None:
+            self.make_tree(sim)
+        return
+
+    def step(self):
+        """ No per-step work: the tree is made from the transmission log when the sim finishes """
+        pass
+
+    def finalize(self):
+        super().finalize()
+        self.make_tree(self.sim)
+        return
+
+    def make_tree(self, sim):
+        """ Make the transmission tree from a sim that has been run """
 
         # Pull out each of the attributes relevant to transmission
         attrs = {'age', 'date_exposed', 'date_symptomatic', 'date_tested', 'date_diagnosed', 'date_quarantined', 'date_severe', 'date_critical', 'date_known_contact', 'date_recovered'}
 
         # Pull out the people and some of the sim results
-        people = sim.people
-        self.sim_start = sim['start_day'] # Used for filtering later
+        people = PeopleSnapshot(sim, copy=False) # All agents, including those who have died
+        self.sim_start = sim.date(0) # Used for filtering later
         self.sim_results = {}
-        self.sim_results['t'] = sim.results['t']
-        self.sim_results['cum_infections'] = sim.results['cum_infections'].values
-        self.n_days = people.t  # people.t should be set to the last simulation timestep in the output (since the Transtree is constructed after the people have been stepped forward in time)
+        self.sim_results['t'] = np.arange(sim.npts)
+        self.sim_results['cum_infections'] = np.asarray(sim.diseases.covid.results['cum_infections']) # Not sim.results, since this may be called before these are made at the end of the run
+        self.n_days = sim.ti  # The last simulation timestep (since the TransTree is constructed after the sim has been run)
         self.pop_size = len(people)
 
-        # Check that rescaling is not on
-        if sim['rescale'] and sim['pop_scale']>1:
-            warningmsg = 'Warning: transmission tree results are unreliable when' \
-                         'dynamic rescaling is on, since agents are reused! Please '\
-                         'rerun with rescale=False and pop_scale=1 for reliable results.'
-            cvm.warn(warningmsg)
-
-        # Include the basic line list -- copying directly is slow, so we'll make a copy later
-        self.infection_log = people.infection_log
+        # Include the basic line list
+        self.infection_log = make_infection_log(sim)
 
         # Parse into sources and targets
         self.sources = [None for i in range(self.pop_size)]
@@ -1828,7 +1646,7 @@ class TransTree(Analyzer):
             source = entry['source']
             target = entry['target']
             date   = entry['date']
-            if source:
+            if source is not None:
                 self.sources[target] = source # Each target has at most one source
                 self.targets[source].append(target) # Each source can have multiple targets
                 self.source_dates[target] = date # Each target has at most one source
@@ -1841,8 +1659,8 @@ class TransTree(Analyzer):
         # Include the detailed transmission tree as well, as a list and as a dataframe
         self.make_detailed(people)
 
-        # Optionally convert to NetworkX -- must be done on import since the people object is not kept
-        if to_networkx:
+        # Optionally convert to NetworkX -- must be done on creation since the people object is not kept
+        if self.to_networkx:
 
             # Initialization
             import networkx as nx
@@ -1852,30 +1670,36 @@ class TransTree(Analyzer):
             for i in range(len(people)):
                 d = {}
                 for attr in attrs:
-                    d[attr] = people[attr][i]
+                    d[attr] = self._get_attr(people, attr)[i]
                 self.graph.add_node(i, **d)
 
             # Next, add edges from linelist
-            for edge in people.infection_log:
+            for edge in self.infection_log:
                 if edge['source'] is not None: # Skip seed infections
                     self.graph.add_edge(edge['source'],edge['target'],date=edge['date'],layer=edge['layer'])
 
         return
 
+    @staticmethod
+    def _get_attr(people, attr):
+        """ Get a per-agent array from the people; v4 does not record the date someone became a known contact, so that is all NaN """
+        if attr in people.keys():
+            return people[attr]
+        else:
+            return np.full(len(people), np.nan)
 
     def __len__(self):
-        '''
+        """
         The length of the transmission tree is the length of the line list,
         which should equal the number of infections.
-        '''
+        """
         try:
             return len(self.infection_log)
         except: # pragma: no cover
             return 0
 
-
     def day(self, day=None, which=None):
-        ''' Convenience function for converting an input to an integer day '''
+        """ Convenience function for converting an input to an integer day """
         if day is not None:
             day = sc.day(day, start_date=self.sim_start)
         elif which == 'start':
@@ -1884,9 +1708,8 @@ class TransTree(Analyzer):
             day = self.n_days
         return day
 
-
     def count_targets(self, start_day=None, end_day=None):
-        '''
+        """
         Count the number of targets each infected person has. If start and/or end
         days are given, it will only count the targets of people who got infected
         between those dates (it does not, however, filter on the date the target
@@ -1895,7 +1718,7 @@ class TransTree(Analyzer):
         Args:
             start_day (int/str): the day on which to start counting people who got infected
             end_day (int/str): the day on which to stop counting people who got infected
-        '''
+        """
 
         # Handle start and end days
         start_day = self.day(start_day, which='start')
@@ -1910,7 +1733,6 @@ class TransTree(Analyzer):
         n_targets = n_targets[n_target_inds]
         self.n_targets = n_targets
         return n_targets
-
 
     def count_transmissions(self):
         """
@@ -1933,19 +1755,18 @@ class TransTree(Analyzer):
         self.target_inds = target_inds
         return transmissions
 
-
     def make_detailed(self, people, reset=False):
-        ''' Construct a detailed transmission tree, with additional information for each person '''
+        """ Construct a detailed transmission tree, with additional information for each person (people is a cv.PeopleSnapshot) """
 
         def df_to_arrdict(df):
-            ''' Convert a dataframe to a dictionary of arrays '''
+            """ Convert a dataframe to a dictionary of arrays """
             arrdict = {}
             for col in df.columns:
                 arrdict[col] = df[col].values
             return arrdict
 
         # Convert infection log to a dataframe and from there to a dict of arrays
-        inflog = df_to_arrdict(sc.dcp(pd.DataFrame(self.infection_log)))
+        inflog = df_to_arrdict(pd.DataFrame(self.infection_log, columns=['source', 'target', 'date', 'layer', 'variant']))
 
         # Initialization
         n_people = len(people)
@@ -1955,7 +1776,8 @@ class TransTree(Analyzer):
         quar_attrs = ['date_quarantined', 'date_end_quarantine']
         date_attrs = [attr for attr in attrs if attr.startswith('date_')]
         is_attrs = [attr.replace('date_', 'is_') for attr in date_attrs]
-        dd_arr = lambda: np.nan*np.zeros(n_people) # Create an empty array of the right size
+        def dd_arr(): # Create an empty array of the right size
+            return np.nan*np.zeros(n_people)
         dd = sc.odict(defaultdict=dd_arr) # Data dictionary, to be converted to a dataframe later
 
         # Handle indices
@@ -1985,8 +1807,9 @@ class TransTree(Analyzer):
 
         # Populate from people
         for attr in attrs+quar_attrs:
-            dd[trg+attr] = people[attr][:]
-            dd[src+attr][vi] = people[attr][vs_inds]
+            values = self._get_attr(people, attr)
+            dd[trg+attr] = values[:]
+            dd[src+attr][vi] = values[vs_inds]
 
         # Pull out valid indices for source and target
         lnot = np.logical_not # Shorten since used heavily
@@ -2000,7 +1823,7 @@ class TransTree(Analyzer):
         dd[trg+'is_quarantined'][ti] = (dd[trg+'date_quarantined'][ti] <= tinfdates) & lnot(dd[trg+'date_end_quarantine'][ti] <= tinfdates)
 
         # Also re-parse the log and convert to a simpler dataframe
-        targets = np.array(self.target_inds)
+        targets = np.array(self.target_inds, dtype=int)
         infdates = dd['date'][targets]
         dtr = {}
         dtr['date']      = infdates
@@ -2031,7 +1854,6 @@ class TransTree(Analyzer):
 
         return
 
-
     def r0(self, recovered_only=False):
         """
         Return average number of transmissions per person
@@ -2055,32 +1877,31 @@ class TransTree(Analyzer):
             raise RuntimeError(errormsg)
         return np.mean(n_infected)
 
-
     def plot(self, fig_args=None, plot_args=None, do_show=None, fig=None):
-        '''
+        """
         Plot the transmission tree.
 
         Args:
-            fig_args  (dict):  passed to pl.figure()
-            plot_args (dict):  passed to pl.plot()
+            fig_args  (dict):  passed to plt.figure()
+            plot_args (dict):  passed to plt.plot()
             do_show   (bool):  whether to show the plot
             fig       (fig):   if supplied, use this figure
-        '''
+        """
 
         fig_args = sc.mergedicts(dict(figsize=(8, 5)), fig_args)
         plot_args = sc.mergedicts(dict(lw=2, alpha=0.5, marker='o'), plot_args)
 
         if fig is None:
-            fig = pl.figure(**fig_args)
-        pl.subplots_adjust(bottom=0.1, top=0.95, left=0.1, right=0.95, wspace=0.4, hspace=0.4)
+            fig = plt.figure(**fig_args)
+        plt.subplots_adjust(bottom=0.1, top=0.95, left=0.1, right=0.95, wspace=0.4, hspace=0.4)
         n_rows = 2
         n_cols = 3
 
         def plot_quantity(key, title, i):
             dat = self.df.groupby(['Day', key]).size().unstack(key)
-            ax = pl.subplot(n_rows, n_cols, i);
+            ax = plt.subplot(n_rows, n_cols, i);
             dat.plot(ax=ax, legend=None, **plot_args)
-            pl.legend(title=None)
+            plt.legend(title=None)
             ax.set_title(title)
             sc.datenumformatter(start_date=self.sim_start, ax=ax)
             ax.set_ylabel('Count')
@@ -2096,11 +1917,10 @@ class TransTree(Analyzer):
         for i, (key, title) in enumerate(to_plot.items()):
             plot_quantity(key, title, i + 1)
 
-        return cvpl.handle_show_return(fig=fig, do_show=do_show)
-
+        return cvplt.handle_show_return(fig=fig, do_show=do_show)
 
     def animate(self, *args, **kwargs):
-        '''
+        """
         Animate the transmission tree.
 
         Args:
@@ -2108,9 +1928,9 @@ class TransTree(Analyzer):
             verbose    (bool):  print out progress of each frame
             markersize (int):   size of the markers
             sus_color  (list):  color for susceptibles
-            fig_args   (dict):  arguments passed to pl.figure()
-            axis_args  (dict):  arguments passed to pl.subplots_adjust()
-            plot_args  (dict):  arguments passed to pl.plot()
+            fig_args   (dict):  arguments passed to plt.figure()
+            axis_args  (dict):  arguments passed to plt.subplots_adjust()
+            plot_args  (dict):  arguments passed to plt.plot()
             delay      (float): delay between frames in seconds
             colors     (list):  color of each person
             cmap       (str):   colormap for each person (if colors is not supplied)
@@ -2118,7 +1938,7 @@ class TransTree(Analyzer):
 
         Returns:
             fig: the figure object
-        '''
+        """
 
         # Settings
         animate   = kwargs.get('animate', True)
@@ -2194,31 +2014,31 @@ class TransTree(Analyzer):
 
         # Configure plotting
         if fig is None:
-            fig = pl.figure(**fig_args)
-        pl.subplots_adjust(**axis_args)
+            fig = plt.figure(**fig_args)
+        plt.subplots_adjust(**axis_args)
         ax = fig.add_subplot(1, 1, 1)
 
         # Create the legend
-        ax2 = pl.axes([0.85, 0.05, 0.14, 0.9])
+        ax2 = plt.axes([0.85, 0.05, 0.14, 0.9])
         ax2.axis('off')
         lcol = colors[0]
         na = np.nan  # Shorten
-        pl.plot(na, na, '-', c=lcol, **plot_args, label='Transmission')
-        pl.plot(na, na, 'o', c=lcol, markersize=msize, **plot_args, label='Source')
-        pl.plot(na, na, '*', c=lcol, markersize=msize, **plot_args, label='Target')
-        pl.plot(na, na, 'o', c=lcol, markersize=msize * 2, fillstyle='none', **plot_args, label='Tested')
-        pl.plot(na, na, 's', c=lcol, markersize=msize * 1.2, **plot_args, label='Diagnosed')
-        pl.plot(na, na, 'x', c=lcol, markersize=msize * 2.0, label='Known contact')
-        pl.legend()
+        plt.plot(na, na, '-', c=lcol, **plot_args, label='Transmission')
+        plt.plot(na, na, 'o', c=lcol, markersize=msize, **plot_args, label='Source')
+        plt.plot(na, na, '*', c=lcol, markersize=msize, **plot_args, label='Target')
+        plt.plot(na, na, 'o', c=lcol, markersize=msize * 2, fillstyle='none', **plot_args, label='Tested')
+        plt.plot(na, na, 's', c=lcol, markersize=msize * 1.2, **plot_args, label='Diagnosed')
+        plt.plot(na, na, 'x', c=lcol, markersize=msize * 2.0, label='Known contact')
+        plt.legend()
 
         # Plot the animation
-        pl.sca(ax)
+        plt.sca(ax)
         for day in range(n):
-            pl.title(f'Day: {day}')
-            pl.xlim([0, n])
-            pl.ylim([0, self.pop_size])
-            pl.xlabel('Day')
-            pl.ylabel('Person')
+            plt.title(f'Day: {day}')
+            plt.xlim([0, n])
+            plt.ylim([0, self.pop_size])
+            plt.xlabel('Day')
+            plt.ylabel('Person')
             flist = frames[day]
             tlist = tests[day]
             dlist = diags[day]
@@ -2231,22 +2051,21 @@ class TransTree(Analyzer):
                 x = f['x']
                 y = f['y']
                 c = f['c']
-                pl.plot(x[0], y[0], 'o', c=c, markersize=msize, **plot_args)  # Plot sources
-                pl.plot(x, y, '-', c=c, **plot_args)  # Plot transmission lines
+                plt.plot(x[0], y[0], 'o', c=c, markersize=msize, **plot_args)  # Plot sources
+                plt.plot(x, y, '-', c=c, **plot_args)  # Plot transmission lines
                 if f['i']:  # If this person is infected
-                    pl.plot(x[1], y[1], '*', c=c, markersize=msize, **plot_args)  # Plot targets
-            for tdq in tlist: pl.plot(t_d, t_t, 'o', c=t_c, markersize=msize * 2, fillstyle='none')  # Tested; No alpha for this
-            for tdq in dlist: pl.plot(t_d, t_t, 's', c=t_c, markersize=msize * 1.2, **plot_args)  # Diagnosed
-            for tdq in qlist: pl.plot(t_d, t_t, 'x', c=t_c, markersize=msize * 2.0)  # Quarantine; no alpha for this
-            pl.plot([0, day], [0.5, 0.5], c='k', lw=3)  # Plot the endless march of time
+                    plt.plot(x[1], y[1], '*', c=c, markersize=msize, **plot_args)  # Plot targets
+            for tdq in tlist: plt.plot(t_d, t_t, 'o', c=t_c, markersize=msize * 2, fillstyle='none')  # Tested; No alpha for this
+            for tdq in dlist: plt.plot(t_d, t_t, 's', c=t_c, markersize=msize * 1.2, **plot_args)  # Diagnosed
+            for tdq in qlist: plt.plot(t_d, t_t, 'x', c=t_c, markersize=msize * 2.0)  # Quarantine; no alpha for this
+            plt.plot([0, day], [0.5, 0.5], c='k', lw=3)  # Plot the endless march of time
             if animate:  # Whether to animate
-                pl.pause(delay)
+                plt.pause(delay)
 
         return fig
 
-
     def plot_histograms(self, start_day=None, end_day=None, bins=None, width=0.8, fig_args=None, fig=None):
-        '''
+        """
         Plots a histogram of the number of transmissions.
 
         Args:
@@ -2254,9 +2073,9 @@ class TransTree(Analyzer):
             end_day (int/str): the day on which to stop counting people who got infected
             bins (list): bin edges to use for the histogram
             width (float): width of bars
-            fig_args (dict): passed to pl.figure()
+            fig_args (dict): passed to plt.figure()
             fig (fig): if supplied, use this figure
-        '''
+        """
 
         # Process targets
         n_targets = self.count_targets(start_day, end_day)
@@ -2282,38 +2101,38 @@ class TransTree(Analyzer):
         # Plotting
         fig_args = sc.mergedicts(dict(figsize=(12,8)), fig_args)
         if fig is None:
-            fig = pl.figure(**fig_args)
-        pl.set_cmap('Spectral')
-        pl.subplots_adjust(left=0.08, right=0.92, bottom=0.08, top=0.92)
+            fig = plt.figure(**fig_args)
+        plt.set_cmap('Spectral')
+        plt.subplots_adjust(left=0.08, right=0.92, bottom=0.08, top=0.92)
         colors = sc.vectocolor(n_bins)
 
-        pl.subplot(1,2,1)
+        plt.subplot(1,2,1)
         w05 = width*0.5
         w025 = w05*0.5
-        pl.bar(bins-w025, counts, width=w05, facecolor='k', label='Number of events')
+        plt.bar(bins-w025, counts, width=w05, facecolor='k', label='Number of events')
         for i in range(n_bins):
             label = 'Number of transmissions (events × transmissions per event)' if i==0 else None
-            pl.bar(bins[i]+w025, total_counts[i], width=w05, facecolor=colors[i], label=label)
-        pl.xlabel('Number of transmissions per person')
-        pl.ylabel('Count')
+            plt.bar(bins[i]+w025, total_counts[i], width=w05, facecolor=colors[i], label=label)
+        plt.xlabel('Number of transmissions per person')
+        plt.ylabel('Count')
         if n_bins<max_labels:
-            pl.xticks(ticks=bins)
-        pl.legend()
-        pl.title('Numbers of events and transmissions')
+            plt.xticks(ticks=bins)
+        plt.legend()
+        plt.title('Numbers of events and transmissions')
 
-        pl.subplot(2,2,2)
+        plt.subplot(2,2,2)
         total = 0
         for i in range(n_bins):
-            pl.bar(bins[i:], total_counts[i], width=width, bottom=total, facecolor=colors[i])
+            plt.bar(bins[i:], total_counts[i], width=width, bottom=total, facecolor=colors[i])
             total += total_counts[i]
         if n_bins<max_labels:
-            pl.xticks(ticks=bins)
-        pl.xlabel('Number of transmissions per person')
-        pl.ylabel('Number of infections caused')
-        pl.title('Number of transmissions, by transmissions per person')
+            plt.xticks(ticks=bins)
+        plt.xlabel('Number of transmissions per person')
+        plt.ylabel('Number of infections caused')
+        plt.title('Number of transmissions, by transmissions per person')
 
-        pl.subplot(2,2,4)
-        pl.plot(index, sorted_sum, lw=1.5, c='k', alpha=0.5)
+        plt.subplot(2,2,4)
+        plt.plot(index, sorted_sum, lw=1.5, c='k', alpha=0.5)
         n_change_inds = len(change_inds)
         label_inds = np.linspace(0, n_change_inds, max_labels).round() # Don't allow more than this many labels
         for i in range(n_change_inds):
@@ -2321,23 +2140,22 @@ class TransTree(Analyzer):
                 label = f'Transmitted to {bins[i+1]:n} people'
             else:
                 label = None
-            pl.scatter([index[change_inds[i]]], [sorted_sum[change_inds[i]]], s=150, zorder=10, c=[colors[i]], label=label)
-        pl.xlabel('Proportion of population, ordered by the number of people they infected (%)')
-        pl.ylabel('Proportion of infections caused (%)')
-        pl.legend()
-        pl.ylim([0, 100])
-        pl.grid(True)
-        pl.title('Proportion of transmissions, by proportion of population')
+            plt.scatter([index[change_inds[i]]], [sorted_sum[change_inds[i]]], s=150, zorder=10, c=[colors[i]], label=label)
+        plt.xlabel('Proportion of population, ordered by the number of people they infected (%)')
+        plt.ylabel('Proportion of infections caused (%)')
+        plt.legend()
+        plt.ylim([0, 100])
+        plt.grid(True)
+        plt.title('Proportion of transmissions, by proportion of population')
 
-        pl.axes([0.30, 0.65, 0.15, 0.2])
+        plt.axes([0.30, 0.65, 0.15, 0.2])
         berry      = [0.8, 0.1, 0.2]
         dirty_snow = [0.9, 0.9, 0.9]
         start_day  = self.day(start_day, which='start')
         end_day    = self.day(end_day, which='end')
-        pl.axvspan(start_day, end_day, facecolor=dirty_snow)
-        pl.plot(self.sim_results['t'], self.sim_results['cum_infections'], lw=1, c=berry)
-        pl.xlabel('Day')
-        pl.ylabel('Cumulative infections')
+        plt.axvspan(start_day, end_day, facecolor=dirty_snow)
+        plt.plot(self.sim_results['t'], self.sim_results['cum_infections'], lw=1, c=berry)
+        plt.xlabel('Day')
+        plt.ylabel('Cumulative infections')
 
-        return cvpl.handle_show_return(fig=fig)
-
+        return cvplt.handle_show_return(fig=fig)

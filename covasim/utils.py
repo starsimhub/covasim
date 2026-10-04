@@ -1,8 +1,5 @@
 '''
-Numerical utilities for running Covasim.
-
-These include the viral load, transmissibility, and infection calculations
-at the heart of the integration loop.
+Numerical utilities for Covasim: sampling, random numbers, and array indexing helpers.
 '''
 
 #%% Housekeeping
@@ -11,6 +8,7 @@ import numba as nb # For faster computations
 import numpy as np # For numerics
 import random # Used only for resetting the seed
 import sciris as sc # For additional utilities
+import starsim as ss # For Starsim arrays
 from .settings import options as cvo # To set options
 from . import defaults as cvd # To set default types
 
@@ -34,104 +32,7 @@ if cvo.numba_parallel not in [0, 1, 2, '0', '1', '2', 'none', 'safe', 'full']:
 cache = cvo.numba_cache # Turning this off can help switching parallelization options
 
 
-#%% The core Covasim functions -- compute the infections
-
-@nb.njit(             (nbint, nbfloat[:], nbfloat[:],     nbfloat[:], nbfloat,   nbfloat,    nbfloat), cache=cache, parallel=safe_parallel)
-def compute_viral_load(t,     time_start, time_recovered, time_dead,  frac_time, load_ratio, high_cap): # pragma: no cover
-    '''
-    Calculate relative transmissibility for time t. Includes time varying
-    viral load, pre/asymptomatic factor, diagnosis factor, etc.
-
-    Args:
-        t: (int) timestep
-        time_start: (float[]) individuals' infectious date
-        time_recovered: (float[]) individuals' recovered date
-        time_dead: (float[]) individuals' death date
-        frac_time: (float) fraction of time in high load
-        load_ratio: (float) ratio for high to low viral load
-        high_cap: (float) cap on the number of days with high viral load
-
-    Returns:
-        load (float): viral load
-    '''
-
-    # Get the end date from recover or death
-    n = len(time_dead)
-    time_stop = np.ones(n, dtype=cvd.default_float)*time_recovered # This is needed to make a copy
-    inds = ~np.isnan(time_dead)
-    time_stop[inds] = time_dead[inds]
-
-    # Calculate which individuals with be high past the cap and when it should happen
-    infect_days_total = time_stop-time_start
-    trans_day = frac_time*infect_days_total
-    inds = trans_day > high_cap
-    cap_frac = high_cap/infect_days_total[inds]
-
-    # Get corrected time to switch from high to low
-    trans_point = np.ones(n,dtype=cvd.default_float)*frac_time
-    trans_point[inds] = cap_frac
-
-    # Calculate load
-    load = np.ones(n, dtype=cvd.default_float) # allocate an array of ones with the correct dtype
-    early = (t-time_start)/infect_days_total < trans_point # are we in the early or late phase
-    load = (load_ratio * early + load * ~early)/(load+frac_time*(load_ratio-load)) # calculate load
-    
-    # Set to zero if not infectious
-    dt = t - time_start
-    invalid = (dt < 0) | (dt >= infect_days_total) | np.isnan(time_start)
-    load[invalid] = 0
-
-    return load
-
-
-@nb.njit(            (nbfloat[:], nbfloat[:], nbbool[:], nbbool[:], nbfloat,    nbfloat[:], nbbool[:], nbbool[:], nbbool[:], nbfloat,      nbfloat,    nbfloat,     nbfloat[:]), cache=cache, parallel=safe_parallel)
-def compute_trans_sus(rel_trans,  rel_sus,    inf,       sus,       beta_layer, viral_load, symp,      iso,      quar,      asymp_factor, iso_factor, quar_factor, immunity_factors): # pragma: no cover
-    ''' Calculate relative transmissibility and susceptibility '''
-    f_asymp   =  symp + ~symp * asymp_factor # Asymptomatic factor, changes e.g. [0,1] with a factor of 0.8 to [0.8,1.0]
-    f_iso     = ~iso  +  iso  * iso_factor # Isolation factor, changes e.g. [0,1] with a factor of 0.2 to [1,0.2]
-    f_quar    = ~quar +  quar * quar_factor # Quarantine, changes e.g. [0,1] with a factor of 0.5 to [1,0.5]
-    rel_trans = rel_trans * inf * f_quar * f_asymp * f_iso * beta_layer * viral_load # Recalculate transmissibility
-    rel_sus   = rel_sus * sus * f_quar * (1-immunity_factors) # Recalculate susceptibility
-    return rel_trans, rel_sus
-
-
-@nb.njit(             (nbfloat,  nbint[:],  nbint[:], nbfloat[:],   nbfloat[:], nbfloat[:], nbbool), cache=cache, parallel=rand_parallel)
-def compute_infections(beta,     p1,        p2,       layer_betas,  rel_trans,  rel_sus,    legacy=False): # pragma: no cover
-    '''
-    Compute who infects whom
-
-    The heaviest step of the model -- figure out who gets infected on this timestep.
-    Cannot be easily parallelized since random numbers are used. Loops over contacts
-    in both directions (i.e., targets become sources).
-
-    Args:
-        beta: overall transmissibility
-        p1: person 1
-        p2: person 2
-        layer_betas: per-contact transmissibilities
-        rel_trans: the source's relative transmissibility
-        rel_sus: the target's relative susceptibility
-        legacy: whether to use the slower legacy (pre 3.1.1) calculation method
-    '''
-    slist = np.empty(0, dtype=nbint)
-    tlist = np.empty(0, dtype=nbint)
-    pairs = [[p1,p2], [p2,p1]] if not legacy else [[p1,p2]]
-    for sources,targets in pairs:
-        source_trans     = rel_trans[sources] # Pull out the transmissibility of the sources (0 for non-infectious people)
-        inf_inds         = source_trans.nonzero()[0] # Infectious indices -- remove noninfectious people
-        betas            = beta * layer_betas[inf_inds] * source_trans[inf_inds] * rel_sus[targets[inf_inds]] # Calculate the raw transmission probabilities
-        nonzero_inds     = betas.nonzero()[0] # Find nonzero entries
-        nonzero_inf_inds = inf_inds[nonzero_inds] # Map onto original indices
-        nonzero_betas    = betas[nonzero_inds] # Remove zero entries from beta
-        nonzero_sources  = sources[nonzero_inf_inds] # Remove zero entries from the sources
-        nonzero_targets  = targets[nonzero_inf_inds] # Remove zero entries from the targets
-        transmissions    = (np.random.random(len(nonzero_betas)) < nonzero_betas).nonzero()[0] # Compute the actual infections!
-        source_inds      = nonzero_sources[transmissions]
-        target_inds      = nonzero_targets[transmissions] # Filter the targets on the actual infections
-        slist = np.concatenate((slist, source_inds), axis=0)
-        tlist = np.concatenate((tlist, target_inds), axis=0)
-    return slist, tlist
-
+#%% Contact lookup
 
 @nb.njit((nbint[:], nbint[:], nb.int64[:]), cache=cache)
 def find_contacts(p1, p2, inds): # pragma: no cover
@@ -507,7 +408,10 @@ def true(arr):
     **Example**::
 
         inds = cv.true(np.array([1,0,0,1,1,0,1])) # Returns array([0, 3, 4, 6])
+        inds = cv.true(sim.people.age > 65) # Returns the UIDs of people over 65
     '''
+    if isinstance(arr, ss.Arr): # A Starsim array: return UIDs, which correspond to v3 indices
+        return arr.true()
     return arr.nonzero()[0]
 
 
@@ -522,6 +426,8 @@ def false(arr):
 
         inds = cv.false(np.array([1,0,0,1,1,0,1]))
     '''
+    if isinstance(arr, ss.Arr):
+        return arr.false()
     return np.logical_not(arr).nonzero()[0]
 
 
@@ -536,6 +442,8 @@ def defined(arr):
 
         inds = cv.defined(np.array([1,np.nan,0,np.nan,1,0,1]))
     '''
+    if isinstance(arr, ss.Arr):
+        return arr.notnan.true()
     return (~np.isnan(arr)).nonzero()[0]
 
 
@@ -548,8 +456,10 @@ def undefined(arr):
 
     **Example**::
 
-        inds = cv.defined(np.array([1,np.nan,0,np.nan,1,0,1]))
+        inds = cv.undefined(np.array([1,np.nan,0,np.nan,1,0,1]))
     '''
+    if isinstance(arr, ss.Arr):
+        return arr.isnan.true()
     return np.isnan(arr).nonzero()[0]
 
 

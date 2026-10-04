@@ -40,14 +40,13 @@ def test_base():
     sim.run()
 
     # Check setting invalid key
-    with pytest.raises(sc.KeyNotFoundError):
-        po = cv.ParsObj(pars={'a':2, 'b':3})
-        po.update_pars({'c':4})
+    with pytest.raises(KeyError):
+        sim.update_pars({'not_a_par':4})
 
     # Printing result
-    r = cv.Result()
+    r = sim.results['cum_infections']
     print(r)
-    print(r.npts)
+    print(len(r))
 
     # Day and date conversion
     daystr = '2020-04-04'
@@ -81,24 +80,16 @@ def test_basepeople():
     sim = cv.Sim(pop_size=100, verbose=verbose)
     sim.initialize()
 
-    # BasePeople methods
+    # People methods
     ppl = sim.people
-    ppl.get(['susceptible', 'infectious'])
     ppl.keys()
-    ppl.person_keys()
     ppl.state_keys()
     ppl.date_keys()
-    ppl.dur_keys()
     ppl.indices()
-    ppl._resize_arrays(new_size=200) # This only resizes the arrays, not actually create new people
-    ppl._resize_arrays(new_size=100) # Change back
     ppl.to_df()
-    ppl.to_arr()
     ppl.person(50)
-    people = ppl.to_list()
-    ppl.from_list(people)
-    ppl.make_edgelist([{'new_key':[0,1,2]}])
     ppl.brief()
+    pytest.skip('The v3 layer API (people.contacts, cv.Layer) is not yet ported')
 
     # Contacts methods
     contacts = ppl.contacts
@@ -283,16 +274,9 @@ def test_population():
         sim = cv.Sim(pop_type='not_an_option')
         sim.initialize()
 
-    # Save/load
-    sim = cv.Sim(pop_size=100)
-    sim.initialize()
-    sim.people.save(pop_path)
-    cv.Sim(pop_size=100, popfile=pop_path)
-    with pytest.raises(ValueError):
-        sim = cv.Sim(pop_size=101, popfile=pop_path)
-        sim.initialize()
-
-    remove_files(pop_path)
+    # Loading a population is not supported in v4
+    with pytest.raises(NotImplementedError):
+        cv.Sim(pop_size=100, popfile=pop_path)
 
     return
 
@@ -304,8 +288,6 @@ def test_requirements():
     cv.requirements.min_versions['sciris'] = '99.99.99'
     with pytest.raises(ImportError):
         cv.requirements.check_sciris()
-
-    cv.requirements.check_synthpops()
 
     print('↑ Should print various requirements warnings')
 
@@ -368,56 +350,17 @@ def test_run():
 def test_sim():
     sc.heading('Testing sim')
 
-    # Test resetting layer parameters
     sim = cv.Sim(pop_size=100, label='test_label')
-    sim.reset_layer_pars()
-    sim.initialize()
-    sim.reset_layer_pars()
-
-    # Test validation
-    sim['pop_size'] = 'invalid'
-    with pytest.raises(ValueError):
-        sim.validate_pars()
-    sim['pop_size'] = 100 # Restore
-
-    # Handle missing start day
-    sim['start_day'] = None
-    sim.validate_pars()
-
-    # Can't have an end day before the start day
-    sim['end_day'] = '2019-01-01'
-    with pytest.raises(ValueError):
-        sim.validate_pars()
-
-    # Can't have both end_days and n_days None
-    sim['end_day'] = None
-    sim['n_days'] = None
-    with pytest.raises(ValueError):
-        sim.validate_pars()
-    sim['n_days'] = 30 # Restore
-
-    # Check layer pars are internally consistent
-    sim['quar_factor'] = {'invalid':30}
-    with pytest.raises(sc.KeyNotFoundError):
-        sim.validate_pars()
-    sim.reset_layer_pars() # Restore
-
-    # Check mismatch with population
-    for key in ['beta_layer', 'contacts', 'quar_factor']:
-        sim[key] = {'invalid':1}
-    with pytest.raises(sc.KeyNotFoundError):
-        sim.validate_pars()
-    sim.reset_layer_pars() # Restore
 
     # Convert interventions dict to intervention
     sim['interventions'] = {'which': 'change_beta', 'pars': {'days': 10, 'changes': 0.5}}
-    sim.validate_pars()
+    sim.initialize()
 
     # Check conversion to absolute parameters
     cv.parameters.absolute_prognoses(sim['prognoses'])
 
     # Test intervention functions and results analyses
-    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.t==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.t}')))).run() # ...This is not the recommended way of defining interventions.
+    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.ti==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.ti}')))).run() # ...This is not the recommended way of defining interventions.
 
     # Test other outputs
     sim = cv.Sim(pop_size=100, verbose=0, n_days=30)

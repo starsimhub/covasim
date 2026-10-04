@@ -5,7 +5,7 @@ or errors if not.
 
 #%% Housekeeping
 
-__all__ = ['min_versions', 'check_sciris', 'check_synthpops']
+__all__ = ['min_versions', 'check_sciris']
 
 min_versions = {'sciris':'2.0.1'} # Should match requirements.txt
 
@@ -26,23 +26,6 @@ def check_sciris():
         raise ImportError(errormsg)
     return
 
-
-def check_synthpops(verbose=False, die=False):
-    ''' Check whether synthpops is available '''
-
-    # Check synthpops -- optional dependency
-    try:
-        import synthpops
-        return synthpops
-    except ModuleNotFoundError as E: # pragma: no cover
-        import_error = f'Synthpops (for detailed demographic data) is not available ({str(E)})\n'
-        if die:
-            raise ModuleNotFoundError(import_error)
-        elif verbose:
-            print(import_error)
-        return False
-
-    return
 
 # Perform the version checks on import
 check_sciris()

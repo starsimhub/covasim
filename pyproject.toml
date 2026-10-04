@@ -18,7 +18,7 @@ authors = [
     {name = "Daniel Klein"},
 ]
 keywords = ["COVID", "COVID-19", "coronavirus", "SARS-CoV-2", "stochastic", "agent-based model", "interventions", "epidemiology"]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
     "Environment :: Console",
     "Intended Audience :: Science/Research",
@@ -36,6 +36,7 @@ dependencies = [
     "statsmodels",
     "matplotlib",
     "sciris>=2.0.4",
+    "starsim>=3.7.1",
 ]
 dynamic = ["version"]
 
@@ -67,6 +68,9 @@ docs = [
     "pandoc",
 ]
 dev = ["covasim[test,docs]"]
+
+[project.scripts]
+covasim-migrate3to4 = "covasim.regression.migrate3to4:main"
 
 [project.urls]
 Homepage = "https://covasim.org"

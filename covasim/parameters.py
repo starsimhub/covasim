@@ -143,10 +143,13 @@ def make_pars(set_prognoses=False, prog_by_age=True, version=None, **kwargs):
         for key in pars.keys(): # Only loop over keys that have been populated
             if key in version_pars: # Only replace keys that exist in the old version
                 pars[key] = version_pars[key]
+        if version_pars.get('prognoses') is not None: # As in v3, convert them from lists to arrays
+            pars['prognoses'] = get_prognoses(pars['prog_by_age'], version=version)
 
         # Handle code change migration
-        if sc.compareversions(version, '<2.1.0') and 'migrate_lognormal' not in pars:
-            cvm.migrate_lognormal(pars, verbose=pars['verbose'])
+        if sc.compareversions(version, '<2.1.0'):
+            errormsg = f'Parameters from Covasim versions before 2.1.0 are not supported (requested {version})'
+            raise ValueError(errormsg)
 
     return pars
 
@@ -211,7 +214,10 @@ def reset_layer_pars(pars, layer_keys=None, force=False):
         if force:
             par_dict = defaults[pkey] # Just use defaults
         else:
-            par_dict = sc.mergedicts(defaults[pkey], pars.get(pkey, None)) # Use user-supplied parameters if available, else default
+            user_par = pars.get(pkey, None)
+            if sc.isnumber(user_par): # A single value for all layers
+                user_par = {lkey:user_par for lkey in (layer_keys or default_layer_keys)}
+            par_dict = sc.mergedicts(defaults[pkey], user_par) # Use user-supplied parameters if available, else default
 
         # Figure out what the layer keys for this parameter are (may be different between parameters)
         if layer_keys:

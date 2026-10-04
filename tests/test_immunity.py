@@ -177,7 +177,7 @@ def test_vaccines_sequential(do_plot=False):
     n_doses = []
     subtarget = dict(inds=np.arange(int(base_pars.pop_size//2)), vals=0.1)
     pfizer = cv.vaccinate_num(vaccine='pfizer', sequence='age', num_doses=num_doses, subtarget=subtarget)
-    sim  = cv.Sim(base_pars, n_days=n_days, rescale=False, use_waning=True, variants=p1, interventions=pfizer, analyzers=lambda sim: n_doses.append(sim.people.doses.copy()))
+    sim  = cv.Sim(base_pars, n_days=n_days, rescale=False, use_waning=True, variants=p1, interventions=pfizer, analyzers=lambda sim: n_doses.append(sim.people.doses.raw.copy())) # v4: .raw includes agents who have died, so the length is constant
     sim.run()
 
     n_doses = np.array(n_doses)
@@ -191,7 +191,7 @@ def test_vaccines_sequential(do_plot=False):
 
         # At the end of the simulation
         df = pd.DataFrame(n_doses.T)
-        df['age_bin'] = np.digitize(sim.people.age,np.arange(0,100,10))
+        df['age_bin'] = np.digitize(sim.people.age.raw,np.arange(0,100,10))
         df['fully_vaccinated'] = df[60]==2
         df['first_dose'] = df[60]==1
         df['unvaccinated'] = df[60]==0
@@ -200,7 +200,7 @@ def test_vaccines_sequential(do_plot=False):
 
         # Part-way through the simulation
         df = pd.DataFrame(n_doses.T)
-        df['age_bin'] = np.digitize(sim.people.age,np.arange(0,100,10))
+        df['age_bin'] = np.digitize(sim.people.age.raw,np.arange(0,100,10))
         df['fully_vaccinated'] = df[40]==2
         df['first_dose'] = df[40]==1
         df['unvaccinated'] = df[40]==0
@@ -259,7 +259,7 @@ def test_vaccine_target_eff():
             return
 
         def apply(self, sim):
-            if sim.t == self.day:
+            if sim.ti == self.day:
                 eligible = cv.true(~np.isfinite(sim.people.date_exposed) & ~sim.people.vaccinated)
                 self.placebo_inds = eligible[cv.choose(len(eligible), min(self.trial_size, len(eligible)))]
             return
@@ -279,7 +279,7 @@ def test_vaccine_target_eff():
 
     def subtarget(sim):
         ''' Select people who are susceptible '''
-        if sim.t == start_trial:
+        if sim.ti == start_trial:
             eligible = cv.true(~np.isfinite(sim.people.date_exposed))
             inds = eligible[cv.choose(len(eligible), min(trial_size // 2, len(eligible)))]
         else:
@@ -399,6 +399,8 @@ def test_historical():
     wave = cv.historical_wave(120, 0.05)
     sim1 = cv.Sim(base_pars, interventions=pfizer).run()
     sim2 = cv.Sim(base_pars, interventions=wave).run()
+    for key in ['cum_infections', 'cum_recoveries', 'cum_symptomatic']: # As in v3, the historical infections are counted on day 0
+        assert sim2.results[key][0] > 0.02*sim2['pop_size'], f'Expected a few percent of people to have {key} on day 0'
     with pytest.raises(RuntimeError):
         cv.Sim(base_pars, pop_scale=5, interventions=wave).run()
     with pytest.raises(ValueError):

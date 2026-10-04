@@ -5,7 +5,13 @@ the baseline results.
 
 import numpy as np
 import sciris as sc
+import pytest
 import covasim as cv
+
+# v4.0 Starsim port: the baseline/benchmark below are regenerated against the v4 engine.
+# v4 is deterministic for a fixed seed (per-distribution CRN), so the default sim reproduces its
+# saved summary exactly. (v4 is NOT bit-for-bit identical to v3; that equivalence is checked
+# statistically by the multi-seed parity gates in tests/migrate3to4/.)
 
 do_plot = 1
 do_save = 0

@@ -1,0 +1,302 @@
+[
+  {
+    "cum_infections": 16715.0,
+    "peak_prevalence": 0.34505879409557166,
+    "peak_n_infectious": 4805.0,
+    "cum_symptomatic": 11229.0,
+    "cum_severe": 902.0,
+    "cum_critical": 268.0,
+    "cum_deaths": 92.0,
+    "_seed": 0
+  },
+  {
+    "cum_infections": 16812.0,
+    "peak_prevalence": 0.340071046180017,
+    "peak_n_infectious": 4761.0,
+    "cum_symptomatic": 11443.0,
+    "cum_severe": 918.0,
+    "cum_critical": 278.0,
+    "cum_deaths": 107.0,
+    "_seed": 1
+  },
+  {
+    "cum_infections": 16906.0,
+    "peak_prevalence": 0.3495922757516634,
+    "peak_n_infectious": 4871.0,
+    "cum_symptomatic": 11462.0,
+    "cum_severe": 966.0,
+    "cum_critical": 306.0,
+    "cum_deaths": 104.0,
+    "_seed": 2
+  },
+  {
+    "cum_infections": 17002.0,
+    "peak_prevalence": 0.35393623942745606,
+    "peak_n_infectious": 4967.0,
+    "cum_symptomatic": 11461.0,
+    "cum_severe": 977.0,
+    "cum_critical": 292.0,
+    "cum_deaths": 94.0,
+    "_seed": 3
+  },
+  {
+    "cum_infections": 16852.0,
+    "peak_prevalence": 0.3493795036028823,
+    "peak_n_infectious": 4886.0,
+    "cum_symptomatic": 11361.0,
+    "cum_severe": 970.0,
+    "cum_critical": 305.0,
+    "cum_deaths": 95.0,
+    "_seed": 4
+  },
+  {
+    "cum_infections": 16948.0,
+    "peak_prevalence": 0.33933753627539276,
+    "peak_n_infectious": 4682.0,
+    "cum_symptomatic": 11388.0,
+    "cum_severe": 903.0,
+    "cum_critical": 273.0,
+    "cum_deaths": 97.0,
+    "_seed": 5
+  },
+  {
+    "cum_infections": 16883.0,
+    "peak_prevalence": 0.345726581265012,
+    "peak_n_infectious": 4835.0,
+    "cum_symptomatic": 11391.0,
+    "cum_severe": 914.0,
+    "cum_critical": 272.0,
+    "cum_deaths": 105.0,
+    "_seed": 6
+  },
+  {
+    "cum_infections": 16947.0,
+    "peak_prevalence": 0.3552486740718503,
+    "peak_n_infectious": 4972.0,
+    "cum_symptomatic": 11455.0,
+    "cum_severe": 931.0,
+    "cum_critical": 268.0,
+    "cum_deaths": 84.0,
+    "_seed": 7
+  },
+  {
+    "cum_infections": 17085.0,
+    "peak_prevalence": 0.3475017522779614,
+    "peak_n_infectious": 4806.0,
+    "cum_symptomatic": 11683.0,
+    "cum_severe": 906.0,
+    "cum_critical": 285.0,
+    "cum_deaths": 112.0,
+    "_seed": 8
+  },
+  {
+    "cum_infections": 16777.0,
+    "peak_prevalence": 0.3436764926680346,
+    "peak_n_infectious": 4794.0,
+    "cum_symptomatic": 11440.0,
+    "cum_severe": 933.0,
+    "cum_critical": 291.0,
+    "cum_deaths": 113.0,
+    "_seed": 9
+  },
+  {
+    "cum_infections": 16913.0,
+    "peak_prevalence": 0.35069548684078855,
+    "peak_n_infectious": 4897.0,
+    "cum_symptomatic": 11394.0,
+    "cum_severe": 976.0,
+    "cum_critical": 300.0,
+    "cum_deaths": 101.0,
+    "_seed": 10
+  },
+  {
+    "cum_infections": 16893.0,
+    "peak_prevalence": 0.3568784392196098,
+    "peak_n_infectious": 4951.0,
+    "cum_symptomatic": 11496.0,
+    "cum_severe": 958.0,
+    "cum_critical": 280.0,
+    "cum_deaths": 97.0,
+    "_seed": 11
+  },
+  {
+    "cum_infections": 17114.0,
+    "peak_prevalence": 0.36390473331331935,
+    "peak_n_infectious": 5062.0,
+    "cum_symptomatic": 11631.0,
+    "cum_severe": 967.0,
+    "cum_critical": 308.0,
+    "cum_deaths": 114.0,
+    "_seed": 12
+  },
+  {
+    "cum_infections": 16742.0,
+    "peak_prevalence": 0.3467253714914695,
+    "peak_n_infectious": 4840.0,
+    "cum_symptomatic": 11358.0,
+    "cum_severe": 910.0,
+    "cum_critical": 268.0,
+    "cum_deaths": 100.0,
+    "_seed": 13
+  },
+  {
+    "cum_infections": 17072.0,
+    "peak_prevalence": 0.3555088351604345,
+    "peak_n_infectious": 4972.0,
+    "cum_symptomatic": 11488.0,
+    "cum_severe": 990.0,
+    "cum_critical": 306.0,
+    "cum_deaths": 124.0,
+    "_seed": 14
+  },
+  {
+    "cum_infections": 16763.0,
+    "peak_prevalence": 0.35053042433947157,
+    "peak_n_infectious": 4858.0,
+    "cum_symptomatic": 11328.0,
+    "cum_severe": 936.0,
+    "cum_critical": 274.0,
+    "cum_deaths": 110.0,
+    "_seed": 15
+  },
+  {
+    "cum_infections": 16806.0,
+    "peak_prevalence": 0.3428271098208029,
+    "peak_n_infectious": 4794.0,
+    "cum_symptomatic": 11310.0,
+    "cum_severe": 905.0,
+    "cum_critical": 271.0,
+    "cum_deaths": 91.0,
+    "_seed": 16
+  },
+  {
+    "cum_infections": 16873.0,
+    "peak_prevalence": 0.34723195515066574,
+    "peak_n_infectious": 4842.0,
+    "cum_symptomatic": 11495.0,
+    "cum_severe": 988.0,
+    "cum_critical": 297.0,
+    "cum_deaths": 110.0,
+    "_seed": 17
+  },
+  {
+    "cum_infections": 16884.0,
+    "peak_prevalence": 0.3385862224223323,
+    "peak_n_infectious": 4713.0,
+    "cum_symptomatic": 11363.0,
+    "cum_severe": 914.0,
+    "cum_critical": 266.0,
+    "cum_deaths": 93.0,
+    "_seed": 18
+  },
+  {
+    "cum_infections": 17014.0,
+    "peak_prevalence": 0.35605264474803583,
+    "peak_n_infectious": 4932.0,
+    "cum_symptomatic": 11484.0,
+    "cum_severe": 984.0,
+    "cum_critical": 308.0,
+    "cum_deaths": 112.0,
+    "_seed": 19
+  },
+  {
+    "cum_infections": 16854.0,
+    "peak_prevalence": 0.3315481255318084,
+    "peak_n_infectious": 4594.0,
+    "cum_symptomatic": 11371.0,
+    "cum_severe": 903.0,
+    "cum_critical": 269.0,
+    "cum_deaths": 104.0,
+    "_seed": 20
+  },
+  {
+    "cum_infections": 16935.0,
+    "peak_prevalence": 0.3530147610708031,
+    "peak_n_infectious": 4969.0,
+    "cum_symptomatic": 11427.0,
+    "cum_severe": 932.0,
+    "cum_critical": 289.0,
+    "cum_deaths": 99.0,
+    "_seed": 21
+  },
+  {
+    "cum_infections": 16992.0,
+    "peak_prevalence": 0.36417312984738553,
+    "peak_n_infectious": 5121.0,
+    "cum_symptomatic": 11503.0,
+    "cum_severe": 939.0,
+    "cum_critical": 289.0,
+    "cum_deaths": 96.0,
+    "_seed": 22
+  },
+  {
+    "cum_infections": 16633.0,
+    "peak_prevalence": 0.3298314072740007,
+    "peak_n_infectious": 4582.0,
+    "cum_symptomatic": 11250.0,
+    "cum_severe": 880.0,
+    "cum_critical": 266.0,
+    "cum_deaths": 101.0,
+    "_seed": 23
+  },
+  {
+    "cum_infections": 16875.0,
+    "peak_prevalence": 0.35550217685032276,
+    "peak_n_infectious": 4948.0,
+    "cum_symptomatic": 11369.0,
+    "cum_severe": 917.0,
+    "cum_critical": 301.0,
+    "cum_deaths": 101.0,
+    "_seed": 24
+  },
+  {
+    "cum_infections": 16871.0,
+    "peak_prevalence": 0.34635976982737054,
+    "peak_n_infectious": 4863.0,
+    "cum_symptomatic": 11399.0,
+    "cum_severe": 923.0,
+    "cum_critical": 270.0,
+    "cum_deaths": 94.0,
+    "_seed": 25
+  },
+  {
+    "cum_infections": 16918.0,
+    "peak_prevalence": 0.3461596197147861,
+    "peak_n_infectious": 4825.0,
+    "cum_symptomatic": 11425.0,
+    "cum_severe": 956.0,
+    "cum_critical": 320.0,
+    "cum_deaths": 110.0,
+    "_seed": 26
+  },
+  {
+    "cum_infections": 16797.0,
+    "peak_prevalence": 0.3355022773912608,
+    "peak_n_infectious": 4715.0,
+    "cum_symptomatic": 11323.0,
+    "cum_severe": 898.0,
+    "cum_critical": 274.0,
+    "cum_deaths": 97.0,
+    "_seed": 27
+  },
+  {
+    "cum_infections": 16772.0,
+    "peak_prevalence": 0.3493222627919772,
+    "peak_n_infectious": 4895.0,
+    "cum_symptomatic": 11392.0,
+    "cum_severe": 946.0,
+    "cum_critical": 277.0,
+    "cum_deaths": 94.0,
+    "_seed": 28
+  },
+  {
+    "cum_infections": 17139.0,
+    "peak_prevalence": 0.361166700020012,
+    "peak_n_infectious": 5019.0,
+    "cum_symptomatic": 11517.0,
+    "cum_severe": 941.0,
+    "cum_critical": 285.0,
+    "cum_deaths": 98.0,
+    "_seed": 29
+  }
+]

@@ -20,13 +20,16 @@ from .misc          import * # Depends on version
 from .parameters    import * # Depends on settings, misc
 from .utils         import * # Depends on defaults
 from .plotting      import * # Depends on defaults, misc
-from .base          import * # Depends on version, misc, defaults, parameters, utils
-from .people        import * # Depends on utils, defaults, base, plotting
-from .population    import * # Depends on people et al.
-from .interventions import * # Depends on defaults, utils, base
-from .immunity      import * # Depends on utils, parameters, defaults
-from .analysis      import * # Depends on utils, misc, interventions
+from .base          import * # Depends on utils, defaults
+from .population    import * # Depends on utils, defaults
+from .network       import * # Depends on parameters
+from .covid         import * # Depends on parameters, immunity
+from .immunity      import * # Depends on parameters
+from .connectors    import * # Depends on immunity
+from .interventions import * # Depends on covid, parameters
+from .people        import * # Depends on defaults
 from .sim           import * # Depends on almost everything
+from .analysis      import * # Depends on sim
 from .run           import * # Depends on sim
-
-
+from .              import data # The demographic data
+from .regression    import migrate3to4 # The script for migrating v3 code to v4

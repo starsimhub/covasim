@@ -1,0 +1,272 @@
+[
+  {
+    "cum_infections": 20773.0,
+    "cum_severe": 985.0,
+    "cum_deaths": 118.0,
+    "peak_n_infectious": 4922.0,
+    "cum_doses": 2146.0,
+    "cum_vaccinated": 1073.0,
+    "_seed": 0
+  },
+  {
+    "cum_infections": 20414.0,
+    "cum_severe": 962.0,
+    "cum_deaths": 108.0,
+    "peak_n_infectious": 5072.0,
+    "cum_doses": 1991.0,
+    "cum_vaccinated": 996.0,
+    "_seed": 1
+  },
+  {
+    "cum_infections": 20703.0,
+    "cum_severe": 1052.0,
+    "cum_deaths": 116.0,
+    "peak_n_infectious": 5176.0,
+    "cum_doses": 1958.0,
+    "cum_vaccinated": 979.0,
+    "_seed": 2
+  },
+  {
+    "cum_infections": 20616.0,
+    "cum_severe": 1016.0,
+    "cum_deaths": 139.0,
+    "peak_n_infectious": 5157.0,
+    "cum_doses": 1984.0,
+    "cum_vaccinated": 992.0,
+    "_seed": 3
+  },
+  {
+    "cum_infections": 20750.0,
+    "cum_severe": 1013.0,
+    "cum_deaths": 123.0,
+    "peak_n_infectious": 5068.0,
+    "cum_doses": 2056.0,
+    "cum_vaccinated": 1028.0,
+    "_seed": 4
+  },
+  {
+    "cum_infections": 20649.0,
+    "cum_severe": 940.0,
+    "cum_deaths": 96.0,
+    "peak_n_infectious": 4861.0,
+    "cum_doses": 1914.0,
+    "cum_vaccinated": 957.0,
+    "_seed": 5
+  },
+  {
+    "cum_infections": 20556.0,
+    "cum_severe": 920.0,
+    "cum_deaths": 107.0,
+    "peak_n_infectious": 5107.0,
+    "cum_doses": 1938.0,
+    "cum_vaccinated": 969.0,
+    "_seed": 6
+  },
+  {
+    "cum_infections": 20629.0,
+    "cum_severe": 987.0,
+    "cum_deaths": 123.0,
+    "peak_n_infectious": 5100.0,
+    "cum_doses": 2047.0,
+    "cum_vaccinated": 1024.0,
+    "_seed": 7
+  },
+  {
+    "cum_infections": 20160.0,
+    "cum_severe": 1035.0,
+    "cum_deaths": 122.0,
+    "peak_n_infectious": 4910.0,
+    "cum_doses": 1988.0,
+    "cum_vaccinated": 994.0,
+    "_seed": 8
+  },
+  {
+    "cum_infections": 20202.0,
+    "cum_severe": 1002.0,
+    "cum_deaths": 115.0,
+    "peak_n_infectious": 4924.0,
+    "cum_doses": 1986.0,
+    "cum_vaccinated": 993.0,
+    "_seed": 9
+  },
+  {
+    "cum_infections": 20701.0,
+    "cum_severe": 1050.0,
+    "cum_deaths": 135.0,
+    "peak_n_infectious": 5159.0,
+    "cum_doses": 2085.0,
+    "cum_vaccinated": 1043.0,
+    "_seed": 10
+  },
+  {
+    "cum_infections": 20648.0,
+    "cum_severe": 1039.0,
+    "cum_deaths": 118.0,
+    "peak_n_infectious": 5234.0,
+    "cum_doses": 1986.0,
+    "cum_vaccinated": 994.0,
+    "_seed": 11
+  },
+  {
+    "cum_infections": 20620.0,
+    "cum_severe": 991.0,
+    "cum_deaths": 124.0,
+    "peak_n_infectious": 5285.0,
+    "cum_doses": 1916.0,
+    "cum_vaccinated": 958.0,
+    "_seed": 12
+  },
+  {
+    "cum_infections": 20569.0,
+    "cum_severe": 973.0,
+    "cum_deaths": 114.0,
+    "peak_n_infectious": 4563.0,
+    "cum_doses": 2057.0,
+    "cum_vaccinated": 1029.0,
+    "_seed": 13
+  },
+  {
+    "cum_infections": 20507.0,
+    "cum_severe": 960.0,
+    "cum_deaths": 108.0,
+    "peak_n_infectious": 5070.0,
+    "cum_doses": 1982.0,
+    "cum_vaccinated": 991.0,
+    "_seed": 14
+  },
+  {
+    "cum_infections": 20560.0,
+    "cum_severe": 1032.0,
+    "cum_deaths": 117.0,
+    "peak_n_infectious": 4847.0,
+    "cum_doses": 1969.0,
+    "cum_vaccinated": 985.0,
+    "_seed": 15
+  },
+  {
+    "cum_infections": 20304.0,
+    "cum_severe": 943.0,
+    "cum_deaths": 102.0,
+    "peak_n_infectious": 5067.0,
+    "cum_doses": 1975.0,
+    "cum_vaccinated": 988.0,
+    "_seed": 16
+  },
+  {
+    "cum_infections": 20414.0,
+    "cum_severe": 1005.0,
+    "cum_deaths": 115.0,
+    "peak_n_infectious": 5044.0,
+    "cum_doses": 1960.0,
+    "cum_vaccinated": 980.0,
+    "_seed": 17
+  },
+  {
+    "cum_infections": 20580.0,
+    "cum_severe": 1025.0,
+    "cum_deaths": 114.0,
+    "peak_n_infectious": 5054.0,
+    "cum_doses": 2087.0,
+    "cum_vaccinated": 1044.0,
+    "_seed": 18
+  },
+  {
+    "cum_infections": 20555.0,
+    "cum_severe": 980.0,
+    "cum_deaths": 101.0,
+    "peak_n_infectious": 5204.0,
+    "cum_doses": 2058.0,
+    "cum_vaccinated": 1029.0,
+    "_seed": 19
+  },
+  {
+    "cum_infections": 20423.0,
+    "cum_severe": 927.0,
+    "cum_deaths": 115.0,
+    "peak_n_infectious": 4808.0,
+    "cum_doses": 2010.0,
+    "cum_vaccinated": 1005.0,
+    "_seed": 20
+  },
+  {
+    "cum_infections": 20724.0,
+    "cum_severe": 1007.0,
+    "cum_deaths": 124.0,
+    "peak_n_infectious": 5305.0,
+    "cum_doses": 2065.0,
+    "cum_vaccinated": 1033.0,
+    "_seed": 21
+  },
+  {
+    "cum_infections": 20735.0,
+    "cum_severe": 997.0,
+    "cum_deaths": 124.0,
+    "peak_n_infectious": 5161.0,
+    "cum_doses": 2024.0,
+    "cum_vaccinated": 1012.0,
+    "_seed": 22
+  },
+  {
+    "cum_infections": 20342.0,
+    "cum_severe": 955.0,
+    "cum_deaths": 117.0,
+    "peak_n_infectious": 4878.0,
+    "cum_doses": 2046.0,
+    "cum_vaccinated": 1024.0,
+    "_seed": 23
+  },
+  {
+    "cum_infections": 20526.0,
+    "cum_severe": 1016.0,
+    "cum_deaths": 115.0,
+    "peak_n_infectious": 5179.0,
+    "cum_doses": 2065.0,
+    "cum_vaccinated": 1033.0,
+    "_seed": 24
+  },
+  {
+    "cum_infections": 20452.0,
+    "cum_severe": 981.0,
+    "cum_deaths": 126.0,
+    "peak_n_infectious": 5024.0,
+    "cum_doses": 2046.0,
+    "cum_vaccinated": 1023.0,
+    "_seed": 25
+  },
+  {
+    "cum_infections": 20689.0,
+    "cum_severe": 998.0,
+    "cum_deaths": 126.0,
+    "peak_n_infectious": 5023.0,
+    "cum_doses": 2058.0,
+    "cum_vaccinated": 1029.0,
+    "_seed": 26
+  },
+  {
+    "cum_infections": 20616.0,
+    "cum_severe": 1007.0,
+    "cum_deaths": 122.0,
+    "peak_n_infectious": 5189.0,
+    "cum_doses": 1896.0,
+    "cum_vaccinated": 948.0,
+    "_seed": 27
+  },
+  {
+    "cum_infections": 20713.0,
+    "cum_severe": 992.0,
+    "cum_deaths": 106.0,
+    "peak_n_infectious": 4964.0,
+    "cum_doses": 1946.0,
+    "cum_vaccinated": 974.0,
+    "_seed": 28
+  },
+  {
+    "cum_infections": 20668.0,
+    "cum_severe": 1018.0,
+    "cum_deaths": 124.0,
+    "peak_n_infectious": 5092.0,
+    "cum_doses": 2014.0,
+    "cum_vaccinated": 1007.0,
+    "_seed": 29
+  }
+]
