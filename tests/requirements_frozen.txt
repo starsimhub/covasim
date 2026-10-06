@@ -33,7 +33,7 @@ Pillow==12.3.0
 prompt-toolkit==3.0.16
 psutil==5.8.0
 ptyprocess==0.7.0
-Pygments==2.15.0
+Pygments==2.20.0
 PyNEST==2.16.0
 pyparsing==2.4.7
 python-dateutil==2.8.1
