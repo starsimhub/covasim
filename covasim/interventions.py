@@ -694,7 +694,8 @@ class BaseVaccination(Intervention):
             if self.p['doses'] != len(self.p['target_eff']):
                 raise ValueError('target_eff length must equal the number of doses.')
             nabs = np.arange(-8, 4, 0.1)
-            VE_symp = cvimm.calc_VE_symp(2 ** nabs, covid.pars.nab_eff)
+            nab_eff = self.p.get('nab_eff', covid.pars.nab_eff)  # Use the vaccine's own nab_eff if supplied
+            VE_symp = cvimm.calc_VE_symp(2 ** nabs, nab_eff)
             peak_nab = nabs[np.argmax(VE_symp > self.p['target_eff'][0])]
             self.p['nab_init'] = dict(dist='normal', par1=float(peak_nab), par2=2)
             if self.p['doses'] == 2:
