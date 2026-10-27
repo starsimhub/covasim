@@ -62,7 +62,7 @@ class Intervention(cvc.V3Module, ss.Intervention):
 
         class halve_beta(cv.Intervention):
             def step(self):
-                if self.ti == 30:
+                if self.today == 30: # The step that starts on day 30
                     self.sim['beta'] = self.sim['beta']/2
 
         sim = cv.Sim(interventions=halve_beta()).run()
@@ -206,7 +206,7 @@ class BaseTest(Intervention):
         """Choose people with influenza-like illness (independent of COVID symptoms) on this day"""
         if self.ili_prev is None:
             return np.array([], dtype=int)
-        rel_t = self.ti - self.start_day
+        rel_t = self.today - self.start_day
         if rel_t >= len(self.ili_prev):
             return np.array([], dtype=int)
         self._choose_ili.set(n=int(self.ili_prev[rel_t] * len(self.sim.people))) # Number with ILI symptoms on this day
@@ -254,7 +254,7 @@ class test_prob(BaseTest):
         return
 
     def step(self):
-        if not self.is_active(self.ti):
+        if not self.is_active(self.today):
             return
         covid = self.sim.diseases.covid
         alive = self.sim.people.auids
@@ -349,12 +349,12 @@ class test_num(BaseTest):
         return
 
     def step(self):
-        ti = self.ti
-        if not self.is_active(ti):
+        day = self.today
+        if not self.is_active(day):
             return
 
         # Check that there are tests today, correcting for the population scale factor
-        rel_t = ti - self.start_day
+        rel_t = day - self.start_day
         if rel_t >= len(self.daily_tests):
             return
         n_tests = randround(self.daily_tests[rel_t]/self.sim.current_scale, self._round)
@@ -464,7 +464,7 @@ class contact_tracing(Intervention):
 
     def step(self):
         """ Trace and notify contacts """
-        if not self.is_active(self.ti):
+        if not self.is_active(self.today):
             return
         trace_inds = self.select_cases(self.sim)
         contacts = self.identify_contacts(self.sim, trace_inds)
@@ -636,7 +636,7 @@ class BaseVaccination(Intervention):
 
         class vaccinate_over_70(cv.BaseVaccination):
             def select_people(self, sim):
-                if sim.ti == 5:
+                if self.today == 5:
                     return cv.true(sim.people.age > 70)
                 return np.array([], dtype=int)
 
@@ -745,9 +745,9 @@ class BaseVaccination(Intervention):
         if len(uids):
             self.doses[uids] += 1
             covid.vaccinate_agents(uids, self.label, self.index)
-            if t is not None: # Back-date the dose
-                covid.date_vaccinated[uids] = t
-                covid.t_nab_event[uids] = t
+            if t is not None: # Back-date the dose to the step that starts on day t
+                covid.date_vaccinated[uids] = t + 1
+                covid.t_nab_event[uids] = t + 1
         return uids
 
     def step(self):
@@ -820,7 +820,7 @@ class vaccinate_prob(BaseVaccination):
     def select_people(self, sim, t=None):
         """ Return the people to give a first dose to on day t (by default, today), and those due a second dose """
         if t is None:
-            t = sim.ti
+            t = self.today
         vacc_inds = [ss.uids()]
         if len(find_day(self.days, t, interv=self, sim=sim)):
             first = self.select_first_doses(sim, t)
@@ -894,23 +894,23 @@ class vaccinate_num(BaseVaccination):
             return np.asarray(sequence(self.sim.people))
         return np.asarray(sequence)
 
-    def get_num_doses(self, ti):
+    def get_num_doses(self, day):
         nd = self.num_doses
         if callable(nd):
             return int(nd(self.sim))
         if isinstance(nd, dict):
-            return int(nd.get(ti, 0))
+            return int(nd.get(day, 0))
         return int(nd)
 
     def select_people(self, sim):
         """ Return the people due a second dose, then those next in the sequence for a first dose, up to the number of doses today """
-        ti = sim.ti
+        day = self.today
         covid = sim.diseases.covid
-        n_doses = self.get_num_doses(ti)
-        scheduled_today = self._scheduled.pop(ti, set())
+        n_doses = self.get_num_doses(day)
+        scheduled_today = self._scheduled.pop(day, set())
         if n_doses <= 0:
             if scheduled_today:
-                self._scheduled.setdefault(ti + 1, set()).update(scheduled_today) # Defer any extras
+                self._scheduled.setdefault(day + 1, set()).update(scheduled_today) # Defer any extras
             return ss.uids()
         n_agents = randround(n_doses / sim.pars.pop_scale, self._round)
 
@@ -918,7 +918,7 @@ class vaccinate_num(BaseVaccination):
         scheduled = np.fromiter(scheduled_today, dtype=int) # Everyone scheduled today
         scheduled = scheduled[~covid.dead[ss.uids(scheduled)] & (self.doses[scheduled] < self.p['doses'])] # Remove anyone who's already had all doses of this vaccine, also dead people
         if len(scheduled) > n_agents: # If there are more people due for a second dose than there are doses, add the remainder to tomorrow's doses
-            self._scheduled.setdefault(ti + 1, set()).update(scheduled[n_agents:].tolist())
+            self._scheduled.setdefault(day + 1, set()).update(scheduled[n_agents:].tolist())
             return ss.uids(np.sort(scheduled[:n_agents]))
 
         # Next, work out who is eligible for their first dose: everyone alive, with any subtargeting
@@ -943,7 +943,7 @@ class vaccinate_num(BaseVaccination):
         n_first = max(0, n_agents - len(scheduled))
         first = first_pool[:n_first]
         if (self.p['doses'] > 1) and len(first): # Schedule the second doses
-            self._scheduled.setdefault(ti + int(self.p['interval']), set()).update(first.tolist())
+            self._scheduled.setdefault(day + int(self.p['interval']), set()).update(first.tolist())
         vacc_inds = np.concatenate([scheduled, first])
         return ss.uids(np.sort(np.unique(vacc_inds)))
 
@@ -1010,7 +1010,7 @@ class simple_vaccine(Intervention):
         return
 
     def step(self):
-        if not len(find_day(self.days, self.ti, interv=self, sim=self.sim)):
+        if not len(find_day(self.days, self.today, interv=self, sim=self.sim)):
             return
         covid = self.sim.diseases.covid
         alive = self.sim.people.auids
@@ -1108,7 +1108,7 @@ class historical_vaccinate_prob(vaccinate_prob):
         """ Step the NAbs of the people vaccinated by this intervention forward a day, on day t before the start of the sim """
         uids = ss.uids(self.doses.nonzero()[0])
         if len(uids):
-            t_since = (t - covid.t_nab_event[uids]).astype(int)
+            t_since = (t + 1 - covid.t_nab_event[uids]).astype(int) # In steps: day t is the step t + 1
             peak = covid.peak_nab[uids]
             nab = covid.nab[uids] + covid.nab_kin[t_since]*peak
             covid.nab[uids] = np.clip(nab, 0, peak) # NAbs can't go below 0 or above the peak
@@ -1195,7 +1195,7 @@ class historical_wave(Intervention):
     def start_step(self):
         """Infect the people in each wave, before the COVID module updates the states on the first timestep (which applies the recoveries, deaths, etc.)"""
         super().start_step()
-        if self.ti != 0:
+        if self.today != 0: # The first step
             return
         sim = self.sim
         covid = self.sim.diseases.covid
@@ -1218,7 +1218,7 @@ class historical_wave(Intervention):
             uids = alive[self._select[wave].rvs(alive)]
             days = self._timing[wave].rvs(uids) - days_prior
             before_start = days <= 0 # As in v3, skip infections that would be after the start of the sim
-            susceptible = covid.susceptible[uids] | (covid.ti_recovered[uids] <= days) # Not infected in an earlier wave, or have since recovered; this also excludes the seed infections (v3 included them, then infected them again, which counted them twice)
+            susceptible = covid.susceptible[uids] | (covid.ti_recovered[uids] <= days + 1) # Not infected in an earlier wave, or have since recovered; this also excludes the seed infections (v3 included them, then infected them again, which counted them twice)
             keep = before_start & susceptible
             uids, days = uids[keep], days[keep]
             reinfected = uids[~covid.susceptible[uids]] # Infected in an earlier wave: count those outcomes now, since they are replaced by the new infection
@@ -1233,13 +1233,13 @@ class historical_wave(Intervention):
                 cvm.warn(warnmsg)
                 continue
 
-            # Infect them as if on day 0, then move the dates of their infection and outcomes back
+            # Infect them as if on day 0 (the first step), then move the dates of their infection and outcomes back
             covid.set_prognoses(uids, variant=mapping[self.variants[wave]])
             for date in dates:
                 date[uids] = date[uids] + days
             for day in np.unique(days): # Wane their NAbs from the day they were infected
                 covid.imprint_historical_nab(uids[days == day], day)
-            covid.infection_log.add_data(uids, day=days, network='historical')
+            covid.infection_log.add_data(uids, day=days + 1, network='historical') # Dated by step, as the other infections are (day 0 is the first step)
 
         # Store the counts to add to the results in step(), since the COVID module resets them when it updates the states
         flows['reinfections'] += covid.flows['reinfections']
@@ -1249,7 +1249,7 @@ class historical_wave(Intervention):
 
     def step(self):
         """As in v3, count the infections before the start of the sim in the results on day 0"""
-        if self.ti == 0:
+        if self.today == 0: # The first step
             covid = self.sim.diseases.covid
             for key,val in self.day0_flows.items():
                 covid.flows[key] += val
@@ -1400,7 +1400,7 @@ class change_beta(Intervention):
 
     def step(self):
         covid = self.sim.diseases.covid
-        for ind in find_day(self.days, self.ti, interv=self, sim=self.sim):
+        for ind in find_day(self.days, self.today, interv=self, sim=self.sim):
             for lk, orig in self.orig_betas.items():
                 if lk == 'overall':
                     covid.pars.beta = ss.probperday(orig * self.changes[ind])
@@ -1469,7 +1469,7 @@ class clip_edges(Intervention):
 
     def step(self):
         nets = self.sim.networks
-        inds = find_day(self.days, self.ti, interv=self, sim=self.sim)
+        inds = find_day(self.days, self.today, interv=self, sim=self.sim)
         if len(inds):
             self._keep = self.changes[inds[0]]
         if self._keep is None: # No changes yet
@@ -1566,7 +1566,7 @@ class dynamic_pars(Intervention):
     def step(self):
         """ Loop over the parameters, and then loop over the days, applying them if any are found """
         for parkey, spec in self.par_changes.items():
-            for ind in find_day(spec['days'], self.ti, interv=self, sim=self.sim):
+            for ind in find_day(spec['days'], self.today, interv=self, sim=self.sim):
                 val = spec['vals'][ind]
                 if isinstance(val, dict):
                     val = sc.mergedicts(self.sim[parkey], val) # Update the parameter if a nested dict, as a new dict so the original can be restored
@@ -1623,8 +1623,8 @@ class sequence(Intervention):
         return
 
     def step(self):
-        ti = self.ti
-        active = [i for i, d in enumerate(self.days) if d <= ti]  # most recently activated
+        day = self.today
+        active = [i for i, d in enumerate(self.days) if d <= day]  # most recently activated
         if active:
             self.interventions[active[-1]].step()
         return

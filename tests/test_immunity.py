@@ -16,7 +16,7 @@ cv.options(interactive=False) # Assume not running interactively
 # Shared parameters across simulations
 base_pars = sc.objdict(
     pop_size = 1e3,
-    verbose  = -1,
+    verbose  = 0,
 )
 
 
@@ -269,7 +269,7 @@ def test_vaccine_target_eff():
         pop_size   = 20_000,
         beta       = 0.01,
         n_days     = 90,
-        verbose    = -1,
+        verbose    = 0,
         use_waning = True,
     )
 
@@ -399,8 +399,8 @@ def test_historical():
     wave = cv.historical_wave(120, 0.05)
     sim1 = cv.Sim(base_pars, interventions=pfizer).run()
     sim2 = cv.Sim(base_pars, interventions=wave).run()
-    for key in ['cum_infections', 'cum_recoveries', 'cum_symptomatic']: # As in v3, the historical infections are counted on day 0
-        assert sim2.results[key][0] > 0.02*sim2['pop_size'], f'Expected a few percent of people to have {key} on day 0'
+    for key in ['cum_infections', 'cum_recoveries', 'cum_symptomatic']: # As in v3, the historical infections are counted on day 0, at the end of the first step (index 1)
+        assert sim2.results[key][1] > 0.02*sim2['pop_size'], f'Expected a few percent of people to have {key} on day 0'
     with pytest.raises(RuntimeError):
         cv.Sim(base_pars, pop_scale=5, interventions=wave).run()
     with pytest.raises(ValueError):
@@ -433,14 +433,17 @@ def test_nabs():
         assert np.all(np.diff(efficacy) > 0)
         assert efficacy[-1] < 1
 
-    # People with more severe disease have more NAbs
-    ppl = sim.people
+    # People with more severe disease have more NAbs (compared by the mean of the log, since the NAbs are lognormal, so their mean is noisy)
+    sim2 = cv.Sim(base_pars, pop_size=5000, pop_infected=0)
+    sim2.initialize()
+    ppl = sim2.people
     ppl.infect(ppl.uid)
     symptomatic = np.isfinite(ppl.date_symptomatic)
     severe      = np.isfinite(ppl.date_severe)
-    asymp_nabs  = ppl.peak_nab[~symptomatic].mean()
-    mild_nabs   = ppl.peak_nab[symptomatic & ~severe].mean()
-    severe_nabs = ppl.peak_nab[severe].mean()
+    log_nabs    = np.log2(ppl.peak_nab.values)
+    asymp_nabs  = log_nabs[~symptomatic].mean()
+    mild_nabs   = log_nabs[symptomatic & ~severe].mean()
+    severe_nabs = log_nabs[severe].mean()
     assert asymp_nabs < mild_nabs < severe_nabs
 
     # The initial NAbs can be changed when creating the sim

@@ -10,7 +10,7 @@ debug   = 0
 
 base_pars = dict(
     pop_size = 10e3,
-    verbose = -1,
+    verbose = 0,
 )
 
 def test_simple(do_plot=False):

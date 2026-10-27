@@ -108,8 +108,8 @@ class variant(sc.prettyobj):
 
     def apply(self, covid):
         """On a matched introduction day, seed ``n_imports`` susceptibles with this variant."""
-        ti = int(covid.ti)
-        if ti not in self.days:
+        day = covid.today
+        if day not in self.days:
             return
         susc = covid.susceptible.uids
         if not len(susc):
@@ -121,7 +121,7 @@ class variant(sc.prettyobj):
             self.round_imports.set(v=self.n_imports / factor)
             n = int(self.round_imports.rvs(1)[0])
             if (n == 0) and (self.n_imports > 0) and covid.sim.pars.verbose: # As in v3, print a message rather than raising a warning
-                print(f'Warning: {self.n_imports} imported infections of {self.label} were specified on day {ti}, but given the rescale factor of {factor:n}, no agents were infected. Increase the number of imports or use more agents.')
+                print(f'Warning: {self.n_imports} imported infections of {self.label} were specified on day {day}, but given the rescale factor of {factor:n}, no agents were infected. Increase the number of imports or use more agents.')
         if n <= 0:
             return
         self.choose_imports.set(n=n)

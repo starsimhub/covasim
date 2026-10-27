@@ -44,6 +44,11 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
     is not provided. This is the main class that's used to run multiple versions
     of a simulation (e.g., with different random seeds).
 
+    This is ``ss.MultiSim`` with Covasim's options for each run (``noise``, ``noisepar``,
+    and ``keep_people``) and the v3 ways of summarizing the runs (``reduce()``, ``mean()``,
+    ``median()``, and ``combine()``), which replace ``msim.results`` (every result, with a
+    run axis first, as in Starsim) with the results of the reduced or combined sim.
+
     Args:
         sims       (Sim/list) : a single sim or a list of sims
         base_sim   (Sim)      : the sim used for shared properties; if not supplied, the first of the sims provided
@@ -51,7 +56,7 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
         n_runs     (int)      : if a single sim is provided, the number of replicates (default 4)
         initialize (bool)     : whether or not to initialize the sims (otherwise, initialize them during run)
         inplace    (bool)     : whether to update the supplied sims with the results (default False, as in v3; Starsim's default is True)
-        kwargs     (dict)     : stored in run_args and passed to run(), e.g. noise=0.1 or keep_people=True
+        kwargs     (dict)     : how to run the sims, e.g. noise=0.1, keep_people=True, or parallel=False (see ``ss.MultiSim``)
 
     Returns:
         msim: a MultiSim object
@@ -78,39 +83,39 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
         msim = cv.MultiSim(sims) # Convert to multisim
         msim.plot() # Plot as single sim
     """
+    run_options = ss.MultiSim.run_options + ['noise', 'noisepar'] # Passed to make_run()
 
-    def __init__(self, sims=None, base_sim=None, label=None, n_runs=4, initialize=False, inplace=False, **kwargs):
+    def __init__(self, sims=None, base_sim=None, label=None, n_runs=None, initialize=False, inplace=False, **kwargs):
         """ As for ss.MultiSim, except that by default the original sims are not modified when they are run (the v3 behavior) """
-        super().__init__(sims=sims, base_sim=base_sim, label=label, n_runs=n_runs, initialize=initialize, inplace=inplace, **kwargs)
+        super().__init__(sims=sims, base_sim=base_sim, label=label, n_runs=n_runs, initialize=initialize, inplace=inplace, **keep_people(kwargs))
+        self.which = None # Whether the runs have been reduced or combined
         return
 
-    def init_sims(self, **kwargs):
+    def make_run(self, sim, values, seed, noise=0.0, noisepar=None):
         """
-        Initialize the sims, but don't actually run them. Syntax is the same
-        as MultiSim.run(). Note: in most cases you can just call run() directly,
-        there is no need to call this separately.
-
-        This mirrors ``ss.MultiSim.init_sims()``, but calls ``cv.multi_run()``; keep the two in sync.
-
-        Args:
-            kwargs  (dict): passed to multi_run()
+        The sim of one run (see ``ss.MultiSim.make_run()``): as in v3, the parameters given are set with
+        ``sim[key] = value``, and with noise, the parameter ``noisepar`` (default beta) is multiplied by a
+        random factor, 1 + noise*z for z > 0 and 1/(1 - noise*z) for z < 0, where z is a standard normal draw
         """
-        sims = self.base_sim if self.sims is None else self.sims
-        kwargs = sc.mergedicts(self.run_args, kwargs, {'do_run':False}) # Never run, that's the point!
-        kwargs.pop('inplace', None)
-        kwargs.pop('debug', None)
-        self.sims = multi_run(sims, **kwargs)
-        return
+        values = dict(values or {})
+        seed = values.pop('rand_seed', seed)
+        new = super().make_run(sim, None, seed)
+        for key,val in values.items():
+            new[key] = val
+        if noise:
+            noisepar = sc.ifelse(noisepar, 'beta')
+            noiseval = noise*np.random.default_rng(seed).normal()
+            new[noisepar] *= (1 + noiseval) if noiseval > 0 else 1/(1 - noiseval)
+        return new
 
     def run(self, reduce=False, combine=False, **kwargs):
         """
-        Run the actual sims. This mirrors ``ss.MultiSim.run()``, but calls
-        ``cv.multi_run()`` and has the v3 reduce and combine options; keep the two in sync.
+        Run the sims (see ``ss.MultiSim.run()``), and optionally reduce or combine them.
 
         Args:
             reduce  (bool): whether or not to reduce after running (see reduce())
             combine (bool): whether or not to combine after running (see combine(), not compatible with reduce)
-            kwargs  (dict): passed to multi_run(), e.g. n_runs, noise, keep_people, parallel; use run_args to pass arguments to sim.run()
+            kwargs  (dict): e.g. n_runs, noise, keep_people, parallel; use run_args to pass arguments to sim.run()
 
         Returns:
             msim (MultiSim): the MultiSim, modified in place
@@ -120,40 +125,15 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
             msim.run()
             msim.run(run_args=dict(until='2020-06-01'))
         """
-        # Handle which sims to use -- same as init_sims()
-        if self.sims is None:
-            sims = self.base_sim
-        else:
-            sims = self.sims
-            for s,sim in enumerate(sims): # Handle missing labels
-                if sim.label is None:
-                    sim.label = f'Sim {s}'
-
-        # Handle the arguments; inplace and debug are the Starsim options
-        kwargs = sc.mergedicts(self.run_args, kwargs)
-        inplace = kwargs.pop('inplace', False)
-        debug = kwargs.pop('debug', False)
-        if debug:
-            kwargs['parallel'] = False # Run in serial for debugging
-
-        # Run
-        self.timer.start()
-        run_sims = multi_run(sims, **kwargs) # The run sims are copies, due to pickling during parallelization
-        if inplace and isinstance(self.sims, list) and len(run_sims) == len(self.sims): # Optionally, update the original sims with the results
-            for old,new in zip(self.sims, run_sims):
-                old.__dict__.update(new.__dict__)
-        self.sims = run_sims
-        self.timer.stop()
-
-        # Reduce or combine
+        super().run(**keep_people(kwargs))
+        self.which = None
         if reduce:
             self.reduce()
         elif combine:
             self.combine()
-
         return self
 
-    def reduce(self, *args, output=False, **kwargs):
+    def reduce(self, quantiles=None, use_mean=False, bounds=None, output=False):
         """
         Combine multiple sims into a single sim statistically: by default, use
         the median value and the 10th and 90th percentiles for the lower and upper
@@ -177,16 +157,56 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
             msim.reduce()
             msim.summarize()
         """
-        super().reduce(*args, **kwargs)
-        self.results = self.base_sim.results # As in v3, the results are those of the reduced sim, rather than flattened
-        return self.base_sim if output else self
+        self.check_run('reduce')
+        bounds = sc.ifelse(bounds, 2)
+        quantiles = sc.ifelse(quantiles, dict(low=0.1, high=0.9))
+        if not isinstance(quantiles, dict):
+            quantiles = dict(low=float(quantiles[0]), high=float(quantiles[1]))
+        reduced = sc.dcp(self.sims[0])
+        reduced.metadata = dict(parallelized=True, combined=False, n_runs=len(self.sims), quantiles=quantiles, use_mean=use_mean, bounds=bounds)
+        flats = [sim.results.flatten() for sim in self.sims]
+        for key,res in reduced.results.flatten().items(): # The results of the sim and of each module, e.g. the COVID results
+            raw = np.array([flat[key].values for flat in flats], dtype=float) # Shape (n_runs, npts), or (n_runs, npts, ncols) for results by variant
+            if use_mean:
+                mean, std = raw.mean(axis=0), raw.std(axis=0)
+                res.values, res.low, res.high = mean, mean - bounds*std, mean + bounds*std
+            else:
+                res.values = np.quantile(raw, 0.5, axis=0)
+                res.low, res.high = np.quantile(raw, quantiles['low'], axis=0), np.quantile(raw, quantiles['high'], axis=0)
+        reduced.compute_summary()
+        if self.which is None:
+            self.orig_base_sim = self.base_sim
+        self.base_sim = reduced
+        self.results = reduced.results # As in v3, the results are those of the reduced sim, rather than with a run axis
+        self.which = 'reduced'
+        return reduced if output else self
+
+    def mean(self, bounds=None, **kwargs):
+        """
+        Alias for reduce(use_mean=True): the mean and ±2 standard deviations.
+
+        Args:
+            bounds (float): the multiplier on the standard deviation for the upper and lower bounds (default 2)
+            kwargs (dict): passed to reduce()
+        """
+        return self.reduce(use_mean=True, bounds=bounds, **kwargs)
+
+    def median(self, quantiles=None, **kwargs):
+        """
+        Alias for reduce(use_mean=False): the median and the 10th and 90th percentiles.
+
+        Args:
+            quantiles (list or dict): upper and lower quantiles (default 0.1 and 0.9)
+            kwargs (dict): passed to reduce()
+        """
+        return self.reduce(use_mean=False, quantiles=quantiles, **kwargs)
 
     def combine(self, output=False):
         """
         Combine multiple sims into a single sim with scaled results, e.g. to
-        treat several smaller sims as one larger population. Count results are
-        summed, and other results (e.g. prevalence) are averaged, weighted by
-        each sim's total population.
+        treat several smaller sims as one larger population (see ``ss.MultiSim.combine()``).
+        Count results are summed, and other results (e.g. prevalence) are averaged, weighted
+        by each sim's total population.
 
         Note: unlike v3, the people are not combined; the combined sim has the
         people of the first sim.
@@ -201,9 +221,51 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
             msim.combine()
             msim.summarize()
         """
-        super().combine()
-        self.results = self.base_sim.results # As in v3, the results are those of the combined sim, rather than flattened
-        return self.base_sim if output else self
+        combined = super().combine()
+        if self.which is None:
+            self.orig_base_sim = self.base_sim
+        self.base_sim = combined
+        self.results = combined.results # As in v3, the results are those of the combined sim, rather than with a run axis
+        self.which = 'combined'
+        return combined if output else self
+
+    def reset(self):
+        """ Undo reduce() or combine(): the base sim is the one the MultiSim was made with, and the results are those of the runs """
+        if self.which is not None:
+            self.base_sim = self.orig_base_sim
+            self.results = ss.run.MultiResults.from_sims(self.sims, self.runs)
+            self.which = None
+        return self
+
+    @property
+    def summary(self):
+        """ v3: the summary of the reduced or combined sim (that of the base sim) """
+        return self.base_sim.summary
+
+    @summary.setter
+    def summary(self, summary):
+        pass # Set by ss.MultiSim, but in v3 it is the base sim's
+
+    @classmethod
+    def merge(cls, *args, base=False):
+        """
+        Merge several MultiSims into one (see ``ss.MultiSim.merge()``).
+
+        Args:
+            args (MultiSim): the MultiSims to merge (either a list, or separate arguments)
+            base (bool): if True (as in v3), the new MultiSim has the base sims of each (e.g. reduced) as its sims, rather than all of their sims
+
+        **Examples**::
+
+            msim = cv.MultiSim.merge(msim1, msim2) # All the runs of each
+            msim = cv.MultiSim.merge(msim1, msim2, base=True) # The two reduced sims, e.g. to plot them as scenarios
+        """
+        if len(args) == 1 and isinstance(args[0], list):
+            args = args[0]
+        if base:
+            return cls(sims=[sc.dcp(msim.base_sim) for msim in args])
+        args = [cls(sims=list(msim.sims), label=msim.label) if msim.which else msim for msim in args] # The runs of a reduced or combined MultiSim, rather than its reduced or combined sim
+        return super().merge(*args)
 
     def compare(self, t=None, sim_inds=None, output=False, do_plot=False, **kwargs):
         """
@@ -241,7 +303,7 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
             if label in resdict: # Avoid duplicates
                 label += f' ({i})'
             for reskey in sim.result_keys():
-                res = sim.diseases.covid.results[reskey]
+                res = sim.results[reskey]
                 val = res.values[day]
                 if res.scale and (val == np.round(val)): # Show whole-number counts as ints (but not e.g. 4.5 from scaling)
                     val = int(val)
@@ -536,9 +598,7 @@ class Scenarios(cvc.V3Scenarios):
         # Create the simulation and handle basepars
         if sim is None:
             sim = cvs.Sim()
-        self.base_sim = sc.dcp(sim)
-        if self.base_sim.initialized: # An initialized sim can't have its parameters changed, so restore it to its state before initialization
-            self.base_sim._restore_orig()
+        self.base_sim = sim.new() if sim.initialized else sc.dcp(sim) # An initialized sim can't have its parameters changed, so it's made again
         self.basepars = sc.dcp(sc.mergedicts(basepars))
         self.base_sim.update_pars(self.basepars)
 
@@ -632,7 +692,7 @@ class Scenarios(cvc.V3Scenarios):
 
             # Store the results, including those by variant (with time as the first axis, as in the sim)
             for reskey in msim.base_sim.result_keys('all'):
-                res = msim.base_sim.diseases.covid.results[reskey]
+                res = msim.base_sim.results['variant'][reskey] if reskey.endswith('_by_variant') else msim.base_sim.results[reskey]
                 if reskey not in self.results:
                     self.results[reskey] = sc.objdict()
                 self.results[reskey][scenkey] = sc.objdict(name=scenname, best=res.values, low=res.low, high=res.high)
@@ -901,6 +961,16 @@ class Scenarios(cvc.V3Scenarios):
 
 #%% Running functions
 
+def keep_people(kwargs):
+    """ The options for running sims, with v3's keep_people as Starsim's shrink (its opposite) """
+    kwargs = dict(kwargs)
+    if 'keep_people' in kwargs:
+        keep = kwargs.pop('keep_people')
+        if keep is not None:
+            kwargs['shrink'] = not keep
+    return kwargs
+
+
 def single_run(sim, ind=0, reseed=True, noise=0.0, noisepar=None, keep_people=False, run_args=None, sim_args=None, verbose=None, do_run=True, **kwargs):
     """
     Convenience function to perform a single simulation run. Mostly used for
@@ -929,77 +999,28 @@ def single_run(sim, ind=0, reseed=True, noise=0.0, noisepar=None, keep_people=Fa
         sim = cv.single_run(sim) # Run it, equivalent(ish) to sim.run()
         sim = cv.single_run(cv.Sim(), beta=0.02) # Change a parameter, then run
     """
-    # Set sim arguments
-    sim_args = sc.mergedicts(sim_args, kwargs)
-    if verbose is None:
-        verbose = sim['verbose']
-
+    seed = sim['rand_seed'] + (ind if reseed else 0) # As in v3
+    sim = MultiSim(sim).make_run(sim, sc.mergedicts(sim_args, kwargs), seed, noise=noise, noisepar=noisepar)
     if not sim.label:
         sim.label = f'Sim {ind}'
-
-    # An initialized sim can't be reseeded or have its parameters changed, so it is rebuilt from the copy saved before it
-    # was initialized. A sim that has been run is always rebuilt, so it is run again from the start.
-    if sim.initialized:
-        has_run = sim.ti > 0
-        needs_reset = has_run or reseed or bool(sim_args)
-        if needs_reset:
-            if not has_run:
-                warnmsg = f'Sim "{sim.label}" is being reset to its state before it was initialized, so any changes made to it after initialization (e.g. to the people) are discarded. To keep them, make the changes in an intervention instead, or pass a list of sims with reseed=False.'
-                cvm.warn(warnmsg)
-            sim._restore_orig()
-
-    if reseed:
-        sim['rand_seed'] += ind # Reset the seed, otherwise no point of parallel runs
-        sim.set_seed()
-
-    # Handle noise -- normally distributed fractional error
-    if noise:
-        if noisepar is None:
-            noisepar = 'beta'
-        noiseval = noise*np.random.normal()
-        if noiseval > 0:
-            noisefactor = 1 + noiseval
-        else:
-            noisefactor = 1/(1-noiseval)
-        sim[noisepar] *= noisefactor
-    else:
-        noiseval = 0.0
-
-    if verbose >= 1:
-        verb = 'Running' if do_run else 'Creating'
-        print(f'{verb} a simulation using seed={sim["rand_seed"]} and noise={noiseval}')
-
-    # Handle additional arguments, e.g. beta=0.02
-    for key,val in sim_args.items():
-        if verbose >= 1:
-            print(f'Setting key {key} from {sim[key]} to {val}')
-        sim[key] = val
-
-    # Run the sim, and shrink it to save memory
-    shrink = do_run and not keep_people # Don't shrink an unrun sim, since then it couldn't be run
     if not do_run:
-        sim.init()
-    sim = ss.single_run(sim, ind=ind, reseed=False, shrink=shrink, run_args=run_args, verbose=verbose, do_run=do_run)
-
-    return sim
+        return sim.init()
+    return ss.run.single_run(sim, ind=ind, shrink=not keep_people, run_args=run_args, verbose=verbose)
 
 
 def multi_run(sim, n_runs=4, reseed=None, noise=0.0, noisepar=None, iterpars=None, combine=False, keep_people=None,
               run_args=None, sim_args=None, par_args=None, do_run=True, parallel=True, n_cpus=None, verbose=None, retry=None, **kwargs):
     """
-    For running multiple runs in parallel. If the first argument is a list of sims,
+    For running multiple runs in parallel, via ``cv.MultiSim``. If the first argument is a list of sims,
     exactly these will be run and most other arguments will be ignored.
-
-    Note: this mirrors ``ss.multi_run()``, but calls ``cv.single_run()`` (to handle
-    noise and keep_people); keep the two in sync.
 
     Args:
         sim         (Sim)   : the sim instance to be run, or a list of sims.
         n_runs      (int)   : the number of parallel runs
-        reseed      (bool)  : whether or not to generate a fresh seed for each run (default: true for single, false for list of sims)
+        reseed      (bool)  : not used (each run has its own seed, unless it is one of a list of sims); accepted for compatibility
         noise       (float) : the amount of noise to add to each run
         noisepar    (str)   : the name of the parameter to add noise to
-        iterpars    (dict)  : any other parameters to iterate over the runs; see sc.parallelize() for syntax
+        iterpars    (dict)  : any other parameters to iterate over the runs, e.g. dict(beta=[0.01, 0.02]); one run for each value
         combine     (bool)  : whether or not to combine all results into one sim, rather than return multiple sim objects
         keep_people (bool)  : whether to keep the people after the sim run (default false)
         run_args    (dict)  : arguments passed to sim.run()
@@ -1023,53 +1044,23 @@ def multi_run(sim, n_runs=4, reseed=None, noise=0.0, noisepar=None, iterpars=Non
         sims = cv.multi_run(sim, n_runs=6, noise=0.2)
         sims = cv.multi_run(sim, iterpars={'beta':[0.01, 0.02, 0.03]}) # Run 3 sims with different betas
     """
-    # Handle inputs
-    sim_args = sc.mergedicts(sim_args, kwargs) # Handle blank
-    par_args = sc.mergedicts({'ncpus':n_cpus}, par_args) # Handle blank
-
-    # Handle iterpars
-    if iterpars is None:
-        iterpars = {}
-    else:
-        n_runs = None # Reset and get from length of dict instead
-        for key,val in iterpars.items():
-            new_n = len(val)
-            if n_runs is not None and new_n != n_runs:
-                raise ValueError(f'Each entry in iterpars must have the same length, not {n_runs} and {len(val)}')
-            else:
-                n_runs = new_n
-
-    # Set up the arguments for each run
-    if isinstance(sim, cvs.Sim): # One sim
-        if reseed is None: reseed = True
-        iterkwargs = dict(ind=np.arange(n_runs))
-        iterkwargs.update(iterpars)
-        kwargs = dict(sim=sim, reseed=reseed, noise=noise, noisepar=noisepar, verbose=verbose, keep_people=keep_people, sim_args=sim_args, run_args=run_args, do_run=do_run)
-    elif isinstance(sim, list): # List of sims
-        if reseed is None: reseed = False
-        iterkwargs = dict(sim=sim, ind=np.arange(len(sim)))
-        kwargs = dict(reseed=reseed, verbose=verbose, keep_people=keep_people, sim_args=sim_args, run_args=run_args, do_run=do_run)
-    else:
-        errormsg = f'Must be Sim object or list, not {type(sim)}'
-        raise TypeError(errormsg)
-
-    # Actually run!
-    if parallel:
-        sims = sc.parallelize(single_run, iterkwargs=iterkwargs, kwargs=kwargs, **par_args) # Run in parallel
-    else: # Run in serial, not in parallel
-        sims = []
-        n_sims = len(list(iterkwargs.values())[0]) # Must have length >=1 and all entries must be the same length
-        for s in range(n_sims):
-            this_iter = {k:v[s] for k,v in iterkwargs.items()} # Pull out items specific to this iteration
-            this_iter.update(kwargs) # Merge with the kwargs
-            this_iter['sim'] = this_iter['sim'].copy() # Ensure we have a fresh sim; this happens implicitly on pickling with multiprocessing
-            sims.append(single_run(**this_iter)) # Run in series
-
-    # Optionally combine
+    sim_args = sc.mergedicts(sim_args, kwargs)
+    is_list = isinstance(sim, list)
+    pars = None
+    if iterpars: # One run for each value of iterpars, as in v3
+        pars = [sc.mergedicts(sim_args, p) for p in ss.run.par_sets(iterpars)]
+        n_runs = None
+    elif sim_args:
+        pars = [sim_args]
+    opts = dict(noise=noise, noisepar=noisepar, keep_people=keep_people, run_args=run_args, par_args=par_args, parallel=parallel, n_cpus=n_cpus, verbose=verbose)
+    msim = MultiSim(sim, n_runs=None if is_list else n_runs, pars=pars, **opts)
+    if not do_run:
+        msim.init_sims()
+        return list(msim.sims)
+    msim.run()
     if combine:
-        return MultiSim(sims=sims).combine(output=True)
-    else:
-        return sims
+        return msim.combine(output=True)
+    return list(msim.sims)
 
 
 def parallel(*args, **kwargs):
@@ -1079,7 +1070,7 @@ def parallel(*args, **kwargs):
 
     Args:
         args (list): The simulations to run
-        kwargs (dict): passed to multi_run()
+        kwargs (dict): passed to MultiSim.run()
 
     Returns:
         A run MultiSim object.

@@ -143,8 +143,6 @@ class Sim(cvc.V3Sim, ss.Sim):
                                    beta_layer=layer_pars['beta_layer'], iso_factor=layer_pars['iso_factor'], quar_factor=layer_pars['quar_factor'])
             if 'dur' in supplied:
                 v3.update(cvcov.v3_durs(dur))
-            if 'beta' in v3:
-                v3['beta'] = ss.probperday(v3['beta'])
             v3.update({key:pars.pop(key) for key in list(pars) if key in diseases.pars})
             diseases.pars.update(v3)
         else: # The sim-level arguments that are applied to the COVID module can't be used with a user-supplied disease
@@ -159,7 +157,6 @@ class Sim(cvc.V3Sim, ss.Sim):
         # Also keep the variants and durations for sim['key']; changes to the durations are applied in init()
         self._v3_pars.update(variants=variants, dur=dur)
         self._v3_dur_applied = sc.dcp(dur)
-        self._v3_changed_pars = [] # Parameters set with sim['key'] after initialization, which are kept by initialize(reset=True)
 
         # Add the cross-immunity connector if waning immunity is on, alongside any user-supplied connectors: it applies the
         # NAb-weighted immunity each step and enables reinfection. As in v3, with use_waning=False there is no reinfection,
@@ -213,12 +210,6 @@ class Sim(cvc.V3Sim, ss.Sim):
                 self._v3_covid().pars.update(cvcov.v3_durs(changed))
                 self._v3_dur_applied = sc.dcp(dur)
 
-            # Keep a copy of the sim before it was initialized, so it can be reset (v3 sim.initialize(reset=True))
-            self._orig_sim = None
-            try:
-                self._orig_sim = sc.dumpstr(self) # Stored as bytes so Starsim doesn't treat it as part of this sim
-            except Exception: # E.g. if a user-defined object can't be pickled; then the sim can't be reset
-                pass
             self.set_seed() # As in v3, seed the global random number generators, for user code that uses them
         if self.pars.n_agents < 0:
             errormsg = f'Population size cannot be negative ({self.pars.n_agents})'
@@ -288,10 +279,11 @@ class Sim(cvc.V3Sim, ss.Sim):
 
     def _get_ia(self, which, label=None, partial=False, as_list=False, as_inds=False, die=True, first=False):
         """Helper method for get_interventions() and get_analyzers(); see get_interventions()"""
-        if (not self.initialized) or self._is_v3_saved(): # v3: available before initialization; also, a sim saved by v3 stores them in its parameters
+        modules = self.__dict__.get(which) # Once the sim has started initializing
+        if modules and not self._is_v3_saved():
+            ia_list = list(modules.values())
+        else: # v3: available before initialization; also, a sim saved by v3 stores them in its parameters
             ia_list = [ia for ia in sc.tolist(self.pars[which]) if not isinstance(ia, dict)]
-        else:
-            ia_list = list(getattr(self, which).values())
         n_ia = len(ia_list)
         if label is None: # Get all of them
             label = list(range(n_ia))
@@ -373,9 +365,8 @@ class Sim(cvc.V3Sim, ss.Sim):
         return self._get_ia('analyzers', label=label, partial=partial, first=first, die=die, as_inds=False, as_list=False)
 
     def compute_fit(self, *args, **kwargs):
-        """Compute the goodness-of-fit against ``self.data`` (v3 ``Sim.compute_fit``); returns a ``cv.Fit``."""
-        self.fit = cva.Fit(self, *args, **kwargs)
-        return self.fit
+        """Compute the goodness-of-fit against ``self.data`` (v3 ``Sim.compute_fit``); returns a ``cv.Fit`` (not stored in the sim, whose ``sim.fit()`` calibrates it)."""
+        return cva.Fit(self, *args, **kwargs)
 
     def compute_r_eff(self, method='daily', smoothing=2, window=7):
         """
@@ -555,12 +546,18 @@ class Sim(cvc.V3Sim, ss.Sim):
         if covid is None:
             return
         variant = ss.Results(module=self.label)
+        stocks = {state.name for state in covid.auto_state_list}
         for key, res in covid.results.items():
             if key.endswith('_by_variant'):
                 variant[key] = res
-            elif isinstance(res, ss.Result) and key not in self.results:
-                self.results[key] = res
-                self._bridged_keys.append(key)
+            elif isinstance(res, ss.Result):
+                key = f'n_{key}' if key in stocks else key # v3 named the counts of states n_<state>, e.g. n_symptomatic
+                if key not in self.results:
+                    self.results[key] = res
+                    self._bridged_keys.append(key)
+        for key in ['alive', 'female']: # Likewise for the people, e.g. n_alive
+            self.results[f'n_{key}'] = self.results[key]
+            self._bridged_keys.append(f'n_{key}')
         self.results['variant'] = variant
         self.results['date'] = self.results['timevec'] # v3 also had the time keys "date" and "t"
         self.results['t'] = np.arange(self.t.npts)

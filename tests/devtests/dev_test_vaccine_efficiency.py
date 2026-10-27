@@ -33,7 +33,7 @@ pars = {
     'pop_size': 20000,
     'beta': 0.015,
     'n_days': 120,
-    'verbose': -1,
+    'verbose': 0,
 }
 
 # Define vaccine arm

@@ -11,7 +11,7 @@ import sciris as sc
 import covasim as cv
 
 do_plot = 1
-verbose = -1
+verbose = 0
 debug   = 1 # This runs without parallelization; faster with pytest
 csv_file  = os.path.join(sc.thisdir(), 'example_data.csv')
 xlsx_file = os.path.join(sc.thisdir(), 'example_data.xlsx')

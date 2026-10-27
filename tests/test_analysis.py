@@ -194,7 +194,7 @@ def test_calibration():
     calib.plot_sims(to_plot=['cum_deaths', 'cum_diagnoses'], **fname('Calibration sims'))
     calib.plot_trend()
 
-    assert calib.after.fit.mismatch < calib.before.fit.mismatch
+    assert calib.after_fit.mismatch < calib.before_fit.mismatch
 
     return calib
 
