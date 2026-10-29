@@ -109,6 +109,7 @@ class Options(sc.objdict):
         # The precision is shared with Starsim; set it directly, since set() would reload Covasim
         if self.precision != ss.options.precision:
             ss.options(precision=self.precision)
+        ss.options(warnings=self.warnings) # Likewise the warnings, so that the two never differ
         return
 
 
@@ -210,7 +211,7 @@ class Options(sc.objdict):
         options.rc = sc.dcp(rc_covasim)
 
         optdesc.warnings = 'How warnings are handled: options are "warn" (default), "print", and "error"'
-        options.warnings = str(os.getenv('COVASIM_WARNINGS', 'warn'))
+        options.warnings = str(os.getenv('COVASIM_WARNINGS', ss.options.warnings)) # Shared with Starsim, so by default as STARSIM_WARNINGS sets it
 
         optdesc.sep = 'Set thousands separator for text output'
         options.sep = str(os.getenv('COVASIM_SEP', ','))

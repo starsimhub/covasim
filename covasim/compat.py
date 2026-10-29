@@ -256,6 +256,8 @@ class V3Sim:
                     self.add_module(mod, key)
         elif key == 'beta':
             covid.pars.update(beta=value) # A number (or an ss.par to fit) stays a daily probability
+            if self.initialized:
+                self.__dict__.setdefault('_v3_set_pars', {})[key] = value # Set again by initialize(reset=True), since sim.new() doesn't keep changes made to an initialized sim
         elif key in ['pop_type', 'contacts', 'location']: # Recreate the networks (and for pop_type, the per-layer parameters)
             pop_type = self.pop_type
             contacts = self._v3_contacts # For location, keep the current contacts, apart from the household size
@@ -280,6 +282,8 @@ class V3Sim:
             raise ValueError(errormsg)
         elif (covid is not None) and (key in covid.pars):
             covid.pars[key] = value
+            if self.initialized:
+                self.__dict__.setdefault('_v3_set_pars', {})[key] = value # As for beta
         elif hasattr(self, key): # A Starsim attribute
             setattr(self, key, value)
         else:
@@ -485,7 +489,9 @@ class V3Sim:
         if self.initialized:
             if not reset:
                 return self
-            self.new(inplace=True) # Made again from what it was made with, keeping the parameters changed since (see sim.new())
+            set_pars = self.__dict__.get('_v3_set_pars') or {} # The COVID parameters set with sim['key'] since it was initialized
+            self.new(inplace=True) # Made again from what it was made with (see sim.new())
+            self._v3_covid().pars.update(set_pars) # Kept, as in v3
         return self.init(*args, **kwargs)
 
     def shrink(self, skip_attrs=None, in_place=True, inplace=None, **kwargs):
@@ -553,7 +559,7 @@ class V3Sim:
         flat = self.results.flatten(sep='_', only_results=False, keep_case=True, columns=True)
         skip = ('covid_', 'variant_') # Skip the duplicates of the COVID results (e.g. "covid_cum_infections", the same as "cum_infections"), and the results by variant, which aren't in the v3 summary
         for key,res in flat.items():
-            if not key.startswith(skip) and key not in ['alive', 'female']: # The same as n_alive and n_female, the v3 names
+            if not key.startswith(skip) and key not in ['alive', 'female', 'unrepresented']: # The same as n_alive and n_female, the v3 names; unrepresented is v4's own
                 val = res[t]
                 if sc.isnumber(val): # Skip the dates
                     summary[key] = val
@@ -602,12 +608,23 @@ class V3Sim:
             df = df.set_index('date')
         return df
 
-    def to_json(self, *args, **kwargs):
-        """ v3: the parameters are stored as "parameters" rather than "pars", and are the v3 parameters from sim.export_pars() """
-        out = super().to_json(*args, **kwargs)
-        if isinstance(out, dict) and ('pars' in out):
-            out.pop('pars')
+    def to_json(self, filename=None, keys=None, verbose=False, indent=2, **kwargs):
+        """
+        v3: the parameters are stored as "parameters" rather than "pars", and are the v3 parameters from
+        sim.export_pars(); the summary is the v3 one (see compute_summary()); the results are as in Starsim
+        """
+        keys = sc.tolist(keys) if keys is not None else ['pars', 'summary', 'results']
+        out = sc.objdict()
+        if ('pars' in keys) or ('parameters' in keys):
             out['parameters'] = self.export_pars()
+        if 'summary' in keys:
+            out['summary'] = dict(self.summary) if self.results_ready else 'Summary not available (Sim has not yet been run)'
+        others = [key for key in keys if key not in ['pars', 'parameters', 'summary']]
+        if others:
+            out.update(super().to_json(keys=others, verbose=verbose))
+        out = sc.jsonify(out, **kwargs)
+        if filename is not None:
+            sc.savejson(filename=filename, obj=out, indent=indent)
         return out
 
 

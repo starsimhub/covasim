@@ -153,7 +153,8 @@ def test_vaccines(do_plot=False):
     nabs = []
     p1 = cv.variant('beta',   days=20, n_imports=20)
     pfizer = cv.vaccinate(vaccine='pfizer', days=30)
-    sim  = cv.Sim(base_pars, use_waning=True, variants=p1, interventions=pfizer, analyzers=lambda sim: nabs.append(sim.people.nab.raw.copy())) # v4: .raw includes agents who have died, so the length is constant
+    analyzer = (lambda sim: nabs.append(sim.people.nab.raw.copy())) if do_plot else None # v4: .raw includes agents who have died, so the length is constant; only kept for plotting, so the shrunk sim holds no test data
+    sim  = cv.Sim(base_pars, use_waning=True, variants=p1, interventions=pfizer, analyzers=analyzer)
     sim.run()
     sim.shrink()
 

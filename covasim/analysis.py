@@ -1389,10 +1389,12 @@ class Calibration(sc.prettyobj):
         to ``custom_fn`` once the sim is initialized, by a ``cv.custom_pars`` connector (which holds them as its
         parameters, so that ``sim.fit()`` can vary them).
         """
-        sim_keys = set(cvpar.make_pars()) | set(self.sim._v3_covid().pars)
+        covid = self.sim._v3_covid()
+        sim_keys = set(cvpar.make_pars()) | set(covid.pars)
         sim_pars = {key:val for key,val in calib_pars.items() if key in sim_keys}
         custom = {key:val for key,val in calib_pars.items() if key not in sim_keys}
-        sim = self.sim.new(**sim_pars)
+        dis_pars = {f'{covid.name}.{key}':val for key,val in sim_pars.items() if key in covid.pars} # Named by module, since e.g. the networks have a beta too
+        sim = self.sim.new(pars=dis_pars or None, **{key:val for key,val in sim_pars.items() if key not in covid.pars})
         if custom:
             if self.custom_fn is None:
                 errormsg = f'The following parameters are not part of the sim, nor is a custom function specified to use them: {sc.strjoin(custom)}'
@@ -1433,8 +1435,9 @@ class Calibration(sc.prettyobj):
         sim = self.make_sim(bounded)
         kwargs = sc.mergedicts(dict(n_trials=self.total_trials, n_workers=self.n_workers, storage=self.storage), kwargs)
         self.fit = sim.fit(gof=self.mismatch, method='optuna', verbose=verbose, **kwargs)
-        self.best_pars = sc.objdict({key:val for name,val in self.fit.pars.items() for key in self.calib_pars if name.split('.')[-1] == key}) # Named e.g. "custom_pars.test_prob" if the name is also another module's parameter
-        self.df = self.fit.trials # In trial order
+        names = {name:self.sim.starsim_names.get(name, name) for name in self.fit.pars} # The v3 names of the sim settings, e.g. pop_size for n_agents
+        self.best_pars = sc.objdict({key:val for name,val in self.fit.pars.items() for key in self.calib_pars if names[name].split('.')[-1] == key}) # Named e.g. "custom_pars.test_prob" if the name is also another module's parameter
+        self.df = self.fit.trials.rename(columns=names) # In trial order
         self.calibrated = True
 
         # Compare the results
@@ -1590,6 +1593,9 @@ class custom_pars(ss.Connector):
         super().init_post()
         self.fn(self.sim, dict(self.pars))
         return
+
+    def step(self):
+        pass # Nothing to do on each timestep
 
 
 def pairplotpars(data, inds=None, color_column=None, bounds=None, cmap='parula', bins=None, edgecolor='w', facecolor='#F8A493', figsize=(20,16)): # pragma: no cover

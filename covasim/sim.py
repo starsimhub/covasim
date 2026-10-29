@@ -56,12 +56,14 @@ class Sim(cvc.V3Sim, ss.Sim):
         kwargs (dict): additional parameters; also passed to ``ss.Sim`` (e.g. ``networks``, ``diseases``, ``connectors``)
     """
 
+    starsim_names = dict(n_agents='pop_size', start='start_day', stop='end_day') # The Starsim names for these v3 parameters
+    v3_names = {v3_key:ss_key for ss_key,v3_key in starsim_names.items()}
+
     def __init__(self, pars=None, datafile=None, label=None, simfile=None, popfile=None, people=None, version=None, **kwargs):
 
         # Parameters can be supplied as a dict (the v3 form) and/or as keyword arguments, which take precedence
         pars = sc.mergedicts(pars, kwargs, _copy=True)
-        starsim_names = dict(n_agents='pop_size', start='start_day', stop='end_day') # The Starsim names for these v3 parameters
-        for ss_key,v3_key in starsim_names.items():
+        for ss_key,v3_key in self.starsim_names.items():
             if ss_key in pars:
                 pars[v3_key] = pars.pop(ss_key)
         if 'dur' in pars and not isinstance(pars['dur'], dict): # The Starsim sim duration, rather than the v3 durations
@@ -88,7 +90,8 @@ class Sim(cvc.V3Sim, ss.Sim):
         supplied = list(v3.keys())
 
         # Sim-level parameters: the user's value, else the default
-        pop_size     = int(v3.pop('pop_size', defaults['pop_size']))
+        pop_size     = v3.pop('pop_size', defaults['pop_size'])
+        pop_size     = pop_size if isinstance(pop_size, ss.par) else round(pop_size) # An ss.par (e.g. with bounds, to calibrate) is kept; a number is rounded to the nearest, as Starsim does
         pop_infected = int(v3.pop('pop_infected', defaults['pop_infected']))
         pop_type     = v3.pop('pop_type',   defaults['pop_type'])
         location     = v3.pop('location',   defaults['location'])
@@ -195,6 +198,13 @@ class Sim(cvc.V3Sim, ss.Sim):
         if datafile is not None:
             self.data = cvm.load_data(datafile) # Also for a dataframe, e.g. to add the cumulative columns, as in v3
         return
+
+    def new(self, pars=None, inplace=False, **kwargs):
+        """ As ``ss.Sim.new()``, also with the v3 names of these Starsim settings, e.g. ``sim.new(pop_size=10e3)`` """
+        if kwargs.get('end_day') is not None: # As for sim['end_day'], a duration, since Covasim's sims have one
+            kwargs['dur'] = ss.days(sc.daydiff(kwargs.get('start_day') or self['start_day'], kwargs.pop('end_day')))
+        kwargs = {self.v3_names.get(key, key):val for key,val in kwargs.items()}
+        return super().new(pars=pars, inplace=inplace, **kwargs)
 
     def init(self, *args, **kwargs):
         """Create the People (with Covasim's age distribution), then initialize as usual."""
