@@ -3,7 +3,8 @@ Contact networks for Covasim, using Starsim's networks.
 
 The "random" population type has a single random network, ``a``; the "hybrid" population type uses
 ``ssl.HybridNet``, which becomes four networks when added to the sim: households (``h``), schools
-(``s``), workplaces (``w``), and community (``c``). As in v3, the networks are static, and the number
+(``s``), workplaces (``w``), and community (``c``). Schools and workplaces are clusters if ``clustered=True``
+and random networks, as in v3, if ``clustered=False``. As in v3, the networks are static, and the number
 of contacts (or the household size) is Poisson distributed. Per-layer transmissibility (v3's
 ``beta_layer``) is applied by the disease (``cv.COVID.pars.beta_layer``), so the edge betas are 1.
 """
@@ -15,17 +16,20 @@ from . import parameters as cvpar
 __all__ = ['make_networks', 'get_contacts']
 
 
-def make_networks(pop_type='random', contacts=None):
+def make_networks(pop_type='random', contacts=None, clustered=None):
     """
     Make the networks for a Covasim population type.
 
     Args:
         pop_type (str): 'random' (a single network, 'a') or 'hybrid' (networks 'h', 's', 'w', and 'c')
         contacts (dict): the mean number of contacts in each network (for 'h', the household size); defaults to Covasim's values (see parameters.reset_layer_pars())
+        clustered (bool): for 'hybrid', whether schools and workplaces are clusters, whose members all know each other (True), or random networks, as in v3 (False); defaults to the value in cv.make_pars()
 
     Returns:
         A list of Starsim networks
     """
+    if clustered is None:
+        clustered = cvpar.make_pars()['clustered']
     layer_pars = dict(pop_type=pop_type, contacts=contacts)
     cvpar.reset_layer_pars(layer_pars) # Fills in the default contacts for this population type, for any layers not supplied
     c = layer_pars['contacts']
@@ -37,6 +41,7 @@ def make_networks(pop_type='random', contacts=None):
             contacts = dict(s=c['s'], w=c['w'], c=c['c']),
             beta = dict(h=1.0, s=1.0, w=1.0, c=1.0), # Per-layer transmissibility is applied by the disease
             method = 'uniform', # As in v3, targets are chosen uniformly
+            clustered = clustered,
         )
         networks = [hybrid]
     else:

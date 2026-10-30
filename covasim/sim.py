@@ -94,6 +94,7 @@ class Sim(cvc.V3Sim, ss.Sim):
         pop_size     = pop_size if isinstance(pop_size, ss.par) else round(pop_size) # An ss.par (e.g. with bounds, to calibrate) is kept; a number is rounded to the nearest, as Starsim does
         pop_infected = int(v3.pop('pop_infected', defaults['pop_infected']))
         pop_type     = v3.pop('pop_type',   defaults['pop_type'])
+        clustered    = v3.pop('clustered',  defaults['clustered'])
         location     = v3.pop('location',   defaults['location'])
         start_day    = v3.pop('start_day',  defaults['start_day'])
         end_day      = v3.pop('end_day',    defaults['end_day'])
@@ -137,7 +138,7 @@ class Sim(cvc.V3Sim, ss.Sim):
         self._v3_contacts = None
         if networks is None:
             self._v3_contacts = self._make_contacts(pop_type, layer_pars['contacts'], verbose)
-            networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts)
+            networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts, clustered=clustered)
 
         # The COVID disease: the remaining v3 parameters, plus any others that are COVID parameters (e.g. dur_exp2inf)
         diseases = pars.pop('diseases', None)
@@ -184,6 +185,7 @@ class Sim(cvc.V3Sim, ss.Sim):
                          n_agents=pop_size, start=ss.date(start_day), dur=ss.days(n_days), dt=ss.days(1),
                          rand_seed=rand_seed, verbose=verbose)
         self.pop_type = pop_type
+        self.clustered = clustered
         self.simfile = simfile
 
         # Report Covasim's version and git info (v3 sim.version / sim.git_info), not Starsim's
@@ -212,7 +214,7 @@ class Sim(cvc.V3Sim, ss.Sim):
             # v3: apply changes made in place since the sim was created, e.g. sim['contacts']['h'] = 4 or sim['dur']['exp2inf']['par1'] = 5
             if self._v3_contacts is not None:
                 if self._v3_contacts != cvnet.get_contacts(sc.tolist(self.pars.networks)):
-                    self.pars.networks = cvnet.make_networks(self.pop_type, contacts=self._v3_contacts)
+                    self.pars.networks = cvnet.make_networks(self.pop_type, contacts=self._v3_contacts, clustered=self.clustered)
             dur = self._v3_pars['dur']
             if dur is not None:
                 applied = sc.mergedicts(self._v3_dur_applied) # Empty if none have been applied yet

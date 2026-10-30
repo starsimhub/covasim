@@ -127,7 +127,7 @@ class V3Sim:
 
     # Parameters that determine how the sim is built, so can only be changed before it is initialized
     _v3_init_keys = ['pop_size', 'pop_type', 'pop_infected', 'n_days', 'start_day', 'end_day', 'rand_seed', 'pop_scale',
-                     'scaled_pop', 'rescale', 'use_waning', 'contacts', 'location', 'dur']
+                     'scaled_pop', 'rescale', 'use_waning', 'contacts', 'location', 'dur', 'clustered']
 
     def _is_v3_saved(self):
         """ Whether this is a sim saved by Covasim v3 and loaded with cv.load(): its results and v3 parameters can be read, but it can't be rerun """
@@ -258,7 +258,7 @@ class V3Sim:
             covid.pars.update(beta=value) # A number (or an ss.par to fit) stays a daily probability
             if self.initialized:
                 self.__dict__.setdefault('_v3_set_pars', {})[key] = value # Set again by initialize(reset=True), since sim.new() doesn't keep changes made to an initialized sim
-        elif key in ['pop_type', 'contacts', 'location']: # Recreate the networks (and for pop_type, the per-layer parameters)
+        elif key in ['pop_type', 'contacts', 'location', 'clustered']: # Recreate the networks (and for pop_type, the per-layer parameters)
             pop_type = self.pop_type
             contacts = self._v3_contacts # For location, keep the current contacts, apart from the household size
             if key == 'pop_type':
@@ -271,12 +271,14 @@ class V3Sim:
                 contacts = value
                 if sc.isnumber(contacts): # A single value for all layers
                     contacts = {lkey:contacts for lkey in self.layer_keys()}
+            elif key == 'clustered':
+                self.clustered = value
             else: # Location: reload the age distribution and household size
                 self._v3_pars['location'] = value
                 self._load_location(value, self.pars.verbose)
             self.pop_type = pop_type
             self._v3_contacts = self._make_contacts(pop_type, contacts, self.pars.verbose)
-            self.pars.networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts)
+            self.pars.networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts, clustered=self.clustered)
         elif key in ['use_waning', 'variants', 'n_variants', 'variant_map', 'variant_pars']:
             errormsg = f'Cannot set "{key}" on an existing sim; please set it when creating the sim'
             raise ValueError(errormsg)
