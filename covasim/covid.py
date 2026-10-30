@@ -584,7 +584,7 @@ class COVID(ss.Infection):
 
             for i, (nkey, route) in enumerate(self.sim.networks.items()):
                 beta_layer = self.get_layer_par('beta_layer', nkey)
-                betas = [b.to_prob(dt) if isinstance(b, ss.Rate) else b for b in betamap[ss.utils.standardize_netkey(nkey)]]
+                betas = [b.to_prob(dt) if isinstance(b, ss.Rate) else b for b in betamap[ss.networks.standardize_netkey(nkey)]]
                 betas = [b*beta_layer for b in betas] # Linear in beta_layer, as in v3 (multiplying an ss.Rate isn't)
                 layer_trans, layer_sus = trans_vals, sus_vals
                 if any_iso:
