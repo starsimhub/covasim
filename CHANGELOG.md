@@ -8,6 +8,23 @@ There are no further major releases planned. If there is a specific bugfix or fe
 
 ## Latest versions (4.0.x)
 
+### Unreleased (Starsim 4)
+
+Covasim now runs on Starsim 4 (it previously required Starsim 3.7). The Covasim API is unchanged, apart from the points below; results agree with Covasim on Starsim 3 within noise (12 seeds of five scenarios), and a run is 1.5–2 times faster.
+
+- *Regression information*: time point 0 of the results is the start of the sim, before the first day's step, and the results at index `d` are those at the start of day `d` (the end of day `d-1`); there is one step fewer than there are time points, so a sim of `n_days` days takes `n_days` steps (v4.0 took `n_days + 1`). Days given to interventions and variants (e.g. `cv.change_beta(days=30, ...)`, `cv.variant(days=10)`, `start_day=`) are the step that starts on that day, as before; the people's dates (e.g. `people.date_diagnosed`) and the transmission log are dated by the step, as the results are, so an event on day `d` is dated `d+1`. Days given to analyzers (e.g. `cv.snapshot('2020-04-04')`) are the time point, so a snapshot matches the results on its day.
+- In custom interventions, `self.today` is the day the step starts on (`self.ti - 1`), for comparing with days; a function intervention can compare dates, e.g. `if sim.now == '2020-04-01':`. Custom analyzers' `self.today` is `self.ti`.
+- `sim.run()` on a sim that has finished runs it again from the start, rather than raising an error.
+- *Regression information*: `sim.compute_fit()` returns the `cv.Fit` without storing it as `sim.fit`, which is now Starsim's `sim.fit()` (calibration); use `fit = sim.compute_fit()`. `cv.Calibration` keeps the fits of the sims before and after calibration as `calib.before_fit` and `calib.after_fit`.
+- `cv.MultiSim` is `ss.MultiSim` with Covasim's options for each run (`noise`, `noisepar`, `keep_people`), and `cv.single_run()` and `cv.multi_run()` are built on it. `msim.results` has every result with a run axis first until `reduce()`, `mean()`, `median()`, or `combine()` replaces it with the results of that sim (`msim.reset()` undoes it).
+- `cv.Calibration` uses `sim.fit()`: the parameters to calibrate are given bounds (`ss.par`) and fitted with Optuna. `par_samplers`, `reseed`, `name`, `db_name`, `keep_db` and `die` are removed (use `storage=` to keep the trials in a file), and `calib.df` has a column `objective` (the mismatch). Parameters set by `custom_fn` are held by a `cv.custom_pars` connector.
+- `sim.initialize(reset=True)`, and `cv.Scenarios` and `cv.Calibration` given an initialized sim, make the sim again from what it was made with (`sim.new()`), keeping the parameters changed since, rather than from a copy saved when it was initialized.
+- `verbose=-1` (or `'brief'`) is removed; use `verbose=0`, and `sim.brief()` for a one-line summary.
+- The results by variant no longer count the seed infections at time point 0 twice (once in `new_infections_by_variant` and once more in `cum_infections_by_variant`), so they add up to the totals.
+- `cv.options.set('defaults')` no longer fails (the thousands separator `sep` is Covasim's own).
+- New parameter `clustered`: `cv.Sim(pop_type='hybrid', clustered=True)` makes schools and workplaces clusters, whose members all know each other, rather than random networks. The mean number of contacts is the same. The default is `False`, which matches v3; with `True`, epidemics grow more slowly, and contact tracing averts more infections.
+
+
 ### Version 4.0.1 (2026-10-16)
 
 - Fixed `cv.change_beta()` and `cv.clip_edges()` raising an error when the days are given as an array (e.g. `np.arange(180)`).

@@ -56,12 +56,14 @@ class Sim(cvc.V3Sim, ss.Sim):
         kwargs (dict): additional parameters; also passed to ``ss.Sim`` (e.g. ``networks``, ``diseases``, ``connectors``)
     """
 
+    starsim_names = dict(n_agents='pop_size', start='start_day', stop='end_day') # The Starsim names for these v3 parameters
+    v3_names = {v3_key:ss_key for ss_key,v3_key in starsim_names.items()}
+
     def __init__(self, pars=None, datafile=None, label=None, simfile=None, popfile=None, people=None, version=None, **kwargs):
 
         # Parameters can be supplied as a dict (the v3 form) and/or as keyword arguments, which take precedence
         pars = sc.mergedicts(pars, kwargs, _copy=True)
-        starsim_names = dict(n_agents='pop_size', start='start_day', stop='end_day') # The Starsim names for these v3 parameters
-        for ss_key,v3_key in starsim_names.items():
+        for ss_key,v3_key in self.starsim_names.items():
             if ss_key in pars:
                 pars[v3_key] = pars.pop(ss_key)
         if 'dur' in pars and not isinstance(pars['dur'], dict): # The Starsim sim duration, rather than the v3 durations
@@ -88,9 +90,11 @@ class Sim(cvc.V3Sim, ss.Sim):
         supplied = list(v3.keys())
 
         # Sim-level parameters: the user's value, else the default
-        pop_size     = int(v3.pop('pop_size', defaults['pop_size']))
+        pop_size     = v3.pop('pop_size', defaults['pop_size'])
+        pop_size     = pop_size if isinstance(pop_size, ss.par) else round(pop_size) # An ss.par (e.g. with bounds, to calibrate) is kept; a number is rounded to the nearest, as Starsim does
         pop_infected = int(v3.pop('pop_infected', defaults['pop_infected']))
         pop_type     = v3.pop('pop_type',   defaults['pop_type'])
+        clustered    = v3.pop('clustered',  defaults['clustered'])
         location     = v3.pop('location',   defaults['location'])
         start_day    = v3.pop('start_day',  defaults['start_day'])
         end_day      = v3.pop('end_day',    defaults['end_day'])
@@ -134,7 +138,7 @@ class Sim(cvc.V3Sim, ss.Sim):
         self._v3_contacts = None
         if networks is None:
             self._v3_contacts = self._make_contacts(pop_type, layer_pars['contacts'], verbose)
-            networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts)
+            networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts, clustered=clustered)
 
         # The COVID disease: the remaining v3 parameters, plus any others that are COVID parameters (e.g. dur_exp2inf)
         diseases = pars.pop('diseases', None)
@@ -143,8 +147,6 @@ class Sim(cvc.V3Sim, ss.Sim):
                                    beta_layer=layer_pars['beta_layer'], iso_factor=layer_pars['iso_factor'], quar_factor=layer_pars['quar_factor'])
             if 'dur' in supplied:
                 v3.update(cvcov.v3_durs(dur))
-            if 'beta' in v3:
-                v3['beta'] = ss.probperday(v3['beta'])
             v3.update({key:pars.pop(key) for key in list(pars) if key in diseases.pars})
             diseases.pars.update(v3)
         else: # The sim-level arguments that are applied to the COVID module can't be used with a user-supplied disease
@@ -159,7 +161,6 @@ class Sim(cvc.V3Sim, ss.Sim):
         # Also keep the variants and durations for sim['key']; changes to the durations are applied in init()
         self._v3_pars.update(variants=variants, dur=dur)
         self._v3_dur_applied = sc.dcp(dur)
-        self._v3_changed_pars = [] # Parameters set with sim['key'] after initialization, which are kept by initialize(reset=True)
 
         # Add the cross-immunity connector if waning immunity is on, alongside any user-supplied connectors: it applies the
         # NAb-weighted immunity each step and enables reinfection. As in v3, with use_waning=False there is no reinfection,
@@ -184,6 +185,7 @@ class Sim(cvc.V3Sim, ss.Sim):
                          n_agents=pop_size, start=ss.date(start_day), dur=ss.days(n_days), dt=ss.days(1),
                          rand_seed=rand_seed, verbose=verbose)
         self.pop_type = pop_type
+        self.clustered = clustered
         self.simfile = simfile
 
         # Report Covasim's version and git info (v3 sim.version / sim.git_info), not Starsim's
@@ -199,13 +201,20 @@ class Sim(cvc.V3Sim, ss.Sim):
             self.data = cvm.load_data(datafile) # Also for a dataframe, e.g. to add the cumulative columns, as in v3
         return
 
+    def new(self, pars=None, inplace=False, **kwargs):
+        """ As ``ss.Sim.new()``, also with the v3 names of these Starsim settings, e.g. ``sim.new(pop_size=10e3)`` """
+        if kwargs.get('end_day') is not None: # As for sim['end_day'], a duration, since Covasim's sims have one
+            kwargs['dur'] = ss.days(sc.daydiff(kwargs.get('start_day') or self['start_day'], kwargs.pop('end_day')))
+        kwargs = {self.v3_names.get(key, key):val for key,val in kwargs.items()}
+        return super().new(pars=pars, inplace=inplace, **kwargs)
+
     def init(self, *args, **kwargs):
         """Create the People (with Covasim's age distribution), then initialize as usual."""
         if not self.initialized:
             # v3: apply changes made in place since the sim was created, e.g. sim['contacts']['h'] = 4 or sim['dur']['exp2inf']['par1'] = 5
             if self._v3_contacts is not None:
                 if self._v3_contacts != cvnet.get_contacts(sc.tolist(self.pars.networks)):
-                    self.pars.networks = cvnet.make_networks(self.pop_type, contacts=self._v3_contacts)
+                    self.pars.networks = cvnet.make_networks(self.pop_type, contacts=self._v3_contacts, clustered=self.clustered)
             dur = self._v3_pars['dur']
             if dur is not None:
                 applied = sc.mergedicts(self._v3_dur_applied) # Empty if none have been applied yet
@@ -213,12 +222,6 @@ class Sim(cvc.V3Sim, ss.Sim):
                 self._v3_covid().pars.update(cvcov.v3_durs(changed))
                 self._v3_dur_applied = sc.dcp(dur)
 
-            # Keep a copy of the sim before it was initialized, so it can be reset (v3 sim.initialize(reset=True))
-            self._orig_sim = None
-            try:
-                self._orig_sim = sc.dumpstr(self) # Stored as bytes so Starsim doesn't treat it as part of this sim
-            except Exception: # E.g. if a user-defined object can't be pickled; then the sim can't be reset
-                pass
             self.set_seed() # As in v3, seed the global random number generators, for user code that uses them
         if self.pars.n_agents < 0:
             errormsg = f'Population size cannot be negative ({self.pars.n_agents})'
@@ -288,10 +291,11 @@ class Sim(cvc.V3Sim, ss.Sim):
 
     def _get_ia(self, which, label=None, partial=False, as_list=False, as_inds=False, die=True, first=False):
         """Helper method for get_interventions() and get_analyzers(); see get_interventions()"""
-        if (not self.initialized) or self._is_v3_saved(): # v3: available before initialization; also, a sim saved by v3 stores them in its parameters
+        modules = self.__dict__.get(which) # Once the sim has started initializing
+        if modules and not self._is_v3_saved():
+            ia_list = list(modules.values())
+        else: # v3: available before initialization; also, a sim saved by v3 stores them in its parameters
             ia_list = [ia for ia in sc.tolist(self.pars[which]) if not isinstance(ia, dict)]
-        else:
-            ia_list = list(getattr(self, which).values())
         n_ia = len(ia_list)
         if label is None: # Get all of them
             label = list(range(n_ia))
@@ -373,9 +377,8 @@ class Sim(cvc.V3Sim, ss.Sim):
         return self._get_ia('analyzers', label=label, partial=partial, first=first, die=die, as_inds=False, as_list=False)
 
     def compute_fit(self, *args, **kwargs):
-        """Compute the goodness-of-fit against ``self.data`` (v3 ``Sim.compute_fit``); returns a ``cv.Fit``."""
-        self.fit = cva.Fit(self, *args, **kwargs)
-        return self.fit
+        """Compute the goodness-of-fit against ``self.data`` (v3 ``Sim.compute_fit``); returns a ``cv.Fit`` (not stored in the sim, whose ``sim.fit()`` calibrates it)."""
+        return cva.Fit(self, *args, **kwargs)
 
     def compute_r_eff(self, method='daily', smoothing=2, window=7):
         """
@@ -555,12 +558,20 @@ class Sim(cvc.V3Sim, ss.Sim):
         if covid is None:
             return
         variant = ss.Results(module=self.label)
+        stocks = {state.name for state in covid.auto_state_list}
         for key, res in covid.results.items():
             if key.endswith('_by_variant'):
                 variant[key] = res
-            elif isinstance(res, ss.Result) and key not in self.results:
-                self.results[key] = res
-                self._bridged_keys.append(key)
+            elif isinstance(res, ss.Result):
+                key = f'n_{key}' if key in stocks else key # v3 named the counts of states n_<state>, e.g. n_symptomatic
+                if key not in self.results:
+                    self.results[key] = res
+                    self._bridged_keys.append(key)
+        for key in ['alive', 'female']: # Likewise for the people, e.g. n_alive
+            self.results[f'n_{key}'] = self.results[key]
+            self._bridged_keys.append(f'n_{key}')
+        self.results['new_emigrants'] = self.results['emigrated'] # The people who left, under the name it had
+        self._bridged_keys.append('new_emigrants')
         self.results['variant'] = variant
         self.results['date'] = self.results['timevec'] # v3 also had the time keys "date" and "t"
         self.results['t'] = np.arange(self.t.npts)

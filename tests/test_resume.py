@@ -23,9 +23,10 @@ def test_resuming():
     s1 = s0.copy()
     s0.run()
 
-    # Cannot run the same simulation multiple times
-    with pytest.raises(cv.AlreadyRunError):
-        s0.run()
+    # Running a sim that has finished runs it again from the start (as in Starsim), with the same results
+    cum_infections = s0.results['cum_infections'][:].copy()
+    s0.run()
+    assert np.array_equal(cum_infections, s0.results['cum_infections'])
 
     # If until=0 then no timesteps will be taken
     with pytest.raises(cv.AlreadyRunError):
@@ -104,10 +105,9 @@ def test_reproducibility():
     s5.initialize(reset=True)
     s5.run()
     r6 = s5.summary[key]
-    s5.initialize(reset=False)
-    with pytest.raises(cv.AlreadyRunError):
-        s5.run()
-    assert r5 == r6
+    s5.initialize(reset=False) # Does nothing, since it's initialized
+    s5.run() # Runs it again from the start
+    assert r5 == r6 == s5.summary[key]
 
     # Parameters set after the sim was initialized are kept by a reset, as in v3
     s5['beta'] = 0

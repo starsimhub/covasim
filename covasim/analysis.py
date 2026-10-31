@@ -4,7 +4,6 @@ but which are useful for particular investigations: the analyzers (which run
 during a sim, e.g. ``cv.snapshot``), ``cv.Fit`` and ``cv.Calibration`` (which
 compare a sim with data), and ``cv.TransTree`` (the transmission tree).
 """
-import tempfile
 import numpy as np
 import pandas as pd
 import sciris as sc
@@ -12,6 +11,7 @@ import starsim as ss
 import matplotlib.pyplot as plt
 
 from . import misc as cvm
+from . import parameters as cvpar
 from . import compat as cvc
 from . import plotting as cvplt
 from . import settings as cvset
@@ -22,7 +22,7 @@ from . import run as cvr
 sns = sc.importbyname('seaborn', lazy=True)
 
 __all__ = ['Analyzer', 'PeopleSnapshot', 'snapshot', 'age_histogram', 'daily_age_stats', 'daily_stats', 'nab_histogram',
-           'Fit', 'Calibration', 'TransTree']
+           'Fit', 'Calibration', 'custom_pars', 'TransTree']
 
 
 def make_infection_log(sim, start=None):
@@ -30,7 +30,7 @@ def make_infection_log(sim, start=None):
     Return the sim's transmission log as a list of dicts with keys ``source`` (None for a seed
     infection or importation), ``target``, ``date`` (the day index), ``layer``, and ``variant``
     (the variant label). This is built from Starsim's infection log (``sim.diseases.covid.infection_log``,
-    an ``ss.InfectionLog``; use its ``to_df()`` method for a dataframe).
+    an ``ss.diseases.InfectionLog``; use its ``to_df()`` method for a dataframe).
 
     Args:
         sim (Sim): a sim that has been run (or is running)
@@ -41,7 +41,7 @@ def make_infection_log(sim, start=None):
 
     # Optionally make a log of only the later entries; chunks are added whole, so any earlier length of the log is a chunk boundary
     if start:
-        sublog = ss.InfectionLog(disease=log.disease, networks=log.networks)
+        sublog = ss.diseases.InfectionLog(disease=log.disease, networks=log.networks)
         count = 0
         for chunk in log.chunks:
             if count >= start:
@@ -98,6 +98,11 @@ class Analyzer(cvc.V3Module, ss.Analyzer):
     Note: a custom analyzer must not store data under the names Starsim reserves on a module
     (``t``, ``pars``, ``sim``, ``dists``, ``results``) -- use e.g. ``self.tvec`` instead of ``self.t``.
     """
+
+    @property
+    def today(self):
+        """ The day the analyzer sees the people on (day 0 is the start day, before the first step), which days given to analyzers (e.g. ``days=10``) refer to; as for the results, the people as they are at the start of that day """
+        return self.ti
 
 
 # The per-agent states that cv.COVID derives (as properties) rather than stores
@@ -244,7 +249,7 @@ class snapshot(Analyzer):
         return
 
     def apply(self, sim):
-        for ind in cvi.find_day(self.days, sim.ti):
+        for ind in cvi.find_day(self.days, self.today):
             date = self.dates[ind]
             self.snapshots[date] = PeopleSnapshot(sim) # Take snapshot!
         return
@@ -358,7 +363,7 @@ class age_histogram(Analyzer):
         return
 
     def apply(self, sim):
-        for ind in cvi.find_day(self.days, sim.ti):
+        for ind in cvi.find_day(self.days, self.today):
             date = self.dates[ind] # Find the date for this index
             self.hists[date] = sc.objdict() # Initialize the dictionary
             scale  = sim.current_scale # Determine current scale factor
@@ -523,8 +528,8 @@ class daily_age_stats(Analyzer):
             inds = sc.findinds(people[f'date_{state}'], sim.ti)
             b, _ = np.histogram(people.age[inds], self.edges)
             df_entry.update({state: b * sim.current_scale})
-        df_entry.update({'day':sim.ti, 'age': self.bins})
-        self.age_results.update({sim.date(sim.ti): df_entry})
+        df_entry.update({'day':self.today, 'age': self.bins})
+        self.age_results.update({sim.date(self.today): df_entry})
         return
 
     def to_df(self):
@@ -689,7 +694,7 @@ class daily_stats(Analyzer):
         return output
 
     def apply(self, sim):
-        for ind in cvi.find_day(self.days, sim.ti):
+        for ind in cvi.find_day(self.days, self.today):
 
             # Initialize
             t = sim.ti
@@ -830,7 +835,7 @@ class daily_stats(Analyzer):
             string = '\n' + string + '\n'
             return string
 
-        datestr = f'day {sim.ti} ({sim.date(sim.ti)})'
+        datestr = f'day {self.today} ({sim.date(self.today)})'
         report  = f'*** Statistics report for {datestr} ***\n\n'
         report += 'Overall stocks:'
         report += make_entry('stocks', show_empty=False)
@@ -979,7 +984,7 @@ class nab_histogram(Analyzer):
         return
 
     def apply(self, sim):
-        for ind in cvi.find_day(self.days, sim.ti):
+        for ind in cvi.find_day(self.days, self.today):
             nab = PeopleSnapshot(sim, copy=False).nab # All agents, including those who have died
             log_nabs = np.log10(nab[nab > 0])
             date = self.dates[ind]  # Find the date for this index
@@ -1323,13 +1328,14 @@ class Fit(sc.prettyobj):
         return cvplt.handle_show_return(fig=fig, do_show=do_show)
 
 
-class Calibration(ss.Calibration):
+class Calibration(sc.prettyobj):
     """
-    A class to handle calibration of Covasim simulations. Uses the Optuna hyperparameter
-    optimization library (optuna.org), via Starsim's ``ss.Calibration``.
+    A class to handle calibration of Covasim simulations, with Starsim's ``sim.fit()`` (using the Optuna
+    hyperparameter optimization library, optuna.org).
 
-    Each trial copies the sim, sets the trial's parameter values (via ``sim[key] = value``), runs it,
-    and computes the fit to the data (``sim.compute_fit()``); Optuna then minimizes the mismatch.
+    Each parameter to calibrate is given its bounds (as ``ss.par``) in a copy of the sim, which ``sim.fit()``
+    then varies, minimizing the mismatch with the data (``sim.compute_fit()``). A parameter that is not one of
+    the sim's (e.g. part of an intervention) is set by ``custom_fn`` once each trial's sim is initialized.
 
     Note: running a calibration does not guarantee a good fit! You must ensure that
     you run for a sufficient number of iterations, have enough free parameters, and
@@ -1340,22 +1346,16 @@ class Calibration(ss.Calibration):
         sim          (Sim)  : the simulation to calibrate (ideally not yet initialized, so that parameters used during initialization, such as pop_infected, can be calibrated)
         calib_pars   (dict) : a dictionary of the parameters to calibrate of the format dict(key1=[best, low, high])
         fit_args     (dict) : a dictionary of options that are passed to sim.compute_fit() to calculate the goodness-of-fit (e.g. data, weights, keys)
-        custom_fn    (func) : a custom function for modifying the simulation; receives the sim and calib_pars as inputs, should return the modified sim. The sim has been initialized, so e.g. sim.get_intervention() can be used; calib_pars keys that are sim parameters have already been set.
-        par_samplers (dict) : an optional mapping from parameters to the Optuna sampler to use for choosing new points for each; by default, suggest_float
+        custom_fn    (func) : a custom function for modifying the simulation; receives the sim and calib_pars as inputs, should return the modified sim. The sim has been initialized, so e.g. sim.get_intervention() can be used.
         n_trials     (int)  : the number of trials per worker (default 20)
         n_workers    (int)  : the number of parallel workers (default: the number of CPUs)
         total_trials (int)  : if supplied, the total number of trials, divided between the workers (overrides n_trials)
-        name         (str)  : the name of the Optuna study (default: 'covasim_calibration')
-        db_name      (str)  : the name of the database file (default: a file in a temporary folder, or f'{name}.db' if name is supplied)
-        keep_db      (bool) : whether to keep the database after calibration (default: false)
-        storage      (str)  : the location of the database (default: sqlite)
+        storage      (str)  : a file to keep the trials in, so that calibrating again resumes the calibration (see ``sim.fit()``)
         label        (str)  : a label for this calibration object
-        die          (bool) : whether to stop if an exception is encountered (default: false)
         verbose      (bool) : whether to print details of the calibration
         data         (df)   : shortcut for fit_args['data']: the data to fit to (default: the sim's data)
         weights      (dict) : shortcut for fit_args['weights']: the weight of each result key
         fit_kw       (dict) : alias for fit_args
-        reseed       (bool) : whether to use a different random seed for each trial (default: false)
 
     **Example**::
 
@@ -1366,136 +1366,85 @@ class Calibration(ss.Calibration):
         calib.plot_sims()
     """
 
-    def __init__(self, sim, calib_pars=None, fit_args=None, custom_fn=None, par_samplers=None,
-                 n_trials=None, n_workers=None, total_trials=None, name=None, db_name=None,
-                 keep_db=None, storage=None, label=None, die=False, verbose=True,
-                 data=None, weights=None, fit_kw=None, reseed=False):
-
-        # Handle run arguments: v3 specified the number of trials per worker, Starsim the total number
-        if n_trials  is None: n_trials  = 20
-        if n_workers is None: n_workers = sc.cpu_count()
-        if db_name is None and name is None: # Use a temporary folder by default, so calibrations run at the same time don't clash
-            db_name = sc.path(tempfile.mkdtemp()) / 'covasim_calibration.db'
-        if name      is None: name      = 'covasim_calibration'
-        if total_trials is None:
-            total_trials = n_trials*n_workers
-        super().__init__(sim, calib_pars=calib_pars, n_workers=n_workers, total_trials=total_trials, reseed=reseed,
-                         label=label, study_name=name, db_name=db_name, keep_db=keep_db, storage=storage,
-                         die=die, verbose=verbose)
-        self.run_args.name = name # The v3 name for study_name
-
-        # Handle other inputs
-        self.fit_args     = sc.mergedicts(fit_kw, fit_args)
+    def __init__(self, sim, calib_pars=None, fit_args=None, custom_fn=None, n_trials=None, n_workers=None,
+                 total_trials=None, storage=None, label=None, verbose=True, data=None, weights=None, fit_kw=None):
+        self.sim = sim.new() if sim.initialized else sim # Calibrated by making it again, with other values, so it can't have been initialized
+        self.calib_pars = calib_pars
+        self.custom_fn = custom_fn
+        self.n_workers = sc.ifelse(n_workers, sc.cpu_count())
+        self.total_trials = sc.ifelse(total_trials, sc.ifelse(n_trials, 20)*self.n_workers) # v3 gave the number of trials per worker
+        self.storage = storage
+        self.label = label
+        self.verbose = verbose
+        self.fit_args = sc.mergedicts(fit_kw, fit_args)
         if data    is not None: self.fit_args['data']    = data
         if weights is not None: self.fit_args['weights'] = weights
-        self.par_samplers = sc.mergedicts(par_samplers)
-        self.custom_fn    = custom_fn
-
-        # If the sim has already been initialized, use a copy of it from before initialization
-        if self.sim.initialized:
-            orig_sim = getattr(self.sim, '_orig_sim', None)
-            if orig_sim is None:
-                errormsg = 'Sim has already been initialized and cannot be reset; please use a sim that has not been initialized'
-                raise RuntimeError(errormsg)
-            warnmsg = 'Sim has already been initialized; using a copy of it from before initialization, but in future, use a sim that has not been initialized'
-            cvm.warn(warnmsg)
-            self.sim = sc.loadstr(orig_sim)
+        self.calibrated = False
         return
 
-    def run_sim(self, calib_pars, label=None, return_sim=False):
+    def make_sim(self, calib_pars, label=None):
         """
-        Create and run a simulation with the supplied parameter values, and compute its fit.
-
-        Args:
-            calib_pars (dict): the parameter values to use, e.g. dict(beta=0.015)
-            label (str): if supplied, the label of the sim
-            return_sim (bool): whether to return the sim (with its fit in sim.fit) rather than the mismatch
-
-        Returns:
-            The mismatch (or the sim if return_sim=True); inf (or None) if the sim could not be run
+        The sim made again (see ``sim.new()``) with these values, or bounds, of the parameters to calibrate:
+        dict(key=value), or dict(key=ss.par(best, bounds=[low, high])). Those that are not the sim's are given
+        to ``custom_fn`` once the sim is initialized, by a ``cv.custom_pars`` connector (which holds them as its
+        parameters, so that ``sim.fit()`` can vary them).
         """
-        sim = self.sim.copy()
-        if label: sim.label = label
+        covid = self.sim._v3_covid()
+        sim_keys = set(cvpar.make_pars()) | set(covid.pars)
+        sim_pars = {key:val for key,val in calib_pars.items() if key in sim_keys}
+        custom = {key:val for key,val in calib_pars.items() if key not in sim_keys}
+        dis_pars = {f'{covid.name}.{key}':val for key,val in sim_pars.items() if key in covid.pars} # Named by module, since e.g. the networks have a beta too
+        sim = self.sim.new(pars=dis_pars or None, **{key:val for key,val in sim_pars.items() if key not in covid.pars})
+        if custom:
+            if self.custom_fn is None:
+                errormsg = f'The following parameters are not part of the sim, nor is a custom function specified to use them: {sc.strjoin(custom)}'
+                raise ValueError(errormsg)
+            sim.pars.connectors = sc.tolist(sim.pars.connectors) + [custom_pars(self.custom_fn, **custom)] # Kept by sim.new(), and so in each trial of sim.fit()
+        if label:
+            sim.label = label
+        return sim
 
-        # Set the parameters of the sim (before initialization, so parameters such as pop_infected can be calibrated)
-        valid_pars = {}
-        for key,val in calib_pars.items():
-            try:
-                sim[key] = val
-                valid_pars[key] = val
-            except KeyError: # Not a sim parameter
-                pass
-        sim.init()
+    def mismatch(self, sim):
+        """ The goodness of fit of a sim that has run: the mismatch of ``sim.compute_fit()`` """
+        return sim.compute_fit(**self.fit_args).mismatch
 
-        # Apply any other parameters using the custom function
-        if self.custom_fn:
-            sim = self.custom_fn(sim, calib_pars)
-        elif len(valid_pars) != len(calib_pars):
-            extra = set(calib_pars.keys()) - set(valid_pars.keys())
-            errormsg = f'The following parameters are not part of the sim, nor is a custom function specified to use them: {sc.strjoin(extra)}'
-            raise ValueError(errormsg)
+    def run_sim(self, calib_pars, label=None):
+        """ Run a sim with these values of the parameters, and compute its fit; returns the sim and its fit """
+        sim = self.make_sim(calib_pars, label=label)
+        sim.run()
+        return sim, sim.compute_fit(**self.fit_args)
 
-        # Run the sim and compute the fit
-        try:
-            sim.run()
-            sim.compute_fit(**self.fit_args)
-            if return_sim:
-                return sim
-            else:
-                return sim.fit.mismatch
-        except Exception as E:
-            if self.die:
-                raise E
-            else:
-                warnmsg = f'Encountered error running sim!\nParameters:\n{valid_pars}\nTraceback:\n{sc.traceback()}'
-                cvm.warn(warnmsg)
-                output = None if return_sim else np.inf
-                return output
-
-    def run_trial(self, trial):
-        """ Define the objective for Optuna: sample the parameters, and return the mismatch """
-        pars = {}
-        for key, (best,low,high) in self.calib_pars.items():
-            if key in self.par_samplers: # If a custom sampler is used, get it now
-                try:
-                    sampler_fn = getattr(trial, self.par_samplers[key])
-                except Exception as E:
-                    errormsg = 'The requested sampler function is not found: ensure it is a valid attribute of an Optuna Trial object'
-                    raise AttributeError(errormsg) from E
-            else:
-                sampler_fn = trial.suggest_float
-            pars[key] = sampler_fn(key, low, high) # Sample from values within this range
-        if self.reseed:
-            pars['rand_seed'] = trial.suggest_int('rand_seed', 0, 1_000_000) # Choose a random seed
-        mismatch = self.run_sim(pars)
-        return mismatch
-
-    def calibrate(self, calib_pars=None, verbose=True, **kwargs):
+    def calibrate(self, calib_pars=None, verbose=None, **kwargs):
         """
         Actually perform calibration.
 
         Args:
             calib_pars (dict): if supplied, overwrite stored calib_pars
             verbose (bool): whether to print a summary of the results
-            kwargs (dict): if supplied, overwrite stored run_args (n_trials, n_workers, etc.)
+            kwargs (dict): passed to ``sim.fit()``, e.g. n_trials=200
         """
-        # Load and validate calibration parameters
         if calib_pars is not None:
             self.calib_pars = calib_pars
         if self.calib_pars is None:
             errormsg = 'You must supply calibration parameters either when creating the calibration object or when calling calibrate().'
             raise ValueError(errormsg)
-        if 'name' in kwargs: # The v3 name for study_name
-            kwargs['study_name'] = kwargs['name']
+        verbose = sc.ifelse(verbose, self.verbose)
 
-        # Run the optimization (in Starsim)
-        super().calibrate(**kwargs)
+        # Run the optimization
+        bounded = {key:ss.par(best, bounds=[low, high]) for key,(best,low,high) in self.calib_pars.items()}
+        sim = self.make_sim(bounded)
+        kwargs = sc.mergedicts(dict(n_trials=self.total_trials, n_workers=self.n_workers, storage=self.storage), kwargs)
+        self.fit = sim.fit(gof=self.mismatch, method='optuna', verbose=verbose, **kwargs)
+        names = {name:self.sim.starsim_names.get(name, name) for name in self.fit.pars} # The v3 names of the sim settings, e.g. pop_size for n_agents
+        self.best_pars = sc.objdict({key:val for name,val in self.fit.pars.items() for key in self.calib_pars if names[name].split('.')[-1] == key}) # Named e.g. "custom_pars.test_prob" if the name is also another module's parameter
+        self.df = self.fit.trials.rename(columns=names) # In trial order
+        self.calibrated = True
 
         # Compare the results
         self.initial_pars = sc.objdict({k:v[0] for k,v in self.calib_pars.items()})
         self.par_bounds   = sc.objdict({k:np.array([v[1], v[2]]) for k,v in self.calib_pars.items()})
-        self.before = self.run_sim(calib_pars=self.initial_pars, label='Before calibration', return_sim=True)
-        self.after  = self.run_sim(calib_pars=self.best_pars,    label='After calibration',  return_sim=True)
+        self.before, self.before_fit = self.run_sim(self.initial_pars, label='Before calibration')
+        self.after,  self.after_fit  = self.run_sim(self.best_pars,    label='After calibration')
         if verbose:
             self.summarize()
         return self
@@ -1503,9 +1452,9 @@ class Calibration(ss.Calibration):
     def summarize(self):
         """ Print out results from the calibration """
         if self.calibrated:
-            print(f'Calibration for {self.run_args.n_workers*self.run_args.n_trials} total trials completed in {self.elapsed:0.1f} s.')
-            before = self.before.fit.mismatch
-            after = self.after.fit.mismatch
+            print(f'Calibration for {len(self.df)} total trials completed.')
+            before = self.before_fit.mismatch
+            after = self.after_fit.mismatch
             print('\nInitial parameter values:')
             print(self.initial_pars)
             print('\nBest parameter values:')
@@ -1517,6 +1466,11 @@ class Calibration(ss.Calibration):
         else:
             print('Calibration not yet run; please run calib.calibrate()')
             return
+
+    def trials(self):
+        """ The parameter values and mismatch of each trial, as a dataframe with the parameters named as in calib_pars """
+        names = {name:key for name in self.df.columns for key in self.calib_pars if name.split('.')[-1] == key}
+        return self.df.rename(columns=dict(names, objective='mismatch'))
 
     def check_fit(self, do_plot=True):
         """
@@ -1532,29 +1486,13 @@ class Calibration(ss.Calibration):
         if not self.calibrated:
             errormsg = 'Calibration not yet run; please run calib.calibrate()'
             raise RuntimeError(errormsg)
-        before = self.before.fit.mismatch
-        after = self.after.fit.mismatch
+        before = self.before_fit.mismatch
+        after = self.after_fit.mismatch
         print(f'Mismatch before calibration: {before:n}')
         print(f'Mismatch after calibration:  {after:n}')
         if do_plot:
             self.plot_sims()
         return after <= before
-
-    def parse_study(self, study=None):
-        """
-        Parse the study into a data frame (self.df), in the order the trials were run -- called automatically.
-
-        Args:
-            study (Study): the Optuna study to parse (default: self.study)
-        """
-        if study is None:
-            study = self.study
-        self.study = study
-        super().parse_study(study)
-        self.best_pars = sc.objdict(self.best_pars)
-        self.data = self.study_data # As in v3; also stored as study_data, as in Starsim
-        self.df = pd.DataFrame.from_dict(self.data) # In trial order, rather than sorted by mismatch as in Starsim
-        return
 
     def plot_sims(self, **kwargs):
         """
@@ -1582,7 +1520,7 @@ class Calibration(ss.Calibration):
         Args:
             best_thresh (float): in the lower panel, show the trials with a mismatch within this factor of the best mismatch
         """
-        mismatch = sc.dcp(self.df['mismatch'].values)
+        mismatch = self.df['objective'].values.copy() # The mismatch of each trial
         best_mismatch = np.zeros(len(mismatch))
         for i in range(len(mismatch)):
             best_mismatch[i] = mismatch[:i+1].min()
@@ -1611,7 +1549,7 @@ class Calibration(ss.Calibration):
 
     def plot_all(self): # pragma: no cover
         """ Plot every point in the calibration. Warning, very slow for more than a few hundred trials. """
-        g = pairplotpars(self.data, color_column='mismatch', bounds=self.par_bounds)
+        g = pairplotpars(self.trials(), color_column='mismatch', bounds=self.par_bounds)
         return g
 
     def plot_best(self, best_thresh=2): # pragma: no cover
@@ -1621,9 +1559,9 @@ class Calibration(ss.Calibration):
         Args:
             best_thresh (float): plot the trials with a mismatch within this factor of the best mismatch
         """
-        max_mismatch = self.df['mismatch'].min()*best_thresh
-        inds = sc.findinds(self.df['mismatch'].values <= max_mismatch)
-        g = pairplotpars(self.data, inds=inds, color_column='mismatch', bounds=self.par_bounds)
+        max_mismatch = self.df['objective'].min()*best_thresh
+        inds = sc.findinds(self.df['objective'].values <= max_mismatch)
+        g = pairplotpars(self.trials(), inds=inds, color_column='mismatch', bounds=self.par_bounds)
         return g
 
     def plot_stride(self, npts=200): # pragma: no cover
@@ -1635,8 +1573,29 @@ class Calibration(ss.Calibration):
         """
         npts = min(len(self.df), npts)
         inds = np.linspace(0, len(self.df)-1, npts).round()
-        g = pairplotpars(self.data, inds=inds, color_column='mismatch', bounds=self.par_bounds)
+        g = pairplotpars(self.trials(), inds=inds, color_column='mismatch', bounds=self.par_bounds)
         return g
+
+
+class custom_pars(ss.Connector):
+    """
+    Parameters to calibrate that are not the sim's (e.g. part of an intervention), held as the parameters of this
+    module, so that ``sim.fit()`` can vary them, and set by a function of the sim once it is initialized (the
+    ``custom_fn`` of ``cv.Calibration``, called as ``fn(sim, pars)``)
+    """
+    def __init__(self, fn, **pars):
+        super().__init__()
+        self.define_pars(**pars)
+        self.fn = fn
+        return
+
+    def init_post(self):
+        super().init_post()
+        self.fn(self.sim, dict(self.pars))
+        return
+
+    def step(self):
+        pass # Nothing to do on each timestep
 
 
 def pairplotpars(data, inds=None, color_column=None, bounds=None, cmap='parula', bins=None, edgecolor='w', facecolor='#F8A493', figsize=(20,16)): # pragma: no cover

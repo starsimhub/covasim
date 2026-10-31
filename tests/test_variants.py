@@ -36,9 +36,9 @@ def test_variant_results(do_plot=False):
     assert sim['variant_map'] == {0:'wild', 1:'alpha', 2:'delta'}
     assert sim['immunity'].shape == (3, 3) # The cross-immunity matrix
 
-    # Each variant is imported on the right day
-    assert res['n_imports'][10] == 20
-    assert res['n_imports'][20] == 30
+    # Each variant is imported on the right day, in the results at the end of that day (index 0 is the start of day 0)
+    assert res['n_imports'][11] == 20
+    assert res['n_imports'][21] == 30
     assert res['n_imports'][:].sum() == 50
 
     # Results by variant have one row per day and one column per variant, and can be accessed by name

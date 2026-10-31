@@ -193,7 +193,7 @@ def test_starsim():
 
     # Starsim modules can be added to a sim, e.g. births
     pop_size = 1000
-    sim = cv.Sim(pop_size=pop_size, n_days=30, demographics=ss.Births(birth_rate=200), verbose=0)
+    sim = cv.Sim(pop_size=pop_size, n_days=30, demographics=ss.Births(birth_rate=ss.peryear(200)), verbose=0)
     sim.run()
     assert sim.people.n_uids > pop_size # People have been born
 
@@ -207,6 +207,10 @@ def test_starsim():
     assert cv.Sim(n_agents=pop_size, dur=ss.years(1))['n_days'] == 365 # Converted to days
     with pytest.raises(ValueError):
         cv.Sim(diseases=cv.COVID(), pop_infected=50) # Would otherwise be silently ignored
+
+    # sim.new() takes the v3 names of the Starsim settings
+    sim3 = sim2.new(pop_size=2*pop_size, end_day='2020-03-11').init()
+    assert len(sim3.people) == 2*pop_size and sim3['n_days'] == 10
 
     return sim
 

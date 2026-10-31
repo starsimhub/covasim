@@ -35,6 +35,7 @@ def make_pars(set_prognoses=False, prog_by_age=True, version=None, **kwargs):
     pars['pop_infected'] = 20       # Number of initial infections
     pars['pop_type']     = 'random' # What type of population data to use -- 'random' (fastest) or 'hybrid' (household, school, work, and community layers)
     pars['location']     = None     # What location to load data from -- default Seattle
+    pars['clustered']    = False    # For hybrid: whether schools and workplaces are random networks, as in v3 (False), or clusters, whose members all know each other (True)
 
     # Simulation parameters
     pars['start_day']  = '2020-03-01' # Start day of the simulation
@@ -144,6 +145,7 @@ def make_pars(set_prognoses=False, prog_by_age=True, version=None, **kwargs):
         for key in pars.keys(): # Only loop over keys that have been populated
             if (key in version_pars) and (key not in skip_keys): # Only replace keys that exist in the old version
                 pars[key] = version_pars[key]
+        pars['clustered'] = version_pars.get('clustered', False) # Schools and workplaces were random networks in earlier versions
         if version_pars.get('prognoses') is not None: # The version file stores the prognoses as lists; convert them to arrays
             pars['prognoses'] = {key:np.array(val) for key,val in version_pars['prognoses'].items()}
 

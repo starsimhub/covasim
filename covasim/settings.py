@@ -109,6 +109,7 @@ class Options(sc.objdict):
         # The precision is shared with Starsim; set it directly, since set() would reload Covasim
         if self.precision != ss.options.precision:
             ss.options(precision=self.precision)
+        ss.options(warnings=self.warnings) # Likewise the warnings, so that the two never differ
         return
 
 
@@ -210,9 +211,9 @@ class Options(sc.objdict):
         options.rc = sc.dcp(rc_covasim)
 
         optdesc.warnings = 'How warnings are handled: options are "warn" (default), "print", and "error"'
-        options.warnings = str(os.getenv('COVASIM_WARNINGS', 'warn'))
+        options.warnings = str(os.getenv('COVASIM_WARNINGS', ss.options.warnings)) # Shared with Starsim, so by default as STARSIM_WARNINGS sets it
 
-        optdesc.sep = 'Set thousands separator for text output (shared with Starsim)'
+        optdesc.sep = 'Set thousands separator for text output'
         options.sep = str(os.getenv('COVASIM_SEP', ','))
 
         optdesc.precision = 'Set arithmetic precision (shared with Starsim) -- 32-bit by default for efficiency'
@@ -243,7 +244,7 @@ class Options(sc.objdict):
         rename = {'font_size': 'fontsize', 'font_family':'font'} # Deprecated keys
         numba_keys = ['precision', 'numba_cache'] # Keys that require a reload
         matplotlib_keys = ['fontsize', 'font', 'dpi', 'backend'] # Keys that are set in Matplotlib directly
-        starsim_keys = ['verbose', 'warnings', 'sep', 'precision'] # Keys that are shared with ss.options
+        starsim_keys = ['verbose', 'warnings', 'precision'] # Keys that are shared with ss.options
 
         # Reset to defaults
         reset = key in ['default', 'defaults']

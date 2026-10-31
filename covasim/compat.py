@@ -85,6 +85,11 @@ class V3Module:
                 cls.finalize = _v3_finalize(func)
         return
 
+    @property
+    def today(self):
+        """ The day this step starts on (day 0 is the start day), which days given to interventions and analyzers (e.g. ``days=10``) refer to; the step's own index, ``self.ti``, is one more, since time point 0 is the start of the run """
+        return self.ti - 1
+
     def init_post(self):
         """ v3: initialize(self, sim) is called once the sim is initialized """
         super().init_post()
@@ -122,7 +127,7 @@ class V3Sim:
 
     # Parameters that determine how the sim is built, so can only be changed before it is initialized
     _v3_init_keys = ['pop_size', 'pop_type', 'pop_infected', 'n_days', 'start_day', 'end_day', 'rand_seed', 'pop_scale',
-                     'scaled_pop', 'rescale', 'use_waning', 'contacts', 'location', 'dur']
+                     'scaled_pop', 'rescale', 'use_waning', 'contacts', 'location', 'dur', 'clustered']
 
     def _is_v3_saved(self):
         """ Whether this is a sim saved by Covasim v3 and loaded with cv.load(): its results and v3 parameters can be read, but it can't be rerun """
@@ -250,8 +255,10 @@ class V3Sim:
                 for mod in new:
                     self.add_module(mod, key)
         elif key == 'beta':
-            covid.pars.beta = value if isinstance(value, (dict, ss.Rate)) else ss.probperday(value)
-        elif key in ['pop_type', 'contacts', 'location']: # Recreate the networks (and for pop_type, the per-layer parameters)
+            covid.pars.update(beta=value) # A number (or an ss.par to fit) stays a daily probability
+            if self.initialized:
+                self.__dict__.setdefault('_v3_set_pars', {})[key] = value # Set again by initialize(reset=True), since sim.new() doesn't keep changes made to an initialized sim
+        elif key in ['pop_type', 'contacts', 'location', 'clustered']: # Recreate the networks (and for pop_type, the per-layer parameters)
             pop_type = self.pop_type
             contacts = self._v3_contacts # For location, keep the current contacts, apart from the household size
             if key == 'pop_type':
@@ -264,25 +271,25 @@ class V3Sim:
                 contacts = value
                 if sc.isnumber(contacts): # A single value for all layers
                     contacts = {lkey:contacts for lkey in self.layer_keys()}
+            elif key == 'clustered':
+                self.clustered = value
             else: # Location: reload the age distribution and household size
                 self._v3_pars['location'] = value
                 self._load_location(value, self.pars.verbose)
             self.pop_type = pop_type
             self._v3_contacts = self._make_contacts(pop_type, contacts, self.pars.verbose)
-            self.pars.networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts)
+            self.pars.networks = cvnet.make_networks(pop_type, contacts=self._v3_contacts, clustered=self.clustered)
         elif key in ['use_waning', 'variants', 'n_variants', 'variant_map', 'variant_pars']:
             errormsg = f'Cannot set "{key}" on an existing sim; please set it when creating the sim'
             raise ValueError(errormsg)
         elif (covid is not None) and (key in covid.pars):
             covid.pars[key] = value
+            if self.initialized:
+                self.__dict__.setdefault('_v3_set_pars', {})[key] = value # As for beta
         elif hasattr(self, key): # A Starsim attribute
             setattr(self, key, value)
         else:
             raise self._v3_key_error(key)
-
-        # v3: initialize(reset=True) keeps the parameters, so record those changed after initialization to set again after a reset
-        if self.initialized and (key not in ['interventions', 'analyzers']):
-            self._v3_changed_pars.append((key, value))
         return
 
     # v3 properties and methods
@@ -342,7 +349,7 @@ class V3Sim:
     def label(self, label):
         ss.Sim.label.fset(self, label)
 
-    def init_data(self, data=None):
+    def init_data(self, data=None, check=True):
         """ v3: keep the data as loaded by cv.load_data() (indexed by date, with a "date" column), rather than converting it to the Starsim format """
         if data is not None:
             self.data = cvm.load_data(data)
@@ -374,12 +381,14 @@ class V3Sim:
             raise ValueError(errormsg)
         if not self.initialized: # There are no results yet
             return []
-        results = self.diseases.covid.results
+        covid = self.diseases.covid
+        stocks = {state.name for state in covid.auto_state_list} # v3 named the counts of states n_<state>, e.g. n_symptomatic (see init_results())
         keys = []
-        for key,res in results.items():
+        for key,res in covid.results.items():
             is_variant = key.endswith('_by_variant')
-            if isinstance(res, ss.Result) and (which == 'all' or is_variant == (which == 'variant')):
-                keys.append(key)
+            is_v3 = key != 'infection' # Starsim's name for new_infections
+            if isinstance(res, ss.Result) and is_v3 and (which == 'all' or is_variant == (which == 'variant')):
+                keys.append(f'n_{key}' if key in stocks else key)
         return keys
 
     def update_pars(self, pars=None, **kwargs):
@@ -471,10 +480,8 @@ class V3Sim:
             for key,val in orig_pars.items():
                 self.diseases.covid.pars[key] = val
             self._orig_pars = None
-        if verbose > 0: # As in v3, print the summary, or a one-line summary for negative values
+        if verbose > 0: # As in v3, print the summary
             self.summarize(full=False)
-        elif verbose < 0:
-            self.brief()
         return
 
     def initialize(self, *args, reset=False, **kwargs):
@@ -485,33 +492,16 @@ class V3Sim:
         if self.initialized:
             if not reset:
                 return self
-            self._restore_orig()
+            set_pars = self.__dict__.get('_v3_set_pars') or {} # The COVID parameters set with sim['key'] since it was initialized
+            self.new(inplace=True) # Made again from what it was made with (see sim.new())
+            self._v3_covid().pars.update(set_pars) # Kept, as in v3
         return self.init(*args, **kwargs)
-
-    def _restore_orig(self):
-        """ Restore the sim to its state before it was initialized (v3 sim.initialize(reset=True)) """
-        if self._orig_sim is None:
-            errormsg = 'This sim cannot be reset, since a copy could not be saved before it was initialized (e.g. because it contains objects that cannot be pickled); please create a new sim instead'
-            raise RuntimeError(errormsg)
-        changed_pars = self._v3_changed_pars
-        orig = sc.loadstr(self._orig_sim)
-        self.__dict__.clear()
-        self.__dict__.update(orig.__dict__)
-        for obj in self.__dict__.values(): # Point objects that refer to the sim (e.g. the loop) to this sim rather than the copy
-            if getattr(obj, 'sim', None) is orig:
-                obj.sim = self
-        for key,value in changed_pars: # v3 kept the parameters, so set again those changed since the sim was initialized
-            self[key] = value
-        self._v3_changed_pars = changed_pars # Keep them for any further resets
-        return
 
     def shrink(self, skip_attrs=None, in_place=True, inplace=None, **kwargs):
         """ v3: in_place rather than inplace; skip_attrs is ignored """
         kwargs.setdefault('die', False) # v3 never raised an error on shrinking
         kwargs.setdefault('base_size', 150) # Starsim's default allows 30 KB per module plus 1 KB per timestep, but the COVID module has about 40 KB of parameters and distributions, and its results by variant can be more than 1 KB per timestep
-        sim = super().shrink(inplace=in_place if inplace is None else inplace, **kwargs)
-        sim._orig_sim = None # Remove the copy of the sim before it was initialized, which includes the people if supplied
-        return sim
+        return super().shrink(inplace=in_place if inplace is None else inplace, **kwargs)
 
     def summarize(self, full=None, t=None, sep=None, output=None, how=None):
         """
@@ -572,7 +562,7 @@ class V3Sim:
         flat = self.results.flatten(sep='_', only_results=False, keep_case=True, columns=True)
         skip = ('covid_', 'variant_') # Skip the duplicates of the COVID results (e.g. "covid_cum_infections", the same as "cum_infections"), and the results by variant, which aren't in the v3 summary
         for key,res in flat.items():
-            if not key.startswith(skip):
+            if not key.startswith(skip) and key not in ['alive', 'female', 'infection', 'died', 'emigrated', 'unrepresented']: # The same as n_alive, n_female, new_infections, new_deaths, and new_emigrants, the v3 names; unrepresented is v4's own
                 val = res[t]
                 if sc.isnumber(val): # Skip the dates
                     summary[key] = val
@@ -588,7 +578,7 @@ class V3Sim:
         With for_json, as in v3, the dict also has the list of result keys ("timeseries_keys"), and the results
         by variant (under "variant").
         """
-        results = self.diseases.covid.results
+        results = self.results
         output = {}
         output['t'] = self.tvec
         if for_json:
@@ -596,7 +586,7 @@ class V3Sim:
         for key in self.result_keys():
             output[key] = results[key].values
         if for_json:
-            output['variant'] = {key:results[key].values for key in self.result_keys('variant')}
+            output['variant'] = {key:results['variant'][key].values for key in self.result_keys('variant')}
             output['date'] = [str(d) for d in self.datevec]
             output = sc.jsonify(output) # Convert the arrays to lists
         if filename is not None:
@@ -607,7 +597,7 @@ class V3Sim:
         """ v3: the results as a dataframe, including the columns "t" and "date", and the COVID results named as in v3 (e.g. "cum_infections") """
         df = super().to_df(**kwargs)
         cols = list(df.columns)
-        dups = ['timevec'] # The same as "date"
+        dups = ['timevec', 'infection', 'covid_infection', 'died', 'emigrated'] # The same as "date", "new_infections", "new_deaths", and "new_emigrants"
         for col in cols: # Remove duplicates of the COVID results, e.g. "covid_cum_infections" (same as "cum_infections")
             if col.startswith('variant_'):
                 dups.append(col)
@@ -621,12 +611,23 @@ class V3Sim:
             df = df.set_index('date')
         return df
 
-    def to_json(self, *args, **kwargs):
-        """ v3: the parameters are stored as "parameters" rather than "pars", and are the v3 parameters from sim.export_pars() """
-        out = super().to_json(*args, **kwargs)
-        if isinstance(out, dict) and ('pars' in out):
-            out.pop('pars')
+    def to_json(self, filename=None, keys=None, verbose=False, indent=2, **kwargs):
+        """
+        v3: the parameters are stored as "parameters" rather than "pars", and are the v3 parameters from
+        sim.export_pars(); the summary is the v3 one (see compute_summary()); the results are as in Starsim
+        """
+        keys = sc.tolist(keys) if keys is not None else ['pars', 'summary', 'results']
+        out = sc.objdict()
+        if ('pars' in keys) or ('parameters' in keys):
             out['parameters'] = self.export_pars()
+        if 'summary' in keys:
+            out['summary'] = dict(self.summary) if self.results_ready else 'Summary not available (Sim has not yet been run)'
+        others = [key for key in keys if key not in ['pars', 'parameters', 'summary']]
+        if others:
+            out.update(super().to_json(keys=others, verbose=verbose))
+        out = sc.jsonify(out, **kwargs)
+        if filename is not None:
+            sc.savejson(filename=filename, obj=out, indent=indent)
         return out
 
 

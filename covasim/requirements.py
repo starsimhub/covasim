@@ -8,7 +8,7 @@ or errors if not.
 import importlib
 import sciris as sc # Its version is checked below
 
-min_versions = {'sciris':'3.4.0', 'starsim':'3.7.1'} # Should match pyproject.toml
+min_versions = {'sciris':'3.4.0', 'starsim':'4.0.0'} # Should match pyproject.toml
 
 
 #%% Check dependencies

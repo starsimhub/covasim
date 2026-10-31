@@ -438,7 +438,7 @@ def iv_subclass_builtin_apply():
             self.n_calls = getattr(self, 'n_calls', 0) + 1
             return super().apply(sim)
     s = rs(interventions=my_tp(symp_prob=0.5))
-    assert s.get_intervention().n_calls == s.npts # The override of a built-in intervention's apply() is called on every day...
+    assert s.get_intervention().n_calls == s.npts - 1 # The override of a built-in intervention's apply() is called on every day (one step between each pair of time points)...
     assert s.results['cum_tests'][-1] > 0 # ...and super().apply() runs the built-in logic
 @probe
 def sim_immunity_without_connector():
@@ -514,12 +514,12 @@ def an_custom_subclass():
     s = rs(analyzers=store_seir(label='seir')); a = s.get_analyzer('seir'); a.plot(); assert len(a.tvec) == 41, len(a.tvec)
 @probe
 def an_custom_initialize_finalize():
-    class A(cv.Analyzer):
+    class Recorder(cv.Analyzer): # Not "A", whose default name would be that of the network "a"
         def initialize(self, sim):
             super().initialize(); self.n = sim.npts; self.vals = np.zeros(sim.npts)
         def apply(self, sim): self.vals[sim.ti] = sim.results['n_infectious'][sim.ti] if sim.ti else 0
         def finalize(self, sim): super().finalize(); self.done = True
-    s = rs(analyzers=A()); assert s.get_analyzer().done
+    s = rs(analyzers=Recorder()); assert s.get_analyzer().done
 @probe
 def an_transtree():
     s = rs(); tt = s.make_transtree(); tt.plot(); pl.close('all'); assert tt.n_targets is not None
@@ -788,15 +788,15 @@ def cv_undefined_datestr():
 @probe
 def cv_calibration():
     fn = datafile(); s = cv.Sim(P, datafile=fn, interventions=cv.test_prob(0.1))
-    calib = cv.Calibration(s, calib_pars=dict(beta=[0.015, 0.01, 0.02]), total_trials=2, n_workers=1, verbose=False, keep_db=False)
-    calib.calibrate(die=True)
+    calib = cv.Calibration(s, calib_pars=dict(beta=[0.015, 0.01, 0.02]), total_trials=2, n_workers=1, verbose=False)
+    calib.calibrate()
 
 # People/sim fine-grained behaviour ---------------------------------
 @probe
 def sim_t_in_function_is_int():
     ts = []
     def f(sim): ts.append(sim.ti)
-    rs(interventions=f); assert ts[0] == 0 and ts[-1] == 40 and isinstance(ts[0], (int, np.integer)), (ts[0], ts[-1], type(ts[0]))
+    rs(interventions=f); assert ts[0] == 1 and ts[-1] == 40 and isinstance(ts[0], (int, np.integer)), (ts[0], ts[-1], type(ts[0])) # The first step is ti == 1, since time point 0 is the start of the run
 @probe
 def sim_results_during_run():
     vals = []
