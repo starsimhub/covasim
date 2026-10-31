@@ -386,7 +386,8 @@ class V3Sim:
         keys = []
         for key,res in covid.results.items():
             is_variant = key.endswith('_by_variant')
-            if isinstance(res, ss.Result) and (which == 'all' or is_variant == (which == 'variant')):
+            is_v3 = key != 'infection' # Starsim's name for new_infections
+            if isinstance(res, ss.Result) and is_v3 and (which == 'all' or is_variant == (which == 'variant')):
                 keys.append(f'n_{key}' if key in stocks else key)
         return keys
 
@@ -561,7 +562,7 @@ class V3Sim:
         flat = self.results.flatten(sep='_', only_results=False, keep_case=True, columns=True)
         skip = ('covid_', 'variant_') # Skip the duplicates of the COVID results (e.g. "covid_cum_infections", the same as "cum_infections"), and the results by variant, which aren't in the v3 summary
         for key,res in flat.items():
-            if not key.startswith(skip) and key not in ['alive', 'female', 'unrepresented']: # The same as n_alive and n_female, the v3 names; unrepresented is v4's own
+            if not key.startswith(skip) and key not in ['alive', 'female', 'infection', 'unrepresented']: # The same as n_alive, n_female, and new_infections, the v3 names; unrepresented is v4's own
                 val = res[t]
                 if sc.isnumber(val): # Skip the dates
                     summary[key] = val
@@ -596,7 +597,7 @@ class V3Sim:
         """ v3: the results as a dataframe, including the columns "t" and "date", and the COVID results named as in v3 (e.g. "cum_infections") """
         df = super().to_df(**kwargs)
         cols = list(df.columns)
-        dups = ['timevec'] # The same as "date"
+        dups = ['timevec', 'infection', 'covid_infection'] # The same as "date" and "new_infections"
         for col in cols: # Remove duplicates of the COVID results, e.g. "covid_cum_infections" (same as "cum_infections")
             if col.startswith('variant_'):
                 dups.append(col)

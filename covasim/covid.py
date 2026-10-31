@@ -910,8 +910,9 @@ class COVID(ss.Infection):
         """
         Define the results: the daily flows (new_*), cumulative counts (cum_*), stocks that aren't
         states (e.g. n_infectious), rates, immunity summaries, and results by variant. The stocks of
-        the states (e.g. symptomatic) and new_infections and cum_infections come from ss.Infection.
-        Counts are scaled by the population scale.
+        the states (e.g. symptomatic) and the result infection come from ss.Infection; new_infections
+        is that result under its v3 name, and cum_infections, unlike infection.cum, includes the initial
+        infections. Counts are scaled by the population scale.
         """
         super().init_results()
 
@@ -920,12 +921,14 @@ class COVID(ss.Infection):
 
         self.define_results(
             R('n_infectious',  'Number infectious'),  # infectious is a property, not auto-counted
+            R('new_infections',  'New infections'),
             R('new_infectious',  'New infectious'),
             R('new_symptomatic', 'New symptomatic'),
             R('new_severe',      'New severe'),
             R('new_critical',    'New critical'),
             R('new_recoveries',  'New recoveries'),
             R('new_deaths',      'New deaths'),
+            R('cum_infections',  'Cumulative infections'),
             R('cum_infectious',  'Cumulative infectious'),
             R('cum_symptomatic', 'Cumulative symptomatic'),
             R('cum_severe',      'Cumulative severe'),
@@ -999,6 +1002,7 @@ class COVID(ss.Infection):
         res = self.results
         res.n_infectious[ti] = int(np.count_nonzero(self.infectious))
         # Flows (captured this timestep in step_state)
+        res.new_infections[ti]  = res.infection[ti]
         res.new_infectious[ti]  = self.flows_by_variant['new_infectious'].sum()
         res.new_symptomatic[ti] = self.flows['symptomatic']
         res.new_severe[ti]      = self.flows['severe']
@@ -1043,7 +1047,7 @@ class COVID(ss.Infection):
         """Cumulate the daily flows into the cum_* results, and finalize the by-variant results."""
         super().finalize_results()
         res = self.results
-        stems = ['infectious', 'symptomatic', 'severe', 'critical', 'recoveries', 'deaths', 'known_deaths',
+        stems = ['infections', 'infectious', 'symptomatic', 'severe', 'critical', 'recoveries', 'deaths', 'known_deaths',
                  'tests', 'diagnoses', 'isolated', 'doses', 'vaccinated', 'quarantined', 'reinfections']
         for stem in stems:
             res[f'cum_{stem}'][:] = np.cumsum(res[f'new_{stem}'][:])
