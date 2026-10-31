@@ -570,6 +570,8 @@ class Sim(cvc.V3Sim, ss.Sim):
         for key in ['alive', 'female']: # Likewise for the people, e.g. n_alive
             self.results[f'n_{key}'] = self.results[key]
             self._bridged_keys.append(f'n_{key}')
+        self.results['new_emigrants'] = self.results['emigrated'] # The people who left, under the name it had
+        self._bridged_keys.append('new_emigrants')
         self.results['variant'] = variant
         self.results['date'] = self.results['timevec'] # v3 also had the time keys "date" and "t"
         self.results['t'] = np.arange(self.t.npts)
