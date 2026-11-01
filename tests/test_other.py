@@ -364,7 +364,7 @@ def test_sim():
     cv.parameters.absolute_prognoses(sim['prognoses'])
 
     # Test intervention functions and results analyses
-    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.ti==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.ti}')))).run() # ...This is not the recommended way of defining interventions.
+    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.diseases.covid.today==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.ti}')))).run() # ...This is not the recommended way of defining interventions.
 
     # Test other outputs
     sim = cv.Sim(pop_size=100, verbose=0, n_days=30)
