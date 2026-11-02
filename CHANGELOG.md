@@ -8,6 +8,10 @@ There are no further major releases planned. If there is a specific bugfix or fe
 
 ## Latest versions (4.0.x)
 
+### Version 4.0.2 (2026-11-01)
+
+- Require Starsim below 4 (`starsim<4`), since this version does not run on Starsim 4.
+
 ### Version 4.0.1 (2026-10-16)
 
 - Fixed `cv.change_beta()` and `cv.clip_edges()` raising an error when the days are given as an array (e.g. `np.arange(180)`).
