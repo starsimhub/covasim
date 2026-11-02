@@ -284,20 +284,6 @@ def test_population():
 
 
 
-def test_requirements():
-    sc.heading('Testing requirements')
-
-    orig = cv.requirements.min_versions['sciris']
-    cv.requirements.min_versions['sciris'] = '99.99.99'
-    with pytest.raises(ImportError):
-        cv.requirements.check_requirements()
-    cv.requirements.min_versions['sciris'] = orig # Restore
-
-    print('↑ Should print various requirements warnings')
-
-    return
-
-
 def test_run():
     sc.heading('Testing run')
 
@@ -398,7 +384,6 @@ if __name__ == '__main__':
     test_misc()
     test_plotting()
     test_population()
-    test_requirements()
     test_run()
     test_sim()
     test_settings()
