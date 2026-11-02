@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.10.20">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-86fc916b84669629367aabb2a24c5117.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-87a1b67b04f4001bca231538bd247c25.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ffb828db5fcd80aebe58acec825209e3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -622,7 +622,7 @@ window.Quarto = {
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>sim.plot(to_plot<span class="op">=</span>[<span class="st">'cum_tests'</span>, <span class="st">'cum_diagnoses'</span>, <span class="st">'cum_deaths'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim 4.0.1 (2026-10-16) — © 2020-2026 by IDM
+<pre><code>Covasim 4.0.2 (2026-11-01) — © 2020-2026 by IDM
   Automatically adding cumulative column cum_diagnoses from new_diagnoses
   Automatically adding cumulative column cum_tests from new_tests
   Automatically adding cumulative column cum_deaths from new_deaths</code></pre>
@@ -641,9 +641,11 @@ window.Quarto = {
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>fit.summarize()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Mismatch values for:
-#0. 'cum_deaths':    49.565217391304344
-#1. 'cum_tests':     0.0
-#2. 'cum_diagnoses': 44.96169560776302
+sc.objdict(
+    cum_deaths    = 49.565217391304344,
+    cum_tests     = 0.0,
+    cum_diagnoses = 44.96169560776302,
+)
 
 Total mismatch value:
 94.52691299906736</code></pre>
@@ -681,9 +683,11 @@ Total mismatch value:
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Mismatch values for:
-#0. 'cum_deaths':    73.04347826086956
-#1. 'cum_tests':     0.0
-#2. 'cum_diagnoses': 44.95658835546476
+sc.objdict(
+    cum_deaths    = 73.04347826086956,
+    cum_tests     = 0.0,
+    cum_diagnoses = 44.95658835546476,
+)
 
 Total mismatch value:
 118.00006661633432</code></pre>
@@ -765,234 +769,231 @@ Total mismatch value:
 <pre><code>  Automatically adding cumulative column cum_diagnoses from new_diagnoses
   Automatically adding cumulative column cum_tests from new_tests
   Automatically adding cumulative column cum_deaths from new_deaths
-Removed existing calibration file /tmp/tmp9jvhewug/covasim_calibration.db
-sqlite:////tmp/tmp9jvhewug/covasim_calibration.db</code></pre>
+Removed existing calibration file /tmp/tmp758g73g5/covasim_calibration.db
+sqlite:////tmp/tmp758g73g5/covasim_calibration.db</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
-<pre><span class="ansi-green-fg">[I 2026-10-16 16:11:40,121]</span> A new study created in RDB with name: covasim_calibration
+<pre><span class="ansi-green-fg">[I 2026-11-02 03:45:24,085]</span> A new study created in RDB with name: covasim_calibration
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:42,871]</span> Trial 2 finished with value: 369.09868099658036 and parameters: {'beta': 0.023002552719921552, 'rel_death_prob': 0.6933501380034991}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:26,250]</span> Trial 0 finished with value: 856.4859883643469 and parameters: {'beta': 0.024332542971320127, 'rel_death_prob': 2.799479612456899}. Best is trial 0 with value: 856.4859883643469.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:42,918]</span> Trial 1 finished with value: 1269.0815828041036 and parameters: {'beta': 0.09121114883429964, 'rel_death_prob': 1.187838853392936}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:26,278]</span> Trial 2 finished with value: 378.4933605720123 and parameters: {'beta': 0.021570165935669707, 'rel_death_prob': 1.2505000893301617}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:43,036]</span> Trial 3 finished with value: 2788.0433672336458 and parameters: {'beta': 0.17739840909469856, 'rel_death_prob': 1.966369937428822}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:26,409]</span> Trial 1 finished with value: 1512.1023004840786 and parameters: {'beta': 0.1650000695544916, 'rel_death_prob': 1.04655206022101}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:43,061]</span> Trial 0 finished with value: 2818.1138695208065 and parameters: {'beta': 0.17174901621978053, 'rel_death_prob': 2.176279954416776}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:26,443]</span> Trial 3 finished with value: 2016.101390060843 and parameters: {'beta': 0.19278746460747226, 'rel_death_prob': 1.3449764839404315}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:44,599]</span> Trial 4 finished with value: 1255.6648310165651 and parameters: {'beta': 0.03715171112381674, 'rel_death_prob': 2.2932086372723868}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:28,083]</span> Trial 4 finished with value: 1701.1999822356443 and parameters: {'beta': 0.07945582243249767, 'rel_death_prob': 1.912902484937425}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:44,603]</span> Trial 5 finished with value: 1354.80947728383 and parameters: {'beta': 0.06214218388195482, 'rel_death_prob': 1.7166643899018346}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:28,149]</span> Trial 5 finished with value: 2926.069969356486 and parameters: {'beta': 0.15312386391660684, 'rel_death_prob': 2.8962641245275}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:44,769]</span> Trial 7 finished with value: 1643.1932539858772 and parameters: {'beta': 0.07290762868031589, 'rel_death_prob': 1.7891976282825433}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:28,192]</span> Trial 7 finished with value: 499.6301683172714 and parameters: {'beta': 0.044057337206626405, 'rel_death_prob': 0.5266658264799793}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:44,820]</span> Trial 6 finished with value: 1626.531953635031 and parameters: {'beta': 0.16245133024704195, 'rel_death_prob': 1.101701937085906}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:28,305]</span> Trial 6 finished with value: 1104.4085579784164 and parameters: {'beta': 0.12326649659241062, 'rel_death_prob': 0.9344939645681806}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:46,307]</span> Trial 9 finished with value: 1165.2250521827953 and parameters: {'beta': 0.12502828730360843, 'rel_death_prob': 0.969912425156491}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:29,983]</span> Trial 9 finished with value: 1388.7086423591063 and parameters: {'beta': 0.09223086247207754, 'rel_death_prob': 1.3213299141711712}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:46,317]</span> Trial 8 finished with value: 2548.800794954923 and parameters: {'beta': 0.150719071893702, 'rel_death_prob': 2.1889500990297743}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:30,219]</span> Trial 10 finished with value: 1628.8387662654882 and parameters: {'beta': 0.04504985764571698, 'rel_death_prob': 2.761041785746597}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:46,458]</span> Trial 11 finished with value: 719.2449038504242 and parameters: {'beta': 0.023649458367440448, 'rel_death_prob': 2.2598912071377244}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:30,414]</span> Trial 8 finished with value: 2480.9915841364304 and parameters: {'beta': 0.16333137189148134, 'rel_death_prob': 1.898943706644429}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:46,482]</span> Trial 10 finished with value: 3208.024714660035 and parameters: {'beta': 0.16972955175571622, 'rel_death_prob': 2.9946738130569925}. Best is trial 2 with value: 369.09868099658036.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:30,615]</span> Trial 11 finished with value: 2603.5805169427545 and parameters: {'beta': 0.15801570688218686, 'rel_death_prob': 2.2945753155345026}. Best is trial 2 with value: 378.4933605720123.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:47,710]</span> Trial 12 finished with value: 101.61156015454989 and parameters: {'beta': 0.01140587478555763, 'rel_death_prob': 0.6205338185147005}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:31,604]</span> Trial 12 finished with value: 68.49491495314652 and parameters: {'beta': 0.015104987469284608, 'rel_death_prob': 2.1926209673972945}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:47,736]</span> Trial 14 finished with value: 129.50859350712796 and parameters: {'beta': 0.008173421711085689, 'rel_death_prob': 2.8578779526952642}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:32,004]</span> Trial 14 finished with value: 82.86250388595283 and parameters: {'beta': 0.01392277257180118, 'rel_death_prob': 0.6325200467647821}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:48,014]</span> Trial 13 finished with value: 2661.305347071102 and parameters: {'beta': 0.13575935827703134, 'rel_death_prob': 2.7383382447944373}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:32,097]</span> Trial 13 finished with value: 2368.0166096726916 and parameters: {'beta': 0.09388360513629966, 'rel_death_prob': 2.618089797416326}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:48,111]</span> Trial 15 finished with value: 679.6368299507039 and parameters: {'beta': 0.027746493198058345, 'rel_death_prob': 1.374267086477777}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:32,371]</span> Trial 15 finished with value: 805.6163121197319 and parameters: {'beta': 0.04354011303950061, 'rel_death_prob': 0.9137575013681398}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:48,881]</span> Trial 16 finished with value: 134.44231025447442 and parameters: {'beta': 0.005943599564144072, 'rel_death_prob': 2.9589712722934913}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:33,215]</span> Trial 17 finished with value: 134.99900075498513 and parameters: {'beta': 0.005132669450041356, 'rel_death_prob': 2.252146850593138}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:49,408]</span> Trial 17 finished with value: 2300.56812630457 and parameters: {'beta': 0.08213204880615743, 'rel_death_prob': 2.8808409594157767}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:33,399]</span> Trial 18 finished with value: 141.43147399742418 and parameters: {'beta': 0.006838469253464111, 'rel_death_prob': 0.5605704912064173}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:49,672]</span> Trial 18 finished with value: 645.4431096504862 and parameters: {'beta': 0.08174451866089266, 'rel_death_prob': 0.5240268786032249}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:33,406]</span> Trial 16 finished with value: 340.1612115290669 and parameters: {'beta': 0.020126368790860622, 'rel_death_prob': 1.5579354225190287}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:49,781]</span> Trial 19 finished with value: 1994.634942487898 and parameters: {'beta': 0.08368759637018261, 'rel_death_prob': 2.3878420385345573}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:34,119]</span> Trial 19 finished with value: 1311.7855398143624 and parameters: {'beta': 0.04006998895182965, 'rel_death_prob': 2.2733266594935415}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:50,527]</span> Trial 20 finished with value: 1720.831482879602 and parameters: {'beta': 0.05562186637644186, 'rel_death_prob': 2.833754355363955}. Best is trial 12 with value: 101.61156015454989.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:35,069]</span> Trial 20 finished with value: 788.8561975396367 and parameters: {'beta': 0.08321854673429942, 'rel_death_prob': 0.7288149960992718}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:50,803]</span> Trial 21 finished with value: 93.66378736066083 and parameters: {'beta': 0.010630614665097168, 'rel_death_prob': 1.7377783788091319}. Best is trial 21 with value: 93.66378736066083.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:35,976]</span> Trial 22 finished with value: 1202.1220633299286 and parameters: {'beta': 0.051859002771389134, 'rel_death_prob': 1.6388794582294652}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:51,056]</span> Trial 22 finished with value: 106.22385308877736 and parameters: {'beta': 0.010454693481184524, 'rel_death_prob': 1.191398942272785}. Best is trial 21 with value: 93.66378736066083.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:36,016]</span> Trial 21 finished with value: 1264.7126615446105 and parameters: {'beta': 0.06907380232292426, 'rel_death_prob': 1.2727177407200398}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:51,398]</span> Trial 23 finished with value: 537.7268286183772 and parameters: {'beta': 0.05840520356086936, 'rel_death_prob': 0.5367106767484588}. Best is trial 21 with value: 93.66378736066083.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:36,705]</span> Trial 23 finished with value: 1025.7790780299329 and parameters: {'beta': 0.03089579335378051, 'rel_death_prob': 2.5169579280271868}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:51,996]</span> Trial 24 finished with value: 54.138206688279965 and parameters: {'beta': 0.014395790675966972, 'rel_death_prob': 2.727698502640594}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:37,240]</span> Trial 24 finished with value: 123.11464671137361 and parameters: {'beta': 0.00926374249451958, 'rel_death_prob': 2.079232860823961}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:52,272]</span> Trial 26 finished with value: 140.97182129058044 and parameters: {'beta': 0.006932494501818487, 'rel_death_prob': 0.5894529826749788}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:37,611]</span> Trial 26 finished with value: 69.14298085890661 and parameters: {'beta': 0.012219426840287506, 'rel_death_prob': 2.581844272744447}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:52,379]</span> Trial 25 finished with value: 242.31092063774037 and parameters: {'beta': 0.01773462358059827, 'rel_death_prob': 1.827997229785084}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:37,846]</span> Trial 25 finished with value: 1855.58933250433 and parameters: {'beta': 0.11732351411505691, 'rel_death_prob': 1.7493539929045145}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:52,537]</span> Trial 27 finished with value: 143.1296353865968 and parameters: {'beta': 0.005540469083275237, 'rel_death_prob': 1.3575443392922217}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:38,565]</span> Trial 27 finished with value: 2108.6445796509306 and parameters: {'beta': 0.10993634049984335, 'rel_death_prob': 2.116634980549091}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:53,456]</span> Trial 28 finished with value: 67.28904827463694 and parameters: {'beta': 0.012539847752352961, 'rel_death_prob': 2.5404478992900295}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:39,018]</span> Trial 28 finished with value: 1210.3506239729982 and parameters: {'beta': 0.0388801588396986, 'rel_death_prob': 1.943963369968043}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:53,920]</span> Trial 29 finished with value: 1145.2320468978994 and parameters: {'beta': 0.03743013618728536, 'rel_death_prob': 1.829627930391857}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:39,116]</span> Trial 30 finished with value: 142.7031798196918 and parameters: {'beta': 0.0059427982495305065, 'rel_death_prob': 1.222039122021621}. Best is trial 12 with value: 68.49491495314652.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:54,000]</span> Trial 30 finished with value: 677.4497046675845 and parameters: {'beta': 0.046866306091883095, 'rel_death_prob': 0.8162514062911292}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:39,209]</span> Trial 29 finished with value: 65.47852733490252 and parameters: {'beta': 0.01282303350604936, 'rel_death_prob': 2.72955342038388}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:54,178]</span> Trial 31 finished with value: 896.9129990673712 and parameters: {'beta': 0.025802743825255416, 'rel_death_prob': 2.684025793550218}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:40,360]</span> Trial 31 finished with value: 1608.5618643691432 and parameters: {'beta': 0.054081152838212826, 'rel_death_prob': 2.454970886985747}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:54,731]</span> Trial 32 finished with value: 129.7945996358307 and parameters: {'beta': 0.008022158154520634, 'rel_death_prob': 2.457228427705118}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:40,765]</span> Trial 34 finished with value: 73.77603588399876 and parameters: {'beta': 0.011847238433537348, 'rel_death_prob': 2.9946539908397654}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:55,357]</span> Trial 35 finished with value: 134.22269840564906 and parameters: {'beta': 0.006100524180838024, 'rel_death_prob': 1.9302709666596103}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:40,798]</span> Trial 32 finished with value: 512.9919616289915 and parameters: {'beta': 0.02508488446973793, 'rel_death_prob': 0.9145533924386501}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:55,544]</span> Trial 33 finished with value: 1521.451347870498 and parameters: {'beta': 0.04537130466457549, 'rel_death_prob': 2.555006355012783}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:40,865]</span> Trial 33 finished with value: 1350.1921881245282 and parameters: {'beta': 0.035299381284930154, 'rel_death_prob': 2.9531953591751274}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:55,643]</span> Trial 34 finished with value: 1145.2461473553317 and parameters: {'beta': 0.03152046858560473, 'rel_death_prob': 2.9297943073755066}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:41,903]</span> Trial 35 finished with value: 78.58773371230626 and parameters: {'beta': 0.011399275684361934, 'rel_death_prob': 2.7852869637089572}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:56,438]</span> Trial 36 finished with value: 1958.6497979304527 and parameters: {'beta': 0.14057725229874507, 'rel_death_prob': 1.6223968553942199}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:42,003]</span> Trial 36 finished with value: 134.99900075498513 and parameters: {'beta': 0.005145275829881571, 'rel_death_prob': 2.9829641143157777}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:56,982]</span> Trial 37 finished with value: 1043.5601989607853 and parameters: {'beta': 0.0463183317259629, 'rel_death_prob': 1.3844050455411625}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:42,404]</span> Trial 37 finished with value: 67.08475818270641 and parameters: {'beta': 0.012662417790324742, 'rel_death_prob': 2.5313786303519885}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:57,167]</span> Trial 38 finished with value: 548.5734112004263 and parameters: {'beta': 0.026450889564245524, 'rel_death_prob': 0.9784722726808347}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:42,608]</span> Trial 38 finished with value: 920.2555846693609 and parameters: {'beta': 0.027329494494761523, 'rel_death_prob': 2.6784286599610923}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:57,274]</span> Trial 39 finished with value: 1555.2802327130614 and parameters: {'beta': 0.05410381520190981, 'rel_death_prob': 2.2255040285503616}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:43,669]</span> Trial 39 finished with value: 2055.8329262335124 and parameters: {'beta': 0.06345404668467913, 'rel_death_prob': 2.9936625881286383}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:58,130]</span> Trial 40 finished with value: 1549.147755029533 and parameters: {'beta': 0.09737263625160689, 'rel_death_prob': 1.5071491555535297}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:43,778]</span> Trial 40 finished with value: 1447.0556690500512 and parameters: {'beta': 0.056934216521883484, 'rel_death_prob': 2.097461428880208}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:58,635]</span> Trial 41 finished with value: 1851.8075232046897 and parameters: {'beta': 0.06532233796181112, 'rel_death_prob': 2.5855845930747807}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:44,139]</span> Trial 42 finished with value: 91.99427099524803 and parameters: {'beta': 0.010919271023765331, 'rel_death_prob': 2.6163303036040473}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:58,761]</span> Trial 42 finished with value: 1648.7658213794025 and parameters: {'beta': 0.043255786572857315, 'rel_death_prob': 2.827175662039319}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:44,161]</span> Trial 41 finished with value: 831.7981969178843 and parameters: {'beta': 0.02666606379271088, 'rel_death_prob': 2.1320039384153615}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:58,863]</span> Trial 43 finished with value: 443.70042634453966 and parameters: {'beta': 0.02103837172737795, 'rel_death_prob': 1.6851122269565306}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:45,345]</span> Trial 43 finished with value: 193.64935382155704 and parameters: {'beta': 0.017053646137771467, 'rel_death_prob': 2.3654720379070358}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:11:59,665]</span> Trial 44 finished with value: 123.78458498023717 and parameters: {'beta': 0.01682607561018154, 'rel_death_prob': 1.2502249147657176}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:45,523]</span> Trial 44 finished with value: 721.7725496291691 and parameters: {'beta': 0.0229793877399578, 'rel_death_prob': 2.8207450118343327}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:00,189]</span> Trial 45 finished with value: 147.4802371541502 and parameters: {'beta': 0.016471723828901923, 'rel_death_prob': 2.080017737652131}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:45,914]</span> Trial 45 finished with value: 1537.1941199982234 and parameters: {'beta': 0.045049819087998155, 'rel_death_prob': 2.5530344840145824}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:00,334]</span> Trial 47 finished with value: 78.918261757783 and parameters: {'beta': 0.014278697809554177, 'rel_death_prob': 0.8144283823087446}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:45,955]</span> Trial 46 finished with value: 2118.6692276946305 and parameters: {'beta': 0.06940198273169633, 'rel_death_prob': 2.8147738357225047}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:00,401]</span> Trial 46 finished with value: 838.7136385841808 and parameters: {'beta': 0.0329829492430634, 'rel_death_prob': 1.5691467526701992}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:47,189]</span> Trial 47 finished with value: 2721.160567571169 and parameters: {'beta': 0.1920076221944194, 'rel_death_prob': 2.0438884342109884}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:01,284]</span> Trial 48 finished with value: 475.9529466625217 and parameters: {'beta': 0.032002845332538464, 'rel_death_prob': 0.5117003116408295}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:47,269]</span> Trial 48 finished with value: 800.4001421148466 and parameters: {'beta': 0.031124127730266838, 'rel_death_prob': 1.6173872803473957}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:01,788]</span> Trial 51 finished with value: 116.49309410667495 and parameters: {'beta': 0.009929410409925456, 'rel_death_prob': 0.962054398917388}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:47,679]</span> Trial 50 finished with value: 337.64255895545585 and parameters: {'beta': 0.01894084839750268, 'rel_death_prob': 2.9801229360815773}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:01,797]</span> Trial 49 finished with value: 403.1434027623573 and parameters: {'beta': 0.02012968852110064, 'rel_death_prob': 2.412011634578883}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:47,689]</span> Trial 49 finished with value: 1900.9503930363726 and parameters: {'beta': 0.0672483597145778, 'rel_death_prob': 2.423206561070208}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:01,948]</span> Trial 50 finished with value: 343.5639738863969 and parameters: {'beta': 0.01866519705818423, 'rel_death_prob': 2.9922131154763956}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:48,933]</span> Trial 51 finished with value: 1325.8546875693924 and parameters: {'beta': 0.0388874925605637, 'rel_death_prob': 2.4309280434658715}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:02,950]</span> Trial 52 finished with value: 1187.4711329217923 and parameters: {'beta': 0.06471657716992726, 'rel_death_prob': 1.2695312689410456}. Best is trial 24 with value: 54.138206688279965.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:48,941]</span> Trial 54 finished with value: 134.8687658213794 and parameters: {'beta': 0.005479298902105493, 'rel_death_prob': 2.766419618695402}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:03,293]</span> Trial 53 finished with value: 53.792800994803926 and parameters: {'beta': 0.014174820466868463, 'rel_death_prob': 2.718748728914293}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:49,042]</span> Trial 52 finished with value: 1515.1903006617222 and parameters: {'beta': 0.05114661593939274, 'rel_death_prob': 2.309175540238509}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:03,429]</span> Trial 54 finished with value: 276.47066660745213 and parameters: {'beta': 0.020714129434252368, 'rel_death_prob': 0.5846630687527455}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:49,455]</span> Trial 53 finished with value: 1258.7412843629256 and parameters: {'beta': 0.03457084076343263, 'rel_death_prob': 2.7292839236010473}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:03,621]</span> Trial 55 finished with value: 1102.9519918283963 and parameters: {'beta': 0.03365104742498976, 'rel_death_prob': 2.525877825060907}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:50,650]</span> Trial 56 finished with value: 333.5790735888439 and parameters: {'beta': 0.01937813805272305, 'rel_death_prob': 1.9303219197654713}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:04,453]</span> Trial 56 finished with value: 54.643824665808054 and parameters: {'beta': 0.01461148211366993, 'rel_death_prob': 2.5586951945948044}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:50,690]</span> Trial 55 finished with value: 310.3297508549096 and parameters: {'beta': 0.018555067926348368, 'rel_death_prob': 2.5543964648559543}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:04,825]</span> Trial 57 finished with value: 132.3296842385753 and parameters: {'beta': 0.016260213502637302, 'rel_death_prob': 2.7960264732922475}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:50,790]</span> Trial 57 finished with value: 1658.0458098325707 and parameters: {'beta': 0.049116439357620396, 'rel_death_prob': 2.9209243463410024}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:05,027]</span> Trial 59 finished with value: 104.88286627881155 and parameters: {'beta': 0.009850498696612184, 'rel_death_prob': 2.729481326327466}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:51,232]</span> Trial 58 finished with value: 829.8386774437092 and parameters: {'beta': 0.02514842912094735, 'rel_death_prob': 2.4263221772967447}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:05,047]</span> Trial 58 finished with value: 1581.284807034685 and parameters: {'beta': 0.04618506383760847, 'rel_death_prob': 2.707181341539466}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:52,026]</span> Trial 60 finished with value: 131.84138650797175 and parameters: {'beta': 0.007013214133452756, 'rel_death_prob': 2.4666764725520944}. Best is trial 29 with value: 65.47852733490252.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:05,727]</span> Trial 60 finished with value: 129.4728427410401 and parameters: {'beta': 0.008361511989071452, 'rel_death_prob': 2.2334981175315693}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:52,267]</span> Trial 59 finished with value: 54.65659279655371 and parameters: {'beta': 0.014728583891791266, 'rel_death_prob': 2.7534607782404072}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:06,475]</span> Trial 61 finished with value: 1650.642847626238 and parameters: {'beta': 0.04193466613562529, 'rel_death_prob': 2.9669248937523958}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:52,555]</span> Trial 61 finished with value: 1405.861016121153 and parameters: {'beta': 0.0525536673850473, 'rel_death_prob': 1.9557600541735254}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:06,689]</span> Trial 62 finished with value: 1492.4047386419147 and parameters: {'beta': 0.04684574510126778, 'rel_death_prob': 2.3847079489455174}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:53,001]</span> Trial 62 finished with value: 1131.5156326331216 and parameters: {'beta': 0.03522392869776424, 'rel_death_prob': 2.1882162198496533}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:06,713]</span> Trial 63 finished with value: 969.5721010791847 and parameters: {'beta': 0.031041360617729732, 'rel_death_prob': 2.138755861197031}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:53,575]</span> Trial 63 finished with value: 67.70784296309455 and parameters: {'beta': 0.012461579643364779, 'rel_death_prob': 2.2446063690888636}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:07,349]</span> Trial 64 finished with value: 643.4185282231203 and parameters: {'beta': 0.03670663625134973, 'rel_death_prob': 0.7214141180952288}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:54,051]</span> Trial 64 finished with value: 840.1380068392771 and parameters: {'beta': 0.028868764024658742, 'rel_death_prob': 1.8184731520707713}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:07,942]</span> Trial 65 finished with value: 54.65914642270285 and parameters: {'beta': 0.014641364147826847, 'rel_death_prob': 2.586424166468532}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:54,160]</span> Trial 65 finished with value: 56.78509570546698 and parameters: {'beta': 0.013651457235347941, 'rel_death_prob': 2.7685085722648046}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:08,257]</span> Trial 67 finished with value: 122.78922591819514 and parameters: {'beta': 0.016841446744865374, 'rel_death_prob': 1.0024347308235837}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:54,242]</span> Trial 66 finished with value: 134.8687658213794 and parameters: {'beta': 0.005530998529759431, 'rel_death_prob': 2.6585653630506205}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:08,323]</span> Trial 66 finished with value: 772.3477816760669 and parameters: {'beta': 0.025083343667972227, 'rel_death_prob': 2.0231970031490127}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:55,173]</span> Trial 67 finished with value: 56.21308344806147 and parameters: {'beta': 0.013990475484334498, 'rel_death_prob': 2.183899195111706}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:08,983]</span> Trial 68 finished with value: 1517.1344983790027 and parameters: {'beta': 0.05924579096748124, 'rel_death_prob': 2.0649487306199616}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:55,802]</span> Trial 68 finished with value: 867.5639516809522 and parameters: {'beta': 0.02691219402351873, 'rel_death_prob': 2.2956730223691517}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:09,401]</span> Trial 69 finished with value: 54.20904205711241 and parameters: {'beta': 0.014059113673456249, 'rel_death_prob': 2.5870360579164866}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:55,932]</span> Trial 69 finished with value: 1124.4859439534575 and parameters: {'beta': 0.029936497179574344, 'rel_death_prob': 2.8784470643815148}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:09,705]</span> Trial 71 finished with value: 105.82648665452768 and parameters: {'beta': 0.009838174199236221, 'rel_death_prob': 1.613189009050247}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:56,028]</span> Trial 70 finished with value: 1631.9958253763823 and parameters: {'beta': 0.05238082667457763, 'rel_death_prob': 2.6327581395161967}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:09,880]</span> Trial 70 finished with value: 1388.367011591242 and parameters: {'beta': 0.03932934051925689, 'rel_death_prob': 2.627412091775503}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:56,513]</span> Trial 71 finished with value: 131.84138650797175 and parameters: {'beta': 0.007180006448437072, 'rel_death_prob': 1.9578970648682583}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:10,617]</span> Trial 72 finished with value: 1704.2364657814096 and parameters: {'beta': 0.05743075006743683, 'rel_death_prob': 2.703477044714136}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:57,494]</span> Trial 72 finished with value: 177.6043655904428 and parameters: {'beta': 0.016884869264320916, 'rel_death_prob': 2.2472509316735394}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:10,993]</span> Trial 73 finished with value: 304.3931251942976 and parameters: {'beta': 0.018376529944979503, 'rel_death_prob': 2.5432518190774926}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:57,688]</span> Trial 73 finished with value: 1321.0667495669938 and parameters: {'beta': 0.0372398922475243, 'rel_death_prob': 2.6206789422682055}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:11,335]</span> Trial 74 finished with value: 1148.8930585779633 and parameters: {'beta': 0.032986855955735896, 'rel_death_prob': 2.7935823096286527}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:57,788]</span> Trial 74 finished with value: 1489.5657725274236 and parameters: {'beta': 0.04071356993672448, 'rel_death_prob': 2.845384036237794}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:11,409]</span> Trial 75 finished with value: 136.3702979970689 and parameters: {'beta': 0.016376182726632535, 'rel_death_prob': 2.6606074612143202}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:58,240]</span> Trial 75 finished with value: 254.82857396633656 and parameters: {'beta': 0.01755106483125168, 'rel_death_prob': 2.8743744367239144}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:12,288]</span> Trial 76 finished with value: 2091.071634764844 and parameters: {'beta': 0.06700528769679938, 'rel_death_prob': 2.8323275717595995}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:59,193]</span> Trial 78 finished with value: 124.59708220455654 and parameters: {'beta': 0.008640647068691219, 'rel_death_prob': 2.861201562717943}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:12,444]</span> Trial 77 finished with value: 67.59548341253276 and parameters: {'beta': 0.012519039423267441, 'rel_death_prob': 2.355847429945413}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:59,245]</span> Trial 76 finished with value: 366.4977572500777 and parameters: {'beta': 0.019817916754480476, 'rel_death_prob': 2.0157128105207534}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:12,973]</span> Trial 78 finished with value: 856.7452369320956 and parameters: {'beta': 0.024305111422712605, 'rel_death_prob': 2.883499898630114}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:59,395]</span> Trial 77 finished with value: 253.65390593773594 and parameters: {'beta': 0.017503524675012674, 'rel_death_prob': 2.7424035489115113}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:13,052]</span> Trial 79 finished with value: 1573.8104543234 and parameters: {'beta': 0.05545522262146624, 'rel_death_prob': 2.381795538033999}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:45:59,779]</span> Trial 79 finished with value: 101.40282897366433 and parameters: {'beta': 0.010043808885709889, 'rel_death_prob': 2.3175160701719473}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:13,678]</span> Trial 80 finished with value: 104.95692143713637 and parameters: {'beta': 0.009836277353145552, 'rel_death_prob': 2.5460664558551467}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:00,960]</span> Trial 80 finished with value: 730.5958831105387 and parameters: {'beta': 0.023160145879480953, 'rel_death_prob': 2.5122991604509037}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:14,078]</span> Trial 81 finished with value: 864.282431052094 and parameters: {'beta': 0.026617079010794437, 'rel_death_prob': 2.364444369167474}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:01,021]</span> Trial 81 finished with value: 1068.0679042501222 and parameters: {'beta': 0.0327069471171559, 'rel_death_prob': 2.378506153359402}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:14,526]</span> Trial 83 finished with value: 56.63698538881734 and parameters: {'beta': 0.013786475698010503, 'rel_death_prob': 2.882156774014804}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:01,203]</span> Trial 82 finished with value: 1638.3634587200781 and parameters: {'beta': 0.07319932295230515, 'rel_death_prob': 1.7533628598500366}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:14,640]</span> Trial 82 finished with value: 810.4216813962782 and parameters: {'beta': 0.08350578435935582, 'rel_death_prob': 0.7617606228106107}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:01,571]</span> Trial 83 finished with value: 1601.3680774525915 and parameters: {'beta': 0.06020489527020374, 'rel_death_prob': 2.247594902048264}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:15,725]</span> Trial 84 finished with value: 668.5054625394148 and parameters: {'beta': 0.02901766350570941, 'rel_death_prob': 1.2047539335928619}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:02,614]</span> Trial 85 finished with value: 70.95860905093929 and parameters: {'beta': 0.011879530727640685, 'rel_death_prob': 2.9292005272001993}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:16,220]</span> Trial 85 finished with value: 1759.294088910601 and parameters: {'beta': 0.05671936933079073, 'rel_death_prob': 2.984293168839965}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:02,759]</span> Trial 84 finished with value: 1690.6301905227162 and parameters: {'beta': 0.05236957829938506, 'rel_death_prob': 2.8314110033060844}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:16,238]</span> Trial 86 finished with value: 131.84138650797175 and parameters: {'beta': 0.007216891806234477, 'rel_death_prob': 2.640692102627852}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:02,998]</span> Trial 86 finished with value: 1153.7528311942087 and parameters: {'beta': 0.041312650126815675, 'rel_death_prob': 1.7587220752267578}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:16,739]</span> Trial 87 finished with value: 856.0080161655637 and parameters: {'beta': 0.02505340634418405, 'rel_death_prob': 2.617691591505065}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:03,377]</span> Trial 87 finished with value: 1146.4777723497803 and parameters: {'beta': 0.0295527968430655, 'rel_death_prob': 2.9894357594565575}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:17,399]</span> Trial 88 finished with value: 635.3769374250566 and parameters: {'beta': 0.022467927010085306, 'rel_death_prob': 2.730151751737642}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:04,407]</span> Trial 88 finished with value: 1433.3967668872408 and parameters: {'beta': 0.04616534272052485, 'rel_death_prob': 2.20931927687654}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:17,634]</span> Trial 89 finished with value: 98.22345339077143 and parameters: {'beta': 0.010352494188373649, 'rel_death_prob': 2.373131024577989}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:04,550]</span> Trial 89 finished with value: 1385.0800506284143 and parameters: {'beta': 0.04446254749864325, 'rel_death_prob': 2.0035328983632956}. Best is trial 59 with value: 54.65659279655371.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:17,727]</span> Trial 90 finished with value: 58.26875249811254 and parameters: {'beta': 0.013424315490844859, 'rel_death_prob': 2.95439465013449}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:04,623]</span> Trial 90 finished with value: 54.5946396056313 and parameters: {'beta': 0.014027746834687738, 'rel_death_prob': 2.4596578541158918}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:18,403]</span> Trial 91 finished with value: 1654.0530488075676 and parameters: {'beta': 0.05320304035722009, 'rel_death_prob': 2.5973399110642283}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:05,142]</span> Trial 91 finished with value: 239.0148554425545 and parameters: {'beta': 0.017575583466295817, 'rel_death_prob': 2.1158123679594834}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:18,979]</span> Trial 92 finished with value: 195.23271306124263 and parameters: {'beta': 0.017550035162294655, 'rel_death_prob': 1.5321195626566348}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:05,682]</span> Trial 92 finished with value: 133.446396056313 and parameters: {'beta': 0.006292137878563262, 'rel_death_prob': 2.1806035057425888}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:19,284]</span> Trial 93 finished with value: 852.3521117377982 and parameters: {'beta': 0.028941734428934676, 'rel_death_prob': 1.865169932970896}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:06,329]</span> Trial 93 finished with value: 909.4556335213393 and parameters: {'beta': 0.02710939133168075, 'rel_death_prob': 2.6012448810909774}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:19,353]</span> Trial 94 finished with value: 418.2580938846205 and parameters: {'beta': 0.020085905797139075, 'rel_death_prob': 2.9209632857048433}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:06,386]</span> Trial 94 finished with value: 736.5335080161656 and parameters: {'beta': 0.02307439485120482, 'rel_death_prob': 2.706466101390719}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:19,948]</span> Trial 95 finished with value: 124.46440467202558 and parameters: {'beta': 0.015956032604575246, 'rel_death_prob': 2.4432595201832306}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:06,911]</span> Trial 95 finished with value: 970.3902606919216 and parameters: {'beta': 0.027639204357094768, 'rel_death_prob': 2.759021374151378}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:20,612]</span> Trial 96 finished with value: 895.5911089399121 and parameters: {'beta': 0.027468272840415447, 'rel_death_prob': 2.5133953561271185}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:07,299]</span> Trial 96 finished with value: 56.320335746325 and parameters: {'beta': 0.013964125882980006, 'rel_death_prob': 2.4911577971968804}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:20,729]</span> Trial 97 finished with value: 86.14868765821379 and parameters: {'beta': 0.011060455965640374, 'rel_death_prob': 2.9211605138036356}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:07,852]</span> Trial 97 finished with value: 1005.6370742105964 and parameters: {'beta': 0.03226363846036723, 'rel_death_prob': 2.0785158586726147}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:20,928]</span> Trial 99 finished with value: 134.8687658213794 and parameters: {'beta': 0.005526180445360026, 'rel_death_prob': 2.852835916886544}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:08,068]</span> Trial 98 finished with value: 1478.4634942487896 and parameters: {'beta': 0.04634190984625546, 'rel_death_prob': 2.391983524365801}. Best is trial 90 with value: 54.5946396056313.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:20,931]</span> Trial 98 finished with value: 1168.4680463649686 and parameters: {'beta': 0.034752362672698, 'rel_death_prob': 2.424697633756763}. Best is trial 53 with value: 53.792800994803926.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:08,296]</span> Trial 99 finished with value: 79.11144912732603 and parameters: {'beta': 0.01149360823977486, 'rel_death_prob': 1.8213290003609741}. Best is trial 90 with value: 54.5946396056313.
 </pre>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Making results structure...
 Processed 100 trials; 0 failed
-Best pars: #0. 'beta':           0.014174820466868463
-#1. 'rel_death_prob': 2.718748728914293
-Removed existing calibration file /tmp/tmp9jvhewug/covasim_calibration.db
-Calibration for 100 total trials completed in 41.5 s.
+Best pars: sc.objdict(beta=0.014027746834687738, rel_death_prob=2.4596578541158918)
+Removed existing calibration file /tmp/tmp758g73g5/covasim_calibration.db
+Calibration for 100 total trials completed in 44.9 s.
 
 Initial parameter values:
-#0. 'beta':           0.015
-#1. 'rel_death_prob': 1.0
+sc.objdict(beta=0.015, rel_death_prob=1.0)
 
 Best parameter values:
-#0. 'beta':           0.014174820466868463
-#1. 'rel_death_prob': 2.718748728914293
+sc.objdict(beta=0.014027746834687738, rel_death_prob=2.4596578541158918)
 
 Mismatch before calibration: 69.5043
-Mismatch after calibration:  53.7928
-Percent improvement:         22.6%</code></pre>
+Mismatch after calibration:  54.5946
+Percent improvement:         21.5%</code></pre>
 </div>
 </div>
 <p>So it improved the fit (see above), but let’s visualize this as a plot:</p>
@@ -1043,7 +1044,7 @@ Percent improvement:         22.6%</code></pre>
 <span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>calib.plot_sims(to_plot<span class="op">=</span>[<span class="st">'cum_deaths'</span>, <span class="st">'cum_diagnoses'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
-<pre><span class="ansi-green-fg">[I 2026-10-16 16:12:24,309]</span> A new study created in RDB with name: covasim_calibration
+<pre><span class="ansi-green-fg">[I 2026-11-02 03:46:11,722]</span> A new study created in RDB with name: covasim_calibration
 </pre>
 </div>
 </div>
@@ -1051,157 +1052,154 @@ Percent improvement:         22.6%</code></pre>
 <pre><code>  Automatically adding cumulative column cum_diagnoses from new_diagnoses
   Automatically adding cumulative column cum_tests from new_tests
   Automatically adding cumulative column cum_deaths from new_deaths
-Removed existing calibration file /tmp/tmpxq18xs1n/covasim_calibration.db
-sqlite:////tmp/tmpxq18xs1n/covasim_calibration.db</code></pre>
+Removed existing calibration file /tmp/tmpsabbo41s/covasim_calibration.db
+sqlite:////tmp/tmpsabbo41s/covasim_calibration.db</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <div class="ansi-escaped-output">
-<pre><span class="ansi-green-fg">[I 2026-10-16 16:12:25,178]</span> Trial 0 finished with value: 145.82646214330205 and parameters: {'beta': 0.005504491005049062, 'test_prob': 0.05166773266305171}. Best is trial 0 with value: 145.82646214330205.
+<pre><span class="ansi-green-fg">[I 2026-11-02 03:46:13,458]</span> Trial 2 finished with value: 141.98025806338555 and parameters: {'beta': 0.011240129440476268, 'test_prob': 0.17400109418191892}. Best is trial 0 with value: 133.9527448520377.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:25,286]</span> Trial 2 finished with value: 143.9018619933265 and parameters: {'beta': 0.010908996050339667, 'test_prob': 0.2790364347045143}. Best is trial 2 with value: 143.9018619933265.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:13,459]</span> Trial 0 finished with value: 133.9527448520377 and parameters: {'beta': 0.012565157180219128, 'test_prob': 0.2525018656613123}. Best is trial 0 with value: 133.9527448520377.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:25,401]</span> Trial 3 finished with value: 137.06500214468718 and parameters: {'beta': 0.012409618878393303, 'test_prob': 0.25758191247310475}. Best is trial 3 with value: 137.06500214468718.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:13,543]</span> Trial 1 finished with value: 131.65885768334766 and parameters: {'beta': 0.015630537481493068, 'test_prob': 0.03479093167441338}. Best is trial 1 with value: 131.65885768334766.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:25,416]</span> Trial 1 finished with value: 104.6631036819623 and parameters: {'beta': 0.01361869555393476, 'test_prob': 0.24096438335085807}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:13,612]</span> Trial 3 finished with value: 86.01552213782058 and parameters: {'beta': 0.014166662346508648, 'test_prob': 0.18602536650133542}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:25,809]</span> Trial 4 finished with value: 131.85164572557423 and parameters: {'beta': 0.009202286140883443, 'test_prob': 0.14850857252691888}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:14,303]</span> Trial 5 finished with value: 139.08589838466176 and parameters: {'beta': 0.012509007391253059, 'test_prob': 0.010866868666574514}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:26,038]</span> Trial 5 finished with value: 117.27471868171762 and parameters: {'beta': 0.013669274134687558, 'test_prob': 0.12717526156148992}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:14,319]</span> Trial 4 finished with value: 87.06783198609358 and parameters: {'beta': 0.015252788713665626, 'test_prob': 0.21116447383720935}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:26,139]</span> Trial 6 finished with value: 140.63206840213942 and parameters: {'beta': 0.01123670852809908, 'test_prob': 0.04689898515521013}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:14,383]</span> Trial 6 finished with value: 140.01950759711522 and parameters: {'beta': 0.018049743984545098, 'test_prob': 0.0022316101531105635}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:26,156]</span> Trial 7 finished with value: 140.91392906503114 and parameters: {'beta': 0.011249744491860563, 'test_prob': 0.0407193758562861}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:14,469]</span> Trial 7 finished with value: 129.02677752009402 and parameters: {'beta': 0.012846757399640776, 'test_prob': 0.08970697226546183}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:26,560]</span> Trial 8 finished with value: 108.18612142658694 and parameters: {'beta': 0.0184419493659384, 'test_prob': 0.24750110606803546}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:15,021]</span> Trial 8 finished with value: 133.23502644371777 and parameters: {'beta': 0.009911537788205634, 'test_prob': 0.280893885549616}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:26,617]</span> Trial 9 finished with value: 145.86548878606916 and parameters: {'beta': 0.006752717934249219, 'test_prob': 0.12460655076275873}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:15,102]</span> Trial 9 finished with value: 144.09927537744628 and parameters: {'beta': 0.009108199741361176, 'test_prob': 0.07632932404731475}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:26,691]</span> Trial 11 finished with value: 145.89512102222102 and parameters: {'beta': 0.005126124176252769, 'test_prob': 0.1879652314765682}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:15,143]</span> Trial 10 finished with value: 143.2161212427422 and parameters: {'beta': 0.010509987576690624, 'test_prob': 0.2385994736987931}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:26,894]</span> Trial 10 finished with value: 113.72056710442197 and parameters: {'beta': 0.016638398127028, 'test_prob': 0.11731114368666697}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:15,308]</span> Trial 11 finished with value: 123.483815470335 and parameters: {'beta': 0.010977397329578593, 'test_prob': 0.07077168168128076}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:27,289]</span> Trial 12 finished with value: 122.55811142816259 and parameters: {'beta': 0.013956326301889671, 'test_prob': 0.09296397188871741}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:15,710]</span> Trial 12 finished with value: 145.37155210563333 and parameters: {'beta': 0.006674477180063332, 'test_prob': 0.23320802337846167}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:27,412]</span> Trial 13 finished with value: 108.15248975592324 and parameters: {'beta': 0.018792380134720375, 'test_prob': 0.03998810934013455}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:15,808]</span> Trial 13 finished with value: 145.74943907420334 and parameters: {'beta': 0.006941439342622806, 'test_prob': 0.15080685750613002}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:27,492]</span> Trial 14 finished with value: 107.76059439491708 and parameters: {'beta': 0.019722946179406002, 'test_prob': 0.2345245286223155}. Best is trial 1 with value: 104.6631036819623.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:16,027]</span> Trial 14 finished with value: 117.96682410711767 and parameters: {'beta': 0.017353245278734317, 'test_prob': 0.27704161567499386}. Best is trial 3 with value: 86.01552213782058.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:27,687]</span> Trial 15 finished with value: 74.01713555871177 and parameters: {'beta': 0.015937190918692733, 'test_prob': 0.2265235963069397}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:16,207]</span> Trial 15 finished with value: 85.902782918 and parameters: {'beta': 0.015412113060498283, 'test_prob': 0.1988075785074628}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:28,053]</span> Trial 16 finished with value: 116.07651436325628 and parameters: {'beta': 0.016946990896098288, 'test_prob': 0.29965631631342116}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:16,616]</span> Trial 16 finished with value: 114.54395362799505 and parameters: {'beta': 0.01747017989958795, 'test_prob': 0.16599126471827183}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:28,180]</span> Trial 17 finished with value: 112.36346343692901 and parameters: {'beta': 0.018360860776404204, 'test_prob': 0.017971262911604908}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:16,730]</span> Trial 17 finished with value: 92.11124561046144 and parameters: {'beta': 0.0190121929814921, 'test_prob': 0.20681522960090085}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:28,284]</span> Trial 18 finished with value: 116.32475789943281 and parameters: {'beta': 0.01883394426636677, 'test_prob': 0.18736388418115255}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:16,933]</span> Trial 18 finished with value: 90.90598269687516 and parameters: {'beta': 0.01517572635733951, 'test_prob': 0.12462343528409382}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:28,481]</span> Trial 19 finished with value: 85.40567840901804 and parameters: {'beta': 0.016399459647427558, 'test_prob': 0.20337812155631685}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:17,116]</span> Trial 19 finished with value: 119.78158314348146 and parameters: {'beta': 0.013067000516704893, 'test_prob': 0.19324134047745747}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:28,787]</span> Trial 20 finished with value: 139.99404812335038 and parameters: {'beta': 0.011203148507054613, 'test_prob': 0.20717520121421212}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:17,516]</span> Trial 20 finished with value: 111.62491190631471 and parameters: {'beta': 0.013892121376768608, 'test_prob': 0.29662606356702925}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:28,941]</span> Trial 21 finished with value: 100.91797799245904 and parameters: {'beta': 0.01611281473364096, 'test_prob': 0.25046388901534433}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:17,523]</span> Trial 21 finished with value: 146.32553704950539 and parameters: {'beta': 0.00788076701907564, 'test_prob': 0.021347289074562126}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:29,077]</span> Trial 22 finished with value: 84.64956037895999 and parameters: {'beta': 0.014421690695594673, 'test_prob': 0.20730874478372344}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:17,838]</span> Trial 23 finished with value: 144.74518865920743 and parameters: {'beta': 0.008842140094890072, 'test_prob': 0.22237533082827932}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:29,246]</span> Trial 23 finished with value: 85.44740281238334 and parameters: {'beta': 0.016243763929219186, 'test_prob': 0.20502012580083223}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:17,861]</span> Trial 22 finished with value: 118.14079952747636 and parameters: {'beta': 0.018032902984353477, 'test_prob': 0.11659759293249114}. Best is trial 15 with value: 85.902782918.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:29,366]</span> Trial 24 finished with value: 133.46683028544848 and parameters: {'beta': 0.009154127709012324, 'test_prob': 0.22589001628128894}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:18,405]</span> Trial 24 finished with value: 71.45380185046474 and parameters: {'beta': 0.014993609967044366, 'test_prob': 0.2277319238446933}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:29,709]</span> Trial 25 finished with value: 116.80407926807052 and parameters: {'beta': 0.016747795265581556, 'test_prob': 0.24621345982017034}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:18,414]</span> Trial 25 finished with value: 108.23000580134112 and parameters: {'beta': 0.014444735345320014, 'test_prob': 0.24438923504018012}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:29,842]</span> Trial 26 finished with value: 88.2626542867416 and parameters: {'beta': 0.015378897952740733, 'test_prob': 0.16167957688642653}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:18,744]</span> Trial 26 finished with value: 116.01171084580943 and parameters: {'beta': 0.01684281850532416, 'test_prob': 0.22784327470725627}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:30,000]</span> Trial 27 finished with value: 116.0124148984927 and parameters: {'beta': 0.013533002201392603, 'test_prob': 0.19983378709286478}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:18,765]</span> Trial 27 finished with value: 100.60007268802525 and parameters: {'beta': 0.01577962509992942, 'test_prob': 0.27593840070365067}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:30,145]</span> Trial 28 finished with value: 95.77179594693594 and parameters: {'beta': 0.018215915457251833, 'test_prob': 0.12270872952489263}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:19,111]</span> Trial 28 finished with value: 145.3712541512267 and parameters: {'beta': 0.006652846355109686, 'test_prob': 0.2868129916337745}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:30,485]</span> Trial 29 finished with value: 115.04880891491906 and parameters: {'beta': 0.017135462433068883, 'test_prob': 0.17697232693419568}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:19,329]</span> Trial 29 finished with value: 112.26733891752856 and parameters: {'beta': 0.01997041117966082, 'test_prob': 0.2970960065515801}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:30,605]</span> Trial 30 finished with value: 113.78082475225725 and parameters: {'beta': 0.018616879888035755, 'test_prob': 0.2939375885096959}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:19,500]</span> Trial 30 finished with value: 131.90489311581595 and parameters: {'beta': 0.009574660609221863, 'test_prob': 0.12782921274483625}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:30,768]</span> Trial 31 finished with value: 89.94239991755107 and parameters: {'beta': 0.018666772362519388, 'test_prob': 0.2140946647274676}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:19,672]</span> Trial 31 finished with value: 85.87849815312231 and parameters: {'beta': 0.016197179586693984, 'test_prob': 0.15104464236122672}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:30,923]</span> Trial 32 finished with value: 111.11688763352805 and parameters: {'beta': 0.019780220603411766, 'test_prob': 0.2723624222282836}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:19,990]</span> Trial 32 finished with value: 132.4863363344447 and parameters: {'beta': 0.012783082273036667, 'test_prob': 0.227878706099815}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:31,256]</span> Trial 33 finished with value: 98.07669277984058 and parameters: {'beta': 0.014992808439941501, 'test_prob': 0.2767551574849445}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:20,220]</span> Trial 33 finished with value: 91.70414274531717 and parameters: {'beta': 0.014124541327556268, 'test_prob': 0.15378581248172285}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:31,377]</span> Trial 34 finished with value: 85.76509537437241 and parameters: {'beta': 0.01552551037413872, 'test_prob': 0.20708228273470689}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:20,386]</span> Trial 34 finished with value: 87.55146712970583 and parameters: {'beta': 0.015128074493049821, 'test_prob': 0.20369482186930415}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:31,528]</span> Trial 35 finished with value: 106.09607912483722 and parameters: {'beta': 0.014555571339048438, 'test_prob': 0.24199221900453896}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:20,570]</span> Trial 35 finished with value: 85.38569060860607 and parameters: {'beta': 0.016145131917118038, 'test_prob': 0.15809927019277586}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:31,704]</span> Trial 36 finished with value: 113.84830185165971 and parameters: {'beta': 0.017472727810825317, 'test_prob': 0.1499360668869229}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:20,882]</span> Trial 36 finished with value: 116.99686220017793 and parameters: {'beta': 0.016783270000469357, 'test_prob': 0.1895691162087493}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:32,034]</span> Trial 37 finished with value: 116.59360914092838 and parameters: {'beta': 0.017493661665113642, 'test_prob': 0.22330274602442135}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:21,102]</span> Trial 37 finished with value: 118.97780009650099 and parameters: {'beta': 0.014965126785290689, 'test_prob': 0.09224110013507944}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:32,161]</span> Trial 38 finished with value: 118.53474391294625 and parameters: {'beta': 0.01763110924713132, 'test_prob': 0.27477140978192693}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:21,271]</span> Trial 38 finished with value: 107.3767320583913 and parameters: {'beta': 0.018550344432437388, 'test_prob': 0.2435955741839341}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:32,289]</span> Trial 39 finished with value: 134.9227957268452 and parameters: {'beta': 0.012257139951464307, 'test_prob': 0.15321489632669524}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:21,444]</span> Trial 39 finished with value: 116.91659436570976 and parameters: {'beta': 0.01641291780163679, 'test_prob': 0.10630151312349365}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:32,401]</span> Trial 40 finished with value: 141.85265946639265 and parameters: {'beta': 0.009830429639071952, 'test_prob': 0.18911997602744562}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:21,769]</span> Trial 40 finished with value: 85.48605916217161 and parameters: {'beta': 0.015863917013990023, 'test_prob': 0.1687943456440189}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:32,824]</span> Trial 41 finished with value: 110.04155636064422 and parameters: {'beta': 0.019628664752808528, 'test_prob': 0.13920966797812234}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:21,992]</span> Trial 41 finished with value: 115.8844655665524 and parameters: {'beta': 0.01988286346308171, 'test_prob': 0.16730696920667992}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:32,952]</span> Trial 42 finished with value: 85.23394203340277 and parameters: {'beta': 0.016353886761835128, 'test_prob': 0.1918710755869819}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:22,158]</span> Trial 42 finished with value: 105.55747936173259 and parameters: {'beta': 0.01969008453169797, 'test_prob': 0.10478922607676862}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:33,075]</span> Trial 43 finished with value: 117.01391780223064 and parameters: {'beta': 0.013517064853643979, 'test_prob': 0.17660242756237318}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:22,335]</span> Trial 43 finished with value: 116.5547670378669 and parameters: {'beta': 0.016930798875507417, 'test_prob': 0.25174455508522176}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:33,177]</span> Trial 44 finished with value: 81.85286087604237 and parameters: {'beta': 0.014858451713165683, 'test_prob': 0.1980609066110709}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:22,641]</span> Trial 44 finished with value: 85.49649424689386 and parameters: {'beta': 0.015833613663823586, 'test_prob': 0.168822685867076}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:33,597]</span> Trial 45 finished with value: 85.60304676271429 and parameters: {'beta': 0.01617681164995593, 'test_prob': 0.21000351665960185}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:22,822]</span> Trial 45 finished with value: 134.55058021079932 and parameters: {'beta': 0.012552110610683087, 'test_prob': 0.14926259858320323}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:33,739]</span> Trial 46 finished with value: 90.50499460771042 and parameters: {'beta': 0.016635291071669077, 'test_prob': 0.2294787072091887}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:23,049]</span> Trial 46 finished with value: 85.45476571086911 and parameters: {'beta': 0.016375058417541267, 'test_prob': 0.2073700718434188}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:33,857]</span> Trial 47 finished with value: 85.49084063258378 and parameters: {'beta': 0.016490921596807158, 'test_prob': 0.18743204539518346}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:23,217]</span> Trial 47 finished with value: 84.48226466672935 and parameters: {'beta': 0.018448961792130677, 'test_prob': 0.14816212145755536}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:33,948]</span> Trial 48 finished with value: 98.6608710106324 and parameters: {'beta': 0.015048896072679153, 'test_prob': 0.23045965926973544}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:23,515]</span> Trial 48 finished with value: 116.57009944948672 and parameters: {'beta': 0.01507366247489573, 'test_prob': 0.16720882874650822}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:34,364]</span> Trial 49 finished with value: 98.39405823860572 and parameters: {'beta': 0.015705432270013545, 'test_prob': 0.0916506766568425}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:23,707]</span> Trial 49 finished with value: 86.18523881364374 and parameters: {'beta': 0.015774217376648463, 'test_prob': 0.14994804380708107}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:34,456]</span> Trial 50 finished with value: 141.8260448465674 and parameters: {'beta': 0.01159094691479332, 'test_prob': 0.09729995198144448}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:23,932]</span> Trial 50 finished with value: 104.47132614853722 and parameters: {'beta': 0.014077496052045417, 'test_prob': 0.22601488064957292}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:34,634]</span> Trial 51 finished with value: 82.533575905118 and parameters: {'beta': 0.014609115391600458, 'test_prob': 0.20863642413747738}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:24,101]</span> Trial 51 finished with value: 112.03018328613243 and parameters: {'beta': 0.018931001648525524, 'test_prob': 0.15082609301599723}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:34,689]</span> Trial 52 finished with value: 116.69105764562849 and parameters: {'beta': 0.01313364120202744, 'test_prob': 0.2732419569729677}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:24,415]</span> Trial 52 finished with value: 117.40644542533687 and parameters: {'beta': 0.0173375271413302, 'test_prob': 0.20741116318394454}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:35,142]</span> Trial 53 finished with value: 83.13091568266323 and parameters: {'beta': 0.014638449321000422, 'test_prob': 0.18304714117544235}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:24,623]</span> Trial 53 finished with value: 115.87280837330269 and parameters: {'beta': 0.019099628658992736, 'test_prob': 0.1874687139205499}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:35,254]</span> Trial 54 finished with value: 103.68178899165733 and parameters: {'beta': 0.014167953791125946, 'test_prob': 0.22347524907594818}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:24,833]</span> Trial 54 finished with value: 86.79240445703869 and parameters: {'beta': 0.014754438991756227, 'test_prob': 0.1843363837026067}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:35,442]</span> Trial 55 finished with value: 118.44885351926158 and parameters: {'beta': 0.019605392163649482, 'test_prob': 0.20582936633301005}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:25,008]</span> Trial 55 finished with value: 118.07307904362675 and parameters: {'beta': 0.013604748364675756, 'test_prob': 0.12219640544806123}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:35,464]</span> Trial 56 finished with value: 132.99044697957714 and parameters: {'beta': 0.012532883611748556, 'test_prob': 0.21789158328945282}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:25,332]</span> Trial 56 finished with value: 104.65355560894103 and parameters: {'beta': 0.013523659723887565, 'test_prob': 0.24331148018092583}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:35,893]</span> Trial 57 finished with value: 117.29802421602145 and parameters: {'beta': 0.01310327866111346, 'test_prob': 0.24990485475791693}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:25,459]</span> Trial 57 finished with value: 86.65488973372662 and parameters: {'beta': 0.014025982124679304, 'test_prob': 0.20556050343699242}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:35,929]</span> Trial 59 finished with value: 134.98671768192358 and parameters: {'beta': 0.012461814936340448, 'test_prob': 0.18732687929787428}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:25,661]</span> Trial 58 finished with value: 119.04395271231415 and parameters: {'beta': 0.0178218684854033, 'test_prob': 0.22735474077793727}. Best is trial 24 with value: 71.45380185046474.
 
-<span class="ansi-green-fg">[I 2026-10-16 16:12:35,980]</span> Trial 58 finished with value: 91.47257268472296 and parameters: {'beta': 0.014364793720207023, 'test_prob': 0.14356013782970978}. Best is trial 15 with value: 74.01713555871177.
+<span class="ansi-green-fg">[I 2026-11-02 03:46:25,743]</span> Trial 59 finished with value: 86.02161315231174 and parameters: {'beta': 0.015857561582751218, 'test_prob': 0.17548948667930034}. Best is trial 24 with value: 71.45380185046474.
 </pre>
 </div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Making results structure...
 Processed 60 trials; 0 failed
-Best pars: #0. 'beta':      0.015937190918692733
-#1. 'test_prob': 0.2265235963069397
-Removed existing calibration file /tmp/tmpxq18xs1n/covasim_calibration.db
-Calibration for 60 total trials completed in 11.9 s.
+Best pars: sc.objdict(beta=0.014993609967044366, test_prob=0.2277319238446933)
+Removed existing calibration file /tmp/tmpsabbo41s/covasim_calibration.db
+Calibration for 60 total trials completed in 14.6 s.
 
 Initial parameter values:
-#0. 'beta':      0.013
-#1. 'test_prob': 0.01
+sc.objdict(beta=0.013, test_prob=0.01)
 
 Best parameter values:
-#0. 'beta':      0.015937190918692733
-#1. 'test_prob': 0.2265235963069397
+sc.objdict(beta=0.014993609967044366, test_prob=0.2277319238446933)
 
 Mismatch before calibration: 143.586
-Mismatch after calibration:  74.0171
-Percent improvement:         48.5%</code></pre>
+Mismatch after calibration:  71.4538
+Percent improvement:         50.2%</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_calibration_files/figure-html/cell-8-output-5.png" width="1919" height="1526" class="figure-img"></p>
+<p><img src="tut_calibration_files/figure-html/cell-8-output-5.png" width="1920" height="1526" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1650,7 +1648,7 @@ Percent improvement:         48.5%</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v4.0.1 (2026-10-16).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v4.0.2 (2026-11-01).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

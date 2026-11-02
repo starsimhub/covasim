@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.10.20">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-86fc916b84669629367aabb2a24c5117.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-87a1b67b04f4001bca231538bd247c25.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ffb828db5fcd80aebe58acec825209e3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -596,19 +596,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>msim.run(n_runs<span class="op">=</span><span class="dv">5</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim 4.0.1 (2026-10-16) — © 2020-2026 by IDM</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Exception ignored while finalizing file &lt;_io.BytesIO object at 0x7f180271a890&gt;:
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.14.8/x64/lib/python3.14/site-packages/starsim/utils.py", line 671, in __getattr__
-    raise AttributeError(attr)
-BufferError: Existing exports of data: object cannot be re-sized</code></pre>
+<pre><code>Covasim 4.0.2 (2026-11-01) — © 2020-2026 by IDM</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_running_files/figure-html/cell-2-output-3.png" width="888" height="754" class="figure-img"></p>
+<p><img src="tut_running_files/figure-html/cell-2-output-2.png" width="888" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -616,8 +609,8 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <p>If you run a multisim with a single sim input as above, it will change the random seed for each sim, which is what leads to the variability you see.</p>
 <p>By default, the multisim simply plots each simulation. These simulations are stored in the <code>sims</code> attribute, which is just a simple list of sims:</p>
 <div id="304def14" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sim <span class="kw">in</span> msim.sims:</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    sim.brief()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sim <span class="kw">in</span> msim.sims:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    sim.brief()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Sim("Sim 0"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 11873⚙, 21☠)
 Sim("Sim 1"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 12175⚙, 11☠)
@@ -628,8 +621,8 @@ Sim("Sim 4"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 8778⚙, 15☠)</
 </div>
 <p>However, often (especially when you run the same parameters with different random seeds), you don’t care about the individual sims, you want to see the <em>statistics</em> for the sims. You can calculate either the mean or the median of the results across all the sims as follows:</p>
 <div id="a392f1f6" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>msim.mean()</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'new_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>msim.mean()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'new_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -639,8 +632,8 @@ Sim("Sim 4"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 8778⚙, 15☠)</
 </div>
 </div>
 <div id="dcae4e25" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>msim.median()</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'new_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>msim.median()</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'new_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -651,8 +644,8 @@ Sim("Sim 4"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 8778⚙, 15☠)</
 </div>
 <p>You can see these are similar, but slightly different. You can also treat each of the individual sims as part of a larger single sim, and “combine” the results into one sim:</p>
 <div id="dfc11ee8" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>msim.combine()</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'new_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>msim.combine()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'new_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -668,16 +661,16 @@ Sim("Sim 4"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 8778⚙, 15☠)</
 <h3 class="anchored" data-anchor-id="running-different-sims">Running different sims</h3>
 <p>Often you don’t want to run the same sim with different seeds, but instead want to run a set of different sims. That’s also very easy – for example, here’s how you would do a sweep across beta values:</p>
 <div id="26e73845" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> np.linspace(<span class="fl">0.010</span>, <span class="fl">0.020</span>, <span class="dv">5</span>) <span class="co"># Sweep beta from 0.01 to 0.02 with 5 values</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>sims <span class="op">=</span> []</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> beta <span class="kw">in</span> betas:</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> cv.Sim(beta<span class="op">=</span>beta, label<span class="op">=</span><span class="ss">f'Beta = </span><span class="sc">{</span>beta<span class="sc">}</span><span class="ss">'</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    sims.append(sim)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.MultiSim(sims)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>msim.run()</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'cum_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> np.linspace(<span class="fl">0.010</span>, <span class="fl">0.020</span>, <span class="dv">5</span>) <span class="co"># Sweep beta from 0.01 to 0.02 with 5 values</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>sims <span class="op">=</span> []</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> beta <span class="kw">in</span> betas:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> cv.Sim(beta<span class="op">=</span>beta, label<span class="op">=</span><span class="ss">f'Beta = </span><span class="sc">{</span>beta<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    sims.append(sim)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.MultiSim(sims)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>msim.run()</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>msim.plot_result(<span class="st">'cum_infections'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -717,15 +710,15 @@ Sim("Sim 4"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 8778⚙, 15☠)</
 <p>As you would expect, higher beta values have more infections.</p>
 <p>Finally, note that you can use multisims to do very compact scenario explorations – here we are using the command <a href="../api/run.html#covasim.run.parallel" title="0"><code>cv.parallel()</code></a>, which is an alias for <a href="../api/run.html#covasim.run.MultiSim.run" title="0"><code>cv.MultiSim().run()</code></a>:</p>
 <div id="ef52b4ec" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> protect_elderly(sim):</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.ti <span class="op">==</span> sim.day(<span class="st">'2021-04-01'</span>):</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        elderly <span class="op">=</span> sim.people.age<span class="op">&gt;</span><span class="dv">70</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        sim.people.rel_sus[elderly] <span class="op">=</span> <span class="fl">0.0</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> {<span class="st">'start_day'</span>:<span class="st">'2021-03-01'</span>, <span class="st">'n_days'</span>:<span class="dv">120</span>}</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Default'</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Protect the elderly'</span>, interventions<span class="op">=</span>protect_elderly)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>cv.parallel(s1, s2).plot([<span class="st">'cum_deaths'</span>, <span class="st">'cum_infections'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> protect_elderly(sim):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.ti <span class="op">==</span> sim.day(<span class="st">'2021-04-01'</span>):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        elderly <span class="op">=</span> sim.people.age<span class="op">&gt;</span><span class="dv">70</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        sim.people.rel_sus[elderly] <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> {<span class="st">'start_day'</span>:<span class="st">'2021-03-01'</span>, <span class="st">'n_days'</span>:<span class="dv">120</span>}</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Default'</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Protect the elderly'</span>, interventions<span class="op">=</span>protect_elderly)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>cv.parallel(s1, s2).plot([<span class="st">'cum_deaths'</span>, <span class="st">'cum_infections'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -742,33 +735,26 @@ Sim("Sim 4"; 2020-03-01 to 2020-04-30; pop: 20000 random; epi: 8778⚙, 15☠)</
 <h3 class="anchored" data-anchor-id="advanced-usage">Advanced usage</h3>
 <p>Finally, you can also merge or split different multisims together. Here’s an example that’s similar to before, except it shows how to run a multisim of different seeds for the same beta value, but then merge multisims for different beta values together into one multisim to rule them all:</p>
 <div id="7b521d3c" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>n_sims <span class="op">=</span> <span class="dv">3</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> [<span class="fl">0.012</span>, <span class="fl">0.016</span>, <span class="fl">0.018</span>]</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>msims <span class="op">=</span> []</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> beta <span class="kw">in</span> betas:</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    sims <span class="op">=</span> []</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(n_sims):</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        sim <span class="op">=</span> cv.Sim(pop_size<span class="op">=</span><span class="fl">10e3</span>, beta<span class="op">=</span>beta, rand_seed<span class="op">=</span>s, label<span class="op">=</span><span class="ss">f'Beta = </span><span class="sc">{</span>beta<span class="sc">}</span><span class="ss">'</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        sims.append(sim)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    msim <span class="op">=</span> cv.MultiSim(sims)</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    msim.run()</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    msim.mean()</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    msims.append(msim)</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> cv.MultiSim.merge(msims, base<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>merged.plot(color_by_sim<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Exception ignored while finalizing file &lt;_io.BytesIO object at 0x7f18026cd260&gt;:
-Traceback (most recent call last):
-  File "/home/runner/work/covasim/covasim/covasim/parameters.py", line 231, in reset_layer_pars
-    par_layer_keys = list(dict.fromkeys(default_layer_keys + list(par_dict.keys())))  # If not supplied, use the defaults, plus any extra from the par_dict (without duplicates)
-BufferError: Existing exports of data: object cannot be re-sized</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>n_sims <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> [<span class="fl">0.012</span>, <span class="fl">0.016</span>, <span class="fl">0.018</span>]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>msims <span class="op">=</span> []</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> beta <span class="kw">in</span> betas:</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    sims <span class="op">=</span> []</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> s <span class="kw">in</span> <span class="bu">range</span>(n_sims):</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        sim <span class="op">=</span> cv.Sim(pop_size<span class="op">=</span><span class="fl">10e3</span>, beta<span class="op">=</span>beta, rand_seed<span class="op">=</span>s, label<span class="op">=</span><span class="ss">f'Beta = </span><span class="sc">{</span>beta<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        sims.append(sim)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    msim <span class="op">=</span> cv.MultiSim(sims)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    msim.run()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    msim.mean()</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    msims.append(msim)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>merged <span class="op">=</span> cv.MultiSim.merge(msims, base<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>merged.plot(color_by_sim<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_running_files/figure-html/cell-9-output-2.png" width="880" height="754" class="figure-img"></p>
+<p><img src="tut_running_files/figure-html/cell-9-output-1.png" width="880" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -780,43 +766,36 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <h2 class="anchored" data-anchor-id="running-with-scenarios">Running with Scenarios</h2>
 <p>Most of the time, you’ll want to run with multisims since they give you the most flexibility. However, in certain cases, Scenario objects let you achieve the same thing more simply. Unlike MultiSims, which are completely agnostic about what sims you include, scenarios always start from the same base sim. They then modify the parameters as you specify, and finally add uncertainty if desired. For example, this shows how you’d use scenarios to run the example similar to the one above.</p>
 <div id="376ed8a2" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set base parameters -- these will be shared across all scenarios</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>basepars <span class="op">=</span> {<span class="st">'pop_size'</span>:<span class="fl">10e3</span>} </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Configure the settings for each scenario</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>scenarios <span class="op">=</span> {<span class="st">'baseline'</span>: {</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">'name'</span>:<span class="st">'Baseline'</span>,</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>              <span class="st">'pars'</span>: {}</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>              },</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">'high_beta'</span>: {</span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>              <span class="st">'name'</span>:<span class="st">'High beta (0.020)'</span>,</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>              <span class="st">'pars'</span>: {</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                  <span class="st">'beta'</span>: <span class="fl">0.020</span>,</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                  }</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>              },</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">'low_beta'</span>: {</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>              <span class="st">'name'</span>:<span class="st">'Low beta (0.012)'</span>,</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>              <span class="st">'pars'</span>: {</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>                  <span class="st">'beta'</span>: <span class="fl">0.012</span>,</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>                  }</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>              },</span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>             }</span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Run and plot the scenarios</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>scens <span class="op">=</span> cv.Scenarios(basepars<span class="op">=</span>basepars, scenarios<span class="op">=</span>scenarios)</span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>scens.run()</span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>scens.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Exception ignored while finalizing file &lt;_io.BytesIO object at 0x7f18012643b0&gt;:
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.14.8/x64/lib/python3.14/site-packages/matplotlib/_api/__init__.py", line 137, in &lt;genexpr&gt;
-    tuple(none_type if tp is None else tp for tp in types))
-BufferError: Existing exports of data: object cannot be re-sized</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set base parameters -- these will be shared across all scenarios</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>basepars <span class="op">=</span> {<span class="st">'pop_size'</span>:<span class="fl">10e3</span>} </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Configure the settings for each scenario</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>scenarios <span class="op">=</span> {<span class="st">'baseline'</span>: {</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">'name'</span>:<span class="st">'Baseline'</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>              <span class="st">'pars'</span>: {}</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>              },</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">'high_beta'</span>: {</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>              <span class="st">'name'</span>:<span class="st">'High beta (0.020)'</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>              <span class="st">'pars'</span>: {</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                  <span class="st">'beta'</span>: <span class="fl">0.020</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                  }</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>              },</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">'low_beta'</span>: {</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>              <span class="st">'name'</span>:<span class="st">'Low beta (0.012)'</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>              <span class="st">'pars'</span>: {</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                  <span class="st">'beta'</span>: <span class="fl">0.012</span>,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                  }</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>              },</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>             }</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Run and plot the scenarios</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>scens <span class="op">=</span> cv.Scenarios(basepars<span class="op">=</span>basepars, scenarios<span class="op">=</span>scenarios)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>scens.run()</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>scens.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_running_files/figure-html/cell-10-output-2.png" width="888" height="754" class="figure-img"></p>
+<p><img src="tut_running_files/figure-html/cell-10-output-1.png" width="888" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1258,7 +1237,7 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v4.0.1 (2026-10-16).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v4.0.2 (2026-11-01).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

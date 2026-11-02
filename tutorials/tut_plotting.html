@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.10.20">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-86fc916b84669629367aabb2a24c5117.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-87a1b67b04f4001bca231538bd247c25.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ffb828db5fcd80aebe58acec825209e3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -589,7 +589,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim()</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>sim.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim 4.0.1 (2026-10-16) — © 2020-2026 by IDM</code></pre>
+<pre><code>Covasim 4.0.2 (2026-11-01) — © 2020-2026 by IDM</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="1">
 <pre><code>Sim(n=20000; 2020.03.01—2020.04.30; networks=a; diseases=covid; connectors=crossimmunity)</code></pre>
@@ -609,79 +609,81 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="48cb59b1" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sim.summarize()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>#0. 'a_n_edges':           199694.0
-#1. 'n_alive':             19979.0
-#2. 'n_female':            10020.0
-#3. 'new_deaths':          3.0
-#4. 'new_emigrants':       0.0
-#5. 'cum_deaths':          21.0
-#6. 'pop_scale':           1.0
-#7. 'n_susceptible':       12605.0
-#8. 'n_infected':          7374.0
-#9. 'n_preinfectious':     2602.0
-#10. 'n_symptomatic':       2983.0
-#11. 'n_severe':            257.0
-#12. 'n_critical':          58.0
-#13. 'n_recovered':         3945.0
-#14. 'n_dead':              3.0
-#15. 'n_naive':             8660.0
-#16. 'n_tested':            0.0
-#17. 'n_diagnosed':         0.0
-#18. 'n_known_contact':     0.0
-#19. 'n_quarantined':       0.0
-#20. 'n_isolated':          0.0
-#21. 'n_vaccinated':        0.0
-#22. 'prevalence':          0.36908754191901494
-#23. 'new_infections':      520.0
-#24. 'cum_infections':      11873.0
-#25. 'n_infectious':        4772.0
-#26. 'new_infectious':      553.0
-#27. 'new_symptomatic':     390.0
-#28. 'new_severe':          22.0
-#29. 'new_critical':        11.0
-#30. 'new_recoveries':      379.0
-#31. 'cum_infectious':      9271.0
-#32. 'cum_symptomatic':     5913.0
-#33. 'cum_severe':          322.0
-#34. 'cum_critical':        89.0
-#35. 'cum_recoveries':      4478.0
-#36. 'new_known_deaths':    0.0
-#37. 'cum_known_deaths':    0.0
-#38. 'n_known_dead':        0.0
-#39. 'n_removed':           21.0
-#40. 'new_reinfections':    62.0
-#41. 'cum_reinfections':    533.0
-#42. 'n_exposed':           7374.0
-#43. 'n_imports':           0.0
-#44. 'new_tests':           0.0
-#45. 'cum_tests':           0.0
-#46. 'new_diagnoses':       0.0
-#47. 'cum_diagnoses':       0.0
-#48. 'new_doses':           0.0
-#49. 'cum_doses':           0.0
-#50. 'new_vaccinated':      0.0
-#51. 'cum_vaccinated':      0.0
-#52. 'new_quarantined':     0.0
-#53. 'cum_quarantined':     0.0
-#54. 'new_isolated':        0.0
-#55. 'cum_isolated':        0.0
-#56. 'test_yield':          0.0
-#57. 'r_eff':               1.058728828217512
-#58. 'incidence':           0.041253470844902815
-#59. 'rel_test_yield':      0.0
-#60. 'frac_vaccinated':     0.0
-#61. 'doubling_time':       13.897517771712964
-#62. 'pop_nabs':            2.137901544570923
-#63. 'pop_protection':      0.16149389743804932
-#64. 'pop_symp_protection': 0.06619777530431747
-#65. 't':                   60</code></pre>
+<pre><code>sc.objdict(
+    a_n_edges           = 199694.0,
+    n_alive             = 19979.0,
+    n_female            = 10020.0,
+    new_deaths          = 3.0,
+    new_emigrants       = 0.0,
+    cum_deaths          = 21.0,
+    pop_scale           = 1.0,
+    n_susceptible       = 12605.0,
+    n_infected          = 7374.0,
+    n_preinfectious     = 2602.0,
+    n_symptomatic       = 2983.0,
+    n_severe            = 257.0,
+    n_critical          = 58.0,
+    n_recovered         = 3945.0,
+    n_dead              = 3.0,
+    n_naive             = 8660.0,
+    n_tested            = 0.0,
+    n_diagnosed         = 0.0,
+    n_known_contact     = 0.0,
+    n_quarantined       = 0.0,
+    n_isolated          = 0.0,
+    n_vaccinated        = 0.0,
+    prevalence          = 0.36908754191901494,
+    new_infections      = 520.0,
+    cum_infections      = 11873.0,
+    n_infectious        = 4772.0,
+    new_infectious      = 553.0,
+    new_symptomatic     = 390.0,
+    new_severe          = 22.0,
+    new_critical        = 11.0,
+    new_recoveries      = 379.0,
+    cum_infectious      = 9271.0,
+    cum_symptomatic     = 5913.0,
+    cum_severe          = 322.0,
+    cum_critical        = 89.0,
+    cum_recoveries      = 4478.0,
+    new_known_deaths    = 0.0,
+    cum_known_deaths    = 0.0,
+    n_known_dead        = 0.0,
+    n_removed           = 21.0,
+    new_reinfections    = 62.0,
+    cum_reinfections    = 533.0,
+    n_exposed           = 7374.0,
+    n_imports           = 0.0,
+    new_tests           = 0.0,
+    cum_tests           = 0.0,
+    new_diagnoses       = 0.0,
+    cum_diagnoses       = 0.0,
+    new_doses           = 0.0,
+    cum_doses           = 0.0,
+    new_vaccinated      = 0.0,
+    cum_vaccinated      = 0.0,
+    new_quarantined     = 0.0,
+    cum_quarantined     = 0.0,
+    new_isolated        = 0.0,
+    cum_isolated        = 0.0,
+    test_yield          = 0.0,
+    r_eff               = 1.058728828217512,
+    incidence           = 0.041253470844902815,
+    rel_test_yield      = 0.0,
+    frac_vaccinated     = 0.0,
+    doubling_time       = 13.897517771712964,
+    pop_nabs            = 2.137901544570923,
+    pop_protection      = 0.16149389743804932,
+    pop_symp_protection = 0.06619777530431747,
+    t                   = 60,
+)</code></pre>
 </div>
 </div>
 <p>Finally, to show the full object, including all methods and attributes, use <code>disp()</code>:</p>
 <div id="8160d931" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sim.disp()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>&lt;covasim.sim.Sim at 0x7f42163e0ec0&gt;
+<pre><code>&lt;covasim.sim.Sim at 0x73856f27f230&gt;
 [&lt;class 'covasim.sim.Sim'&gt;, &lt;class 'covasim.compat.V3Sim'&gt;, &lt;class 'starsim.sim.Sim'&gt;, &lt;class 'starsim.modules.Base'&gt;]
 ————————————————————————————————————————————————————————————————————————
 Methods:
@@ -723,8 +725,8 @@ Properties:
                   'n_symptomati [...]
  _household_size: None
       _orig_pars: None
-       _orig_sim: b'\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xed=\tx\x
-                  14U\xd2\xb9\ [...]
+       _orig_sim: b'(\xb5/\xfd`\x12\xa1%\xa7\x01\xaa\xe1\xd2\x9eM\x10\
+                  x180)\x073\x [...]
 _v3_changed_pars: []
     _v3_contacts: {'a': 20}
  _v3_dur_applied: {'exp2inf': {'dist': 'lognormal_int', 'par1': 4.5,
@@ -733,32 +735,36 @@ _v3_changed_pars: []
                   [], 'dur': {' [...]
        analyzers: ndict()
         complete: True
-      connectors: #0. 'crossimmunity': crossimmunity(pars=[immunity,
-                  disease]; sta [...]
-         created: datetime.datetime(2026, 10, 16, 16, 14, 30, 680719)
+      connectors: ndict(crossimmunity=crossimmunity(pars=[immunity,
+                  disease]; stat [...]
+         created: datetime.datetime(2026, 11, 2, 3, 48, 24, 716953)
           custom: ndict()
             data: None
     demographics: ndict()
      diagnostics: None
-        diseases: #0. 'covid': covid(pars=[init_prev, beta,
-                  beta_layer, rel_beta,  [...]
-           dists: &lt;starsim.distributions.Dists at 0x7f42163e2e40&gt;
+        diseases: ndict(
+                      covid = covid(pars=[init_prev, beta, beta_layer,
+                  rel_ [...]
+           dists: &lt;starsim.distributions.Dists at 0x73856f1a12b0&gt;
                   [&lt;class 'starsim [...]
      dynam_layer: {'a': 0}
-         elapsed: 0.6309897899627686
+         elapsed: 0.686246395111084
         filename: None
-        git_info: {'covasim': {'version': '4.0.1', 'branch': 'Detached
+        git_info: {'covasim': {'version': '4.0.2', 'branch': 'Detached
                   head (no br [...]
      initialized: True
    interventions: ndict()
             loop: Loop(n=1098, funcs=18, npts=61, index=1098)
-        metadata: #0. 'version':     '3.7.2'
-                  #1. 'versiondate': '2026-10-06'
-                  #2. ' [...]
-        networks: #0. 'a': a:RandomNet(n_edges=199635;
-                  pars=[n_contacts, dur, beta [...]
-            pars: #0. 'label':             ''
-                  ———————————————————————————————————— [...]
+        metadata: sc.objdict(
+                      version     = '3.7.3',
+                      versiondate = '2026-1 [...]
+        networks: ndict(
+                      a = a:RandomNet(n_edges=199635;
+                  pars=[n_contacts, dur [...]
+            pars: SimPars(
+                      label             = '',
+                      verbose           = 0,
+                   [...]
           people: People(n=20000; alive=19979; age=38.3±22.0)
         pop_type: 'random'
          results: Results(Sim)
@@ -768,16 +774,17 @@ _v3_changed_pars: []
      rng_rescale: ss.choose_n(n=1, weights=None)
          simfile: None
    stopping_func: None
-         summary: #0. 'a_n_edges':           199694.0
-                  #1. 'n_alive':             1 [...]
+         summary: sc.objdict(
+                      a_n_edges           = 199694.0,
+                      n_alive      [...]
                t: Timeline(2020.03.01-2020.04.30; dt=days(1);
                   now=2020.04.30; ti=6 [...]
        timelimit: None
-           timer: &lt;sciris.sc_datetime.timer at 0x7f42163e1940&gt;
+           timer: &lt;sciris.sc_datetime.timer at 0x73856f1a0050&gt;
                   Timings:
-                  #0. '(0)': [...]
+                  sc.objdict [...]
          verbose: 0
-         version: '4.0.1'
+         version: '4.0.2'
    _v3_init_keys: ['pop_size', 'pop_type', 'pop_infected', 'n_days',
                   'start_day',  [...]
 ————————————————————————————————————————————————————————————————————————
@@ -847,16 +854,16 @@ _v3_changed_pars: []
 <div id="bd4712dc" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>cv.get_png_metadata(<span class="st">'my-fig.png'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim version: 4.0.1
+<pre><code>Covasim version: 4.0.2
 Covasim branch: Detached head (no branch)
-Covasim hash: 75f8f6f
-Covasim date: 2026-10-16T09:04:49-07:00
+Covasim hash: 9454c84
+Covasim date: 2026-11-01T22:38:43-05:00
 Covasim caller branch: Detached head (no branch)
-Covasim caller hash: 75f8f6f
-Covasim caller date: 2026-10-16T09:04:49-07:00
+Covasim caller hash: 9454c84
+Covasim caller date: 2026-11-01T22:38:43-05:00
 Covasim caller filename: /home/runner/work/covasim/covasim/covasim/misc.py
-Covasim current time: 2026-Oct-16 16:14:34
-Covasim calling file: /tmp/ipykernel_4307/1033588508.py</code></pre>
+Covasim current time: 2026-Nov-02 03:48:29
+Covasim calling file: /tmp/ipykernel_4458/1033588508.py</code></pre>
 </div>
 </div>
 </section>
@@ -1474,7 +1481,7 @@ Covasim calling file: /tmp/ipykernel_4307/1033588508.py</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v4.0.1 (2026-10-16).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v4.0.2 (2026-11-01).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">

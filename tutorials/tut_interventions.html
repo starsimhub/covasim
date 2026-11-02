@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.10.20">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -80,14 +80,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-6453f418aeef366c23116eb9cb0b6816.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-5c1318cf63eba56dbef7ba16bc7d56f5.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-86fc916b84669629367aabb2a24c5117.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-29e00c98bbba659d91ab3844292f79dc.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-87a1b67b04f4001bca231538bd247c25.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../site_libs/bootstrap/bootstrap-36db928f69306286132634f357b475da.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ffb828db5fcd80aebe58acec825209e3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-68d4ea9405300e6485a57578094e674d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -605,19 +605,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(orig_sim, sim)</span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Covasim 4.0.1 (2026-10-16) — © 2020-2026 by IDM</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Exception ignored while finalizing file &lt;_io.BytesIO object at 0x7f2b1df49d00&gt;:
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.14.8/x64/lib/python3.14/site-packages/matplotlib/_api/__init__.py", line 226, in check_in_list
-    if not exists:
-BufferError: Existing exports of data: object cannot be re-sized</code></pre>
+<pre><code>Covasim 4.0.2 (2026-11-01) — © 2020-2026 by IDM</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_interventions_files/figure-html/cell-2-output-3.png" width="888" height="754" class="figure-img"></p>
+<p><img src="tut_interventions_files/figure-html/cell-2-output-2.png" width="888" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
@@ -630,7 +623,7 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <li>All interventions handle dates automatically, so days can be specified as strings, integer numbers of days from the start of the sim, or datetime objects. You can even mix and match (e.g.&nbsp;<code>days=[10, '2020-05-05']</code>), although this is not recommended for obvious reasons!</li>
 </ul>
 <p>If your simulation has different layers (discussed in Tutorial 1), you can also define the beta change to only apply to a single layer. For example, an intervention that closed 90% of schools (<code>'s'</code>) on September 1st would be written as:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>close_schools <span class="op">=</span> cv.change_beta(days<span class="op">=</span><span class="st">'2020-09-01'</span>, changes<span class="op">=</span><span class="fl">0.1</span>, layers<span class="op">=</span><span class="st">'s'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>close_schools <span class="op">=</span> cv.change_beta(days<span class="op">=</span><span class="st">'2020-09-01'</span>, changes<span class="op">=</span><span class="fl">0.1</span>, layers<span class="op">=</span><span class="st">'s'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The “clip edges” intervention works similarly to the “change beta” intervention, with two important distinctions:</p>
 <ol type="1">
 <li>Whereas beta changes affect the per-contact transmission probability, clip edges change the number of contacts. For example, in the <code>close_schools</code> example above, each school-aged child has an unchanged number of contacts (about 20), but 10 times lower probability of infection per contact (about 0.1% per contact per day). If clip edges were used instead, then each child would have unchanged probability of infection per contact (about 1% per contact per day), but 10 times fewer contacts (about 2).</li>
@@ -641,26 +634,26 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 </div>
 <p>You can use <code>change_beta</code> to do some gnarly things, like create sinusoidally varying infection probability:</p>
 <div id="cbe4ed1b" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> sc.objdict(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    beta     <span class="op">=</span> <span class="fl">0.008</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    n_agents <span class="op">=</span> <span class="fl">50e3</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    n_days   <span class="op">=</span> <span class="dv">180</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    verbose  <span class="op">=</span> <span class="dv">0</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>beta_days <span class="op">=</span> np.arange(pars.n_days)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>beta_vals <span class="op">=</span> np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>beta_days<span class="op">/</span><span class="dv">90</span>)<span class="op">**</span><span class="dv">2</span><span class="op">+</span><span class="fl">0.5</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> cv.change_beta(beta_days, beta_vals, do_plot<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Normal'</span>)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>beta, label<span class="op">=</span><span class="st">'Waves'</span>)</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(s1, s2)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>msim.plot([<span class="st">'r_eff'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sciris <span class="im">as</span> sc</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> sc.objdict(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    beta     <span class="op">=</span> <span class="fl">0.008</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    n_agents <span class="op">=</span> <span class="fl">50e3</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    n_days   <span class="op">=</span> <span class="dv">180</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    verbose  <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>beta_days <span class="op">=</span> np.arange(pars.n_days)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>beta_vals <span class="op">=</span> np.cos(<span class="dv">2</span><span class="op">*</span>np.pi<span class="op">*</span>beta_days<span class="op">/</span><span class="dv">90</span>)<span class="op">**</span><span class="dv">2</span><span class="op">+</span><span class="fl">0.5</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>beta <span class="op">=</span> cv.change_beta(beta_days, beta_vals, do_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Normal'</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>beta, label<span class="op">=</span><span class="st">'Waves'</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(s1, s2)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>msim.plot([<span class="st">'r_eff'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -684,29 +677,29 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 </div>
 <p>The example below illustrates (a) <code>test_num</code> with data, (b) <code>test_num</code> with a fixed number of tests per day, and (c) <code>test_prob</code>.</p>
 <div id="c3ac77f4" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the testing interventions</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>tn_data <span class="op">=</span> cv.test_num(<span class="st">'data'</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>tn_fixed <span class="op">=</span> cv.test_num(daily_tests<span class="op">=</span><span class="dv">500</span>, start_day<span class="op">=</span><span class="st">'2020-03-01'</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>tp <span class="op">=</span> cv.test_prob(symp_prob<span class="op">=</span><span class="fl">0.2</span>, asymp_prob<span class="op">=</span><span class="fl">0.001</span>, start_day<span class="op">=</span><span class="st">'2020-03-01'</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the default parameters</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="op">=</span> <span class="fl">50e3</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    pop_infected <span class="op">=</span> <span class="dv">100</span>,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    start_day <span class="op">=</span> <span class="st">'2020-02-01'</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    end_day   <span class="op">=</span> <span class="st">'2020-03-30'</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the simulations</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>sim1 <span class="op">=</span> cv.Sim(pars, datafile<span class="op">=</span><span class="st">'example_data.csv'</span>, interventions<span class="op">=</span>tn_data, label<span class="op">=</span><span class="st">'Number of tests from data'</span>)</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>sim2 <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>tn_fixed, label<span class="op">=</span><span class="st">'Constant daily number of tests'</span>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>sim3 <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>tp, label<span class="op">=</span><span class="st">'Probability-based testing'</span>)</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Run and plot results</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(sim1, sim2, sim3)</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>msim.plot([<span class="st">'new_infections'</span>, <span class="st">'new_tests'</span>, <span class="st">'new_diagnoses'</span>, <span class="st">'cum_diagnoses'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the testing interventions</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>tn_data <span class="op">=</span> cv.test_num(<span class="st">'data'</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>tn_fixed <span class="op">=</span> cv.test_num(daily_tests<span class="op">=</span><span class="dv">500</span>, start_day<span class="op">=</span><span class="st">'2020-03-01'</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>tp <span class="op">=</span> cv.test_prob(symp_prob<span class="op">=</span><span class="fl">0.2</span>, asymp_prob<span class="op">=</span><span class="fl">0.001</span>, start_day<span class="op">=</span><span class="st">'2020-03-01'</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the default parameters</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="op">=</span> <span class="fl">50e3</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    pop_infected <span class="op">=</span> <span class="dv">100</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    start_day <span class="op">=</span> <span class="st">'2020-02-01'</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    end_day   <span class="op">=</span> <span class="st">'2020-03-30'</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the simulations</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>sim1 <span class="op">=</span> cv.Sim(pars, datafile<span class="op">=</span><span class="st">'example_data.csv'</span>, interventions<span class="op">=</span>tn_data, label<span class="op">=</span><span class="st">'Number of tests from data'</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>sim2 <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>tn_fixed, label<span class="op">=</span><span class="st">'Constant daily number of tests'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>sim3 <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>tp, label<span class="op">=</span><span class="st">'Probability-based testing'</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Run and plot results</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(sim1, sim2, sim3)</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>msim.plot([<span class="st">'new_infections'</span>, <span class="st">'new_tests'</span>, <span class="st">'new_diagnoses'</span>, <span class="st">'cum_diagnoses'</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Automatically adding cumulative column cum_diagnoses from new_diagnoses
   Automatically adding cumulative column cum_tests from new_tests
@@ -725,30 +718,30 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <h2 class="anchored" data-anchor-id="contact-tracing">Contact tracing</h2>
 <p>Contact tracing is the process of notifying the contacts of a diagnosed positive COVID case and letting them know that they have been exposed, so they can be tested, go into quarantine, or both. Since contact tracing uses diagnosed people to start with, and since people are only diagnosed if they are tested, you <strong>must</strong> include at least one testing intervention in your sim before including contact tracing. The main option for contact tracing is <code>trace_prob</code>, the probability that a person in each layer will be traced (usually high for households and lower for other layers). For example:</p>
 <div id="b0b02c6b" class="cell" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the testing and contact tracing interventions</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>tp <span class="op">=</span> cv.test_prob(symp_prob<span class="op">=</span><span class="fl">0.2</span>, asymp_prob<span class="op">=</span><span class="fl">0.001</span>, symp_quar_prob<span class="op">=</span><span class="fl">1.0</span>, asymp_quar_prob<span class="op">=</span><span class="fl">1.0</span>, do_plot<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> cv.contact_tracing(trace_probs<span class="op">=</span><span class="bu">dict</span>(h<span class="op">=</span><span class="fl">1.0</span>, s<span class="op">=</span><span class="fl">0.5</span>, w<span class="op">=</span><span class="fl">0.5</span>, c<span class="op">=</span><span class="fl">0.3</span>), do_plot<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the default parameters</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    pop_type      <span class="op">=</span> <span class="st">'hybrid'</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    pop_size      <span class="op">=</span> <span class="fl">50e3</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    pop_infected  <span class="op">=</span> <span class="dv">100</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    start_day     <span class="op">=</span> <span class="st">'2020-02-01'</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    end_day       <span class="op">=</span> <span class="st">'2020-05-01'</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    interventions <span class="op">=</span> [tp, ct],</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and run the simulation</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(pars)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the simulation</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>cv.options.<span class="bu">set</span>(fontsize<span class="op">=</span><span class="dv">8</span>) <span class="co"># Make the font size a bit smaller here so the labels don't overlap</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>sim.plot([<span class="st">'new_infections'</span>, <span class="st">'new_tests'</span>, <span class="st">'new_diagnoses'</span>, <span class="st">'cum_diagnoses'</span>, <span class="st">'new_quarantined'</span>, <span class="st">'test_yield'</span>])</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>cv.options.<span class="bu">set</span>(fontsize<span class="op">=</span><span class="st">'default'</span>) <span class="co"># Reset to the default value</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the testing and contact tracing interventions</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>tp <span class="op">=</span> cv.test_prob(symp_prob<span class="op">=</span><span class="fl">0.2</span>, asymp_prob<span class="op">=</span><span class="fl">0.001</span>, symp_quar_prob<span class="op">=</span><span class="fl">1.0</span>, asymp_quar_prob<span class="op">=</span><span class="fl">1.0</span>, do_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>ct <span class="op">=</span> cv.contact_tracing(trace_probs<span class="op">=</span><span class="bu">dict</span>(h<span class="op">=</span><span class="fl">1.0</span>, s<span class="op">=</span><span class="fl">0.5</span>, w<span class="op">=</span><span class="fl">0.5</span>, c<span class="op">=</span><span class="fl">0.3</span>), do_plot<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the default parameters</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    pop_type      <span class="op">=</span> <span class="st">'hybrid'</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    pop_size      <span class="op">=</span> <span class="fl">50e3</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    pop_infected  <span class="op">=</span> <span class="dv">100</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    start_day     <span class="op">=</span> <span class="st">'2020-02-01'</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    end_day       <span class="op">=</span> <span class="st">'2020-05-01'</span>,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    interventions <span class="op">=</span> [tp, ct],</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and run the simulation</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(pars)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>sim.run()</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the simulation</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>cv.options.<span class="bu">set</span>(fontsize<span class="op">=</span><span class="dv">8</span>) <span class="co"># Make the font size a bit smaller here so the labels don't overlap</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>sim.plot([<span class="st">'new_infections'</span>, <span class="st">'new_tests'</span>, <span class="st">'new_diagnoses'</span>, <span class="st">'cum_diagnoses'</span>, <span class="st">'new_quarantined'</span>, <span class="st">'test_yield'</span>])</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>cv.options.<span class="bu">set</span>(fontsize<span class="op">=</span><span class="st">'default'</span>) <span class="co"># Reset to the default value</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -763,11 +756,11 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <section id="simple-vaccination" class="level2">
 <h2 class="anchored" data-anchor-id="simple-vaccination">Simple vaccination</h2>
 <p>Vaccines can do one of two things: they can stop you from becoming infected in the first place (acquisition blocking), or they can stop you from developing symptoms or severe disease once infected (symptom blocking). The Covasim <code>simple_vaccine</code> intervention lets you control both of these options. In its simplest form, a vaccine is like a change beta intervention. For example, this vaccine:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span><span class="dv">30</span>, prob<span class="op">=</span><span class="fl">1.0</span>, rel_sus<span class="op">=</span><span class="fl">0.3</span>, rel_symp<span class="op">=</span><span class="fl">1.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span><span class="dv">30</span>, prob<span class="op">=</span><span class="fl">1.0</span>, rel_sus<span class="op">=</span><span class="fl">0.3</span>, rel_symp<span class="op">=</span><span class="fl">1.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>is equivalent to this beta change:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> cv.change_beta(days<span class="op">=</span><span class="dv">30</span>, changes<span class="op">=</span><span class="fl">0.3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> cv.change_beta(days<span class="op">=</span><span class="dv">30</span>, changes<span class="op">=</span><span class="fl">0.3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>But that’s not very realistic. A vaccine given on days 30 and 44 (two weeks later), with efficacy of 50% per dose which accumulates, given to 60% of the population, and which blocks 50% of acquisition and (among those who get infected even so) 90% of symptoms, would look like this:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span>[<span class="dv">30</span>, <span class="dv">44</span>], cumulative<span class="op">=</span>[<span class="fl">0.5</span>, <span class="fl">0.5</span>], prob<span class="op">=</span><span class="fl">0.6</span>, rel_sus<span class="op">=</span><span class="fl">0.5</span>, rel_symp<span class="op">=</span><span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span>[<span class="dv">30</span>, <span class="dv">44</span>], cumulative<span class="op">=</span>[<span class="fl">0.5</span>, <span class="fl">0.5</span>], prob<span class="op">=</span><span class="fl">0.6</span>, rel_sus<span class="op">=</span><span class="fl">0.5</span>, rel_symp<span class="op">=</span><span class="fl">0.1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="alert alert-success">
 <p>For more advanced vaccine usage, see <em>T8 - Vaccines and variants</em>.</p>
 </div>
@@ -776,30 +769,30 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <h2 class="anchored" data-anchor-id="age-targeting-and-other-subtargeting">Age targeting and other subtargeting</h2>
 <p>For some interventions, you want them to preferentially apply to some people in the population, e.g.&nbsp;the elderly. For testing and vaccine interventions, this can be done using the <code>subtarget</code> argument. Subtargeting is quite flexible in terms of what it accepts, but the easiest approach is usually to define a function to do it. This function must return a dictionary with keys <code>inds</code> (which people to subtarget) and <code>vals</code> (the values they are subtargeted with). This example shows how to define a 20% transmission-blocking, 94% symptom-blocking vaccine with varying coverage levels by age (for the vaccine intervention, <code>subtarget</code> modifies <code>prob</code>, the probability of a person being vaccinated) applied on day 20:</p>
 <div id="e18df3b4" class="cell" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the vaccine subtargeting</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vaccinate_by_age(sim):</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    young  <span class="op">=</span> cv.true(sim.people.age <span class="op">&lt;</span> <span class="dv">50</span>) <span class="co"># cv.true() returns indices of people matching this condition, i.e. people under 50</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    middle <span class="op">=</span> cv.true((sim.people.age <span class="op">&gt;=</span> <span class="dv">50</span>) <span class="op">*</span> (sim.people.age <span class="op">&lt;</span> <span class="dv">75</span>)) <span class="co"># Multiplication means "and" here</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    old    <span class="op">=</span> cv.true(sim.people.age <span class="op">&gt;=</span> <span class="dv">75</span>)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    inds <span class="op">=</span> sim.people.uid <span class="co"># Everyone in the population -- equivalent to np.arange(len(sim.people))</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> np.ones(<span class="bu">len</span>(sim.people)) <span class="co"># Create the array</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    vals[young] <span class="op">=</span> <span class="fl">0.1</span> <span class="co"># 10% probability for people &lt;50</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    vals[middle] <span class="op">=</span> <span class="fl">0.5</span> <span class="co"># 50% probability for people 50-75</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    vals[old] <span class="op">=</span> <span class="fl">0.9</span> <span class="co"># 90% probability for people &gt;75</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> <span class="bu">dict</span>(inds<span class="op">=</span>inds, vals<span class="op">=</span>vals)</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> output</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the vaccine</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span><span class="dv">20</span>, rel_sus<span class="op">=</span><span class="fl">0.8</span>, rel_symp<span class="op">=</span><span class="fl">0.06</span>, subtarget<span class="op">=</span>vaccinate_by_age)</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Create, run, and plot the simulations</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>sim1 <span class="op">=</span> cv.Sim(label<span class="op">=</span><span class="st">'Baseline'</span>)</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>sim2 <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>vaccine, label<span class="op">=</span><span class="st">'With age-targeted vaccine'</span>)</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(sim1, sim2)</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the vaccine subtargeting</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> vaccinate_by_age(sim):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    young  <span class="op">=</span> cv.true(sim.people.age <span class="op">&lt;</span> <span class="dv">50</span>) <span class="co"># cv.true() returns indices of people matching this condition, i.e. people under 50</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    middle <span class="op">=</span> cv.true((sim.people.age <span class="op">&gt;=</span> <span class="dv">50</span>) <span class="op">*</span> (sim.people.age <span class="op">&lt;</span> <span class="dv">75</span>)) <span class="co"># Multiplication means "and" here</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    old    <span class="op">=</span> cv.true(sim.people.age <span class="op">&gt;=</span> <span class="dv">75</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    inds <span class="op">=</span> sim.people.uid <span class="co"># Everyone in the population -- equivalent to np.arange(len(sim.people))</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> np.ones(<span class="bu">len</span>(sim.people)) <span class="co"># Create the array</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    vals[young] <span class="op">=</span> <span class="fl">0.1</span> <span class="co"># 10% probability for people &lt;50</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    vals[middle] <span class="op">=</span> <span class="fl">0.5</span> <span class="co"># 50% probability for people 50-75</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    vals[old] <span class="op">=</span> <span class="fl">0.9</span> <span class="co"># 90% probability for people &gt;75</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    output <span class="op">=</span> <span class="bu">dict</span>(inds<span class="op">=</span>inds, vals<span class="op">=</span>vals)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> output</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the vaccine</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span><span class="dv">20</span>, rel_sus<span class="op">=</span><span class="fl">0.8</span>, rel_symp<span class="op">=</span><span class="fl">0.06</span>, subtarget<span class="op">=</span>vaccinate_by_age)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Create, run, and plot the simulations</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>sim1 <span class="op">=</span> cv.Sim(label<span class="op">=</span><span class="st">'Baseline'</span>)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>sim2 <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>vaccine, label<span class="op">=</span><span class="st">'With age-targeted vaccine'</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(sim1, sim2)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -809,23 +802,23 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 </div>
 </div>
 <p>If you have a simple conditional, you can also define subtargeting using a lambda function, e.g.&nbsp;this is a vaccine with 90% probability of being given to people over age 75, and 10% probability of being applied to everyone else (i.e.&nbsp;people under age 75%):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span><span class="dv">20</span>, prob<span class="op">=</span><span class="fl">0.1</span>, subtarget<span class="op">=</span><span class="bu">dict</span>(inds<span class="op">=</span><span class="kw">lambda</span> sim: cv.true(sim.people.age<span class="op">&gt;</span><span class="dv">50</span>), vals<span class="op">=</span><span class="fl">0.9</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>vaccine <span class="op">=</span> cv.simple_vaccine(days<span class="op">=</span><span class="dv">20</span>, prob<span class="op">=</span><span class="fl">0.1</span>, subtarget<span class="op">=</span><span class="bu">dict</span>(inds<span class="op">=</span><span class="kw">lambda</span> sim: cv.true(sim.people.age<span class="op">&gt;</span><span class="dv">50</span>), vals<span class="op">=</span><span class="fl">0.9</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>However, lambda functions are not known for their easy readability, so their use is discouraged.</p>
 </section>
 <section id="dynamic-parameters" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-parameters">Dynamic parameters</h2>
 <p>A slightly more advanced intervention is the dynamic parameters intervention. This is not an intervention the same way the others are; instead, it provides a consistent way to modify parameters dynamically. For example, to change the number of imported infections on day 15 from 0 to 100 (representing, say, resuming international travel), and then change back to 0 on day 30:</p>
 <div id="40236691" class="cell" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the dynamic parameters</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>imports <span class="op">=</span> cv.dynamic_pars(n_imports<span class="op">=</span><span class="bu">dict</span>(days<span class="op">=</span>[<span class="dv">15</span>, <span class="dv">30</span>], vals<span class="op">=</span>[<span class="dv">100</span>, <span class="dv">0</span>]))</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create, run, and plot the simulations</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>sim1 <span class="op">=</span> cv.Sim(label<span class="op">=</span><span class="st">'Baseline'</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>sim2 <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>imports, label<span class="op">=</span><span class="st">'With imported infections'</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(sim1, sim2)</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the dynamic parameters</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>imports <span class="op">=</span> cv.dynamic_pars(n_imports<span class="op">=</span><span class="bu">dict</span>(days<span class="op">=</span>[<span class="dv">15</span>, <span class="dv">30</span>], vals<span class="op">=</span>[<span class="dv">100</span>, <span class="dv">0</span>]))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create, run, and plot the simulations</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>sim1 <span class="op">=</span> cv.Sim(label<span class="op">=</span><span class="st">'Baseline'</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>sim2 <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>imports, label<span class="op">=</span><span class="st">'With imported infections'</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(sim1, sim2)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -847,41 +840,41 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <li>Finally, this example shows some of the flexibility in how interventions are plotted – i.e.&nbsp;shown in the legend with a label and with a custom color.</li>
 </ul>
 <div id="618dc28d" class="cell" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> inf_thresh(<span class="va">self</span>, sim, thresh<span class="op">=</span><span class="dv">500</span>):</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' Dynamically define on and off days for a beta change -- use self like it's a method '''</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Meets threshold, activate</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.people.infectious.<span class="bu">sum</span>() <span class="op">&gt;</span> thresh:</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.active:</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.active <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.t_on <span class="op">=</span> sim.ti</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.plot_days.append(<span class="va">self</span>.t_on)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Does not meet threshold, deactivate</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.active:</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.active <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.t_off <span class="op">=</span> sim.ti</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.plot_days.append(<span class="va">self</span>.t_off)</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="va">self</span>.t_on, <span class="va">self</span>.t_off]</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the intervention</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>on <span class="op">=</span> <span class="fl">0.2</span> <span class="co"># Beta less than 1 -- intervention is on</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>off <span class="op">=</span> <span class="fl">1.0</span> <span class="co"># Beta is 1, i.e. normal -- intervention is off</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>changes <span class="op">=</span> [on, off]</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>plot_args <span class="op">=</span> <span class="bu">dict</span>(label<span class="op">=</span><span class="st">'Dynamic beta'</span>, show_label<span class="op">=</span><span class="va">True</span>, line_args<span class="op">=</span>{<span class="st">'c'</span>:<span class="st">'blue'</span>})</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> cv.change_beta(days<span class="op">=</span>inf_thresh, changes<span class="op">=</span>changes, <span class="op">**</span>plot_args)</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Set custom properties</span></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>cb.t_on <span class="op">=</span> np.nan</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>cb.t_off <span class="op">=</span> np.nan</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>cb.active <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>cb.plot_days <span class="op">=</span> []</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the simulation and plot</span></span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>cb)</span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>sim.run().plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> inf_thresh(<span class="va">self</span>, sim, thresh<span class="op">=</span><span class="dv">500</span>):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">''' Dynamically define on and off days for a beta change -- use self like it's a method '''</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Meets threshold, activate</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.people.infectious.<span class="bu">sum</span>() <span class="op">&gt;</span> thresh:</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.active:</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.active <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.t_on <span class="op">=</span> sim.ti</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.plot_days.append(<span class="va">self</span>.t_on)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Does not meet threshold, deactivate</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.active:</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.active <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.t_off <span class="op">=</span> sim.ti</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.plot_days.append(<span class="va">self</span>.t_off)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="va">self</span>.t_on, <span class="va">self</span>.t_off]</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the intervention</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>on <span class="op">=</span> <span class="fl">0.2</span> <span class="co"># Beta less than 1 -- intervention is on</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>off <span class="op">=</span> <span class="fl">1.0</span> <span class="co"># Beta is 1, i.e. normal -- intervention is off</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>changes <span class="op">=</span> [on, off]</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>plot_args <span class="op">=</span> <span class="bu">dict</span>(label<span class="op">=</span><span class="st">'Dynamic beta'</span>, show_label<span class="op">=</span><span class="va">True</span>, line_args<span class="op">=</span>{<span class="st">'c'</span>:<span class="st">'blue'</span>})</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>cb <span class="op">=</span> cv.change_beta(days<span class="op">=</span>inf_thresh, changes<span class="op">=</span>changes, <span class="op">**</span>plot_args)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Set custom properties</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>cb.t_on <span class="op">=</span> np.nan</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>cb.t_off <span class="op">=</span> np.nan</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>cb.active <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>cb.plot_days <span class="op">=</span> []</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the simulation and plot</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>cb)</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>sim.run().plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -896,72 +889,72 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 <p>If you’re still standing after the previous example, Covasim also lets you do things that are even <em>more</em> complicated, namely define an arbitrary function or class to act as an intervention instead. If a custom intervention is supplied as a function (as it was in Tutorial 1 as well), then it receives the <code>sim</code> object as its only argument, and is called on each timestep. It can perform arbitrary manipulations to the sim object, such as changing parameters, modifying state, etc.</p>
 <p>This example reimplements the dynamic parameters example above, except using a hard-coded custom intervention:</p>
 <div id="2955e28e" class="cell" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dynamic_imports(sim):</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.ti <span class="op">==</span> <span class="dv">15</span>:</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        sim[<span class="st">'n_imports'</span>] <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> sim.ti <span class="op">==</span> <span class="dv">30</span>:</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        sim[<span class="st">'n_imports'</span>] <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>dynamic_imports)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dynamic_imports(sim):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.ti <span class="op">==</span> <span class="dv">15</span>:</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        sim[<span class="st">'n_imports'</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> sim.ti <span class="op">==</span> <span class="dv">30</span>:</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        sim[<span class="st">'n_imports'</span>] <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(interventions<span class="op">=</span>dynamic_imports)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>However, function-based interventions only take you so far.</p>
 <p>We saw in Tutorial 1 how you could define a simple “protect the elderly” intervention with just a few lines of code:</p>
 <div id="2c7ff930" class="cell" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> protect_elderly(sim):</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.ti <span class="op">==</span> sim.day(<span class="st">'2020-04-01'</span>):</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        elderly <span class="op">=</span> sim.people.age<span class="op">&gt;</span><span class="dv">70</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        sim.people.rel_sus[elderly] <span class="op">=</span> <span class="fl">0.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> protect_elderly(sim):</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sim.ti <span class="op">==</span> sim.day(<span class="st">'2020-04-01'</span>):</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        elderly <span class="op">=</span> sim.people.age<span class="op">&gt;</span><span class="dv">70</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        sim.people.rel_sus[elderly] <span class="op">=</span> <span class="fl">0.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This example explains how to create an intervention object that does much the same thing, but is more fully-featured because it uses the <code>Intervention</code> class.</p>
 <div class="alert alert-warning">
 <p>You must include the line <code>super().__init__(**kwargs)</code> in the <code>self.__init__()</code> method, or else the intervention won’t work. You must also include <code>super().initialize()</code> in the <code>self.initialize()</code> method.</p>
 </div>
 <div id="577f1ee3" class="cell" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pylab <span class="im">as</span> pl</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> protect_elderly(cv.Intervention):</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, start_day<span class="op">=</span><span class="va">None</span>, end_day<span class="op">=</span><span class="va">None</span>, age_cutoff<span class="op">=</span><span class="dv">70</span>, rel_sus<span class="op">=</span><span class="fl">0.0</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs):</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="op">**</span>kwargs) <span class="co"># NB: This line must be included</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.start_day   <span class="op">=</span> start_day</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.end_day     <span class="op">=</span> end_day</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.age_cutoff  <span class="op">=</span> age_cutoff</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rel_sus     <span class="op">=</span> rel_sus</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> initialize(<span class="va">self</span>, sim):</span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().initialize() <span class="co"># NB: This line must also be included</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.start_day   <span class="op">=</span> sim.day(<span class="va">self</span>.start_day) <span class="co"># Convert string or dateobject dates into an integer number of days</span></span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.end_day     <span class="op">=</span> sim.day(<span class="va">self</span>.end_day)</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.days        <span class="op">=</span> [<span class="va">self</span>.start_day, <span class="va">self</span>.end_day]</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.elderly     <span class="op">=</span> sim.people.age <span class="op">&gt;</span> <span class="va">self</span>.age_cutoff <span class="co"># Find the elderly people here</span></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exposed     <span class="op">=</span> np.zeros(sim.npts) <span class="co"># Initialize results</span></span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.tvec        <span class="op">=</span> sim.tvec <span class="co"># Copy the time vector into this intervention</span></span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="bu">apply</span>(<span class="va">self</span>, sim):</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exposed[sim.ti] <span class="op">=</span> sim.people.exposed[<span class="va">self</span>.elderly].<span class="bu">sum</span>()</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Start the intervention</span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> sim.ti <span class="op">==</span> <span class="va">self</span>.start_day:</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>            sim.people.rel_sus[<span class="va">self</span>.elderly] <span class="op">=</span> <span class="va">self</span>.rel_sus</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># End the intervention</span></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> sim.ti <span class="op">==</span> <span class="va">self</span>.end_day:</span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>            sim.people.rel_sus[<span class="va">self</span>.elderly] <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> plot(<span class="va">self</span>):</span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>        fig <span class="op">=</span> pl.figure()</span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>        pl.plot(<span class="va">self</span>.tvec, <span class="va">self</span>.exposed)</span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>        pl.xlabel(<span class="st">'Day'</span>)</span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>        pl.ylabel(<span class="st">'Number infected'</span>)</span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>        pl.title(<span class="st">'Number of elderly people with active COVID'</span>)</span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> fig</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pylab <span class="im">as</span> pl</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> covasim <span class="im">as</span> cv</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> protect_elderly(cv.Intervention):</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, start_day<span class="op">=</span><span class="va">None</span>, end_day<span class="op">=</span><span class="va">None</span>, age_cutoff<span class="op">=</span><span class="dv">70</span>, rel_sus<span class="op">=</span><span class="fl">0.0</span>, <span class="op">*</span>args, <span class="op">**</span>kwargs):</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="op">**</span>kwargs) <span class="co"># NB: This line must be included</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.start_day   <span class="op">=</span> start_day</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.end_day     <span class="op">=</span> end_day</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.age_cutoff  <span class="op">=</span> age_cutoff</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.rel_sus     <span class="op">=</span> rel_sus</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> initialize(<span class="va">self</span>, sim):</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().initialize() <span class="co"># NB: This line must also be included</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.start_day   <span class="op">=</span> sim.day(<span class="va">self</span>.start_day) <span class="co"># Convert string or dateobject dates into an integer number of days</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.end_day     <span class="op">=</span> sim.day(<span class="va">self</span>.end_day)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.days        <span class="op">=</span> [<span class="va">self</span>.start_day, <span class="va">self</span>.end_day]</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.elderly     <span class="op">=</span> sim.people.age <span class="op">&gt;</span> <span class="va">self</span>.age_cutoff <span class="co"># Find the elderly people here</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exposed     <span class="op">=</span> np.zeros(sim.npts) <span class="co"># Initialize results</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.tvec        <span class="op">=</span> sim.tvec <span class="co"># Copy the time vector into this intervention</span></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="bu">apply</span>(<span class="va">self</span>, sim):</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exposed[sim.ti] <span class="op">=</span> sim.people.exposed[<span class="va">self</span>.elderly].<span class="bu">sum</span>()</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Start the intervention</span></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> sim.ti <span class="op">==</span> <span class="va">self</span>.start_day:</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>            sim.people.rel_sus[<span class="va">self</span>.elderly] <span class="op">=</span> <span class="va">self</span>.rel_sus</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># End the intervention</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> sim.ti <span class="op">==</span> <span class="va">self</span>.end_day:</span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>            sim.people.rel_sus[<span class="va">self</span>.elderly] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span></span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> plot(<span class="va">self</span>):</span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>        fig <span class="op">=</span> pl.figure()</span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>        pl.plot(<span class="va">self</span>.tvec, <span class="va">self</span>.exposed)</span>
+<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>        pl.xlabel(<span class="st">'Day'</span>)</span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a>        pl.ylabel(<span class="st">'Number infected'</span>)</span>
+<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>        pl.title(<span class="st">'Number of elderly people with active COVID'</span>)</span>
+<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> fig</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>While this example is fairly long, hopefully it’s fairly straightforward:</p>
 <ul>
@@ -972,42 +965,35 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
 </ul>
 <p>Here is what this custom intervention looks like in action. Note how it automatically shows when the intervention starts and stops (with vertical dashed lines).</p>
 <div id="12724033" class="cell" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define and run the baseline simulation</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="op">=</span> <span class="fl">50e3</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    pop_infected <span class="op">=</span> <span class="dv">100</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    n_days <span class="op">=</span> <span class="dv">90</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    verbose <span class="op">=</span> <span class="dv">0</span>,</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>orig_sim <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Default'</span>)</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the intervention and the scenario sim</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>protect <span class="op">=</span> protect_elderly(start_day<span class="op">=</span><span class="st">'2020-04-01'</span>, end_day<span class="op">=</span><span class="st">'2020-05-01'</span>, rel_sus<span class="op">=</span><span class="fl">0.1</span>) <span class="co"># Create intervention</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>protect, label<span class="op">=</span><span class="st">'Protect the elderly'</span>)</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Run and plot</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(orig_sim, sim)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Exception ignored while finalizing file &lt;_io.BytesIO object at 0x7f2b1dbac7c0&gt;:
-Traceback (most recent call last):
-  File "/opt/hostedtoolcache/Python/3.14.8/x64/lib/python3.14/site-packages/starsim/time.py", line 324, in _rebuild
-    out = unpickling_func(*args)
-BufferError: Existing exports of data: object cannot be re-sized</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define and run the baseline simulation</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>pars <span class="op">=</span> <span class="bu">dict</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    pop_size <span class="op">=</span> <span class="fl">50e3</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    pop_infected <span class="op">=</span> <span class="dv">100</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    n_days <span class="op">=</span> <span class="dv">90</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    verbose <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>orig_sim <span class="op">=</span> cv.Sim(pars, label<span class="op">=</span><span class="st">'Default'</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the intervention and the scenario sim</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>protect <span class="op">=</span> protect_elderly(start_day<span class="op">=</span><span class="st">'2020-04-01'</span>, end_day<span class="op">=</span><span class="st">'2020-05-01'</span>, rel_sus<span class="op">=</span><span class="fl">0.1</span>) <span class="co"># Create intervention</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>sim <span class="op">=</span> cv.Sim(pars, interventions<span class="op">=</span>protect, label<span class="op">=</span><span class="st">'Protect the elderly'</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Run and plot</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>msim <span class="op">=</span> cv.parallel(orig_sim, sim)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>msim.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tut_interventions_files/figure-html/cell-12-output-2.png" width="888" height="754" class="figure-img"></p>
+<p><img src="tut_interventions_files/figure-html/cell-12-output-1.png" width="888" height="754" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
 <p>Because we collected information in the intervention itself, we can also plot that:</p>
 <div id="97d91f03" class="cell" data-execution_count="12">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot intervention</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>protect <span class="op">=</span> msim.sims[<span class="dv">1</span>].get_intervention(protect_elderly) <span class="co"># Find intervention by type</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>protect.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot intervention</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>protect <span class="op">=</span> msim.sims[<span class="dv">1</span>].get_intervention(protect_elderly) <span class="co"># Find intervention by type</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>protect.plot()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="12">
 <div>
 <figure class="figure">
@@ -1460,7 +1446,7 @@ BufferError: Existing exports of data: object cannot be re-sized</code></pre>
       &nbsp;
     </div>   
     <div class="nav-footer-center">
-<p>Docs built for Covasim v4.0.1 (2026-10-16).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
+<p>Docs built for Covasim v4.0.2 (2026-11-01).<br>© 2020–2026, Bill &amp; Melinda Gates Foundation. All rights reserved.</p>
 <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/starsimhub/covasim/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div></div>
     <div class="nav-footer-right">
       <ul class="footer-items list-unstyled">
