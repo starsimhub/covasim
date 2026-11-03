@@ -25,6 +25,11 @@ Covasim now runs on Starsim 4 (it previously required Starsim 3.7). The Covasim 
 - New parameter `clustered`: `cv.Sim(pop_type='hybrid', clustered=True)` makes schools and workplaces clusters, whose members all know each other, rather than random networks. The mean number of contacts is the same. The default is `False`, which matches v3; with `True`, epidemics grow more slowly, and contact tracing averts more infections.
 
 
+### Version 4.0.2 (2026-11-01)
+
+- Require Starsim below 4 (`starsim<4`), since this version does not run on Starsim 4.
+
+
 ### Version 4.0.1 (2026-10-16)
 
 - Fixed `cv.change_beta()` and `cv.clip_edges()` raising an error when the days are given as an array (e.g. `np.arange(180)`).
