@@ -8,6 +8,10 @@ There are no further major releases planned. If there is a specific bugfix or fe
 
 ## Latest versions (4.0.x)
 
+### Version 4.0.3 (2026-11-03)
+
+- Fix plotting bug that prevented plots from appearing when `start_day` and `end_day` were specified.
+
 ### Version 4.0.2 (2026-11-01)
 
 - Require Starsim below 4 (`starsim<4`), since this version does not run on Starsim 4.
