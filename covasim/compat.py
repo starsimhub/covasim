@@ -269,7 +269,7 @@ class V3Sim:
                 covid.pars.update({k:layer_pars[k] for k in ['beta_layer', 'iso_factor', 'quar_factor']})
             elif key == 'contacts':
                 contacts = value
-                if sc.isnumber(contacts): # A single value for all layers
+                if not isinstance(contacts, dict): # A single value for all layers, e.g. a number or a distribution
                     contacts = {lkey:contacts for lkey in self.layer_keys()}
             elif key == 'clustered':
                 self.clustered = value

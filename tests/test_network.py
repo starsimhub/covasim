@@ -37,6 +37,16 @@ def test_random():
     assert len(ages) == pop_size # Everyone is in the layer
     assert np.isclose(n_contacts, sim['contacts']['a'], rtol=0.05)
 
+    # The number of contacts can be a distribution instead of a number, e.g. a negative binomial for overdispersion
+    m, k = 20, 0.5
+    nbinom = ss.nbinom(mean=m, n=k) # n is the dispersion
+    overdispersed = cv.Sim(pop_size=pop_size, contacts=nbinom, verbose=0).initialize()
+    layer = overdispersed.people.contacts['a']
+    counts = np.bincount(np.concatenate([layer['p1'], layer['p2']]), minlength=pop_size) # The number of contacts each person has
+    assert np.isclose(counts.mean(), m, rtol=0.05) # The same mean as the Poisson...
+    assert counts.var() > 5*m # ...but a much larger variance (for a Poisson, it's about m)
+    assert overdispersed['contacts']['a'] is overdispersed.networks.a.pars.n_contacts # sim['contacts'] gives the distribution, since it has no single mean
+
     return sim
 
 

@@ -176,8 +176,10 @@ def reset_layer_pars(pars, layer_keys=None, force=False):
     commonly, however, mismatches need to be fixed explicitly.
 
     Each layer parameter (``beta_layer``, ``contacts``, ``dynam_layer``, ``iso_factor``,
-    ``quar_factor``) can be a dict by layer, or a single number for all layers
-    (e.g. ``beta_layer=0.5``).
+    ``quar_factor``) can be a dict by layer, or a single value for all layers
+    (e.g. ``beta_layer=0.5``). The number of contacts can also be a Starsim
+    distribution (e.g. ``contacts=dict(c=ss.nbinom(mean=20, n=0.5))``); a number
+    is the mean of a Poisson distribution.
 
     Args:
         pars (dict): the parameters dictionary
@@ -222,7 +224,7 @@ def reset_layer_pars(pars, layer_keys=None, force=False):
             par_dict = defaults[pkey] # Just use defaults
         else:
             user_par = pars.get(pkey, None)
-            if sc.isnumber(user_par): # A single value for all layers
+            if (user_par is not None) and not isinstance(user_par, dict): # A single value for all layers, e.g. a number or a distribution
                 user_par = {lkey:user_par for lkey in (layer_keys or default_layer_keys)}
             par_dict = sc.mergedicts(defaults[pkey], user_par) # Use user-supplied parameters if available, else default
 

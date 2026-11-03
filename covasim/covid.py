@@ -76,7 +76,7 @@ def v3_dist(d, unit=None, round=False):
         dist = ss.poisson(lam=d['par1'], round=round)
     elif name == 'neg_binomial': # Mean par1 and dispersion par2, as v3's cv.n_neg_binomial()
         step = d.get('step', 1)
-        dist = ss.nbinom(n=d['par2'], p=d['par2']/(d['par1']/step + d['par2']), round=round)
+        dist = ss.nbinom(mean=d['par1']/step, n=d['par2'], round=round)
     else:
         errormsg = f'Distribution "{d["dist"]}" is not supported; choices are uniform, normal, normal_pos, normal_int, lognormal, lognormal_int, poisson, and neg_binomial'
         raise ValueError(errormsg)

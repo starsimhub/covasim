@@ -22,6 +22,7 @@ Covasim now runs on Starsim 4 (it previously required Starsim 3.7). The Covasim 
 - `verbose=-1` (or `'brief'`) is removed; use `verbose=0`, and `sim.brief()` for a one-line summary.
 - The results by variant no longer count the seed infections at time point 0 twice (once in `new_infections_by_variant` and once more in `cum_infections_by_variant`), so they add up to the totals.
 - `cv.options.set('defaults')` no longer fails (the thousands separator `sep` is Covasim's own).
+- The number of contacts (`contacts`) can be a Starsim distribution instead of a number, for all layers or per layer, e.g. `cv.Sim(contacts=dict(c=ss.nbinom(mean=20, n=0.5)))` for overdispersed contacts with a mean of 20 and a dispersion of 0.5; a number is still the mean of a Poisson distribution. `sim['contacts']` gives the distribution for such a layer, rather than None. Previously, this failed with an error from the random number generator.
 - New parameter `clustered`: `cv.Sim(pop_type='hybrid', clustered=True)` makes schools and workplaces clusters, whose members all know each other, rather than random networks. The mean number of contacts is the same. The default is `False`, which matches v3; with `True`, epidemics grow more slowly, and contact tracing averts more infections.
 
 
