@@ -15,7 +15,7 @@ age-conditional prognoses from ``parameters.get_prognoses`` (already conditional
 do not re-divide). Without waning immunity (``use_waning=False``), recovery confers
 permanent immunity; with it, neutralizing antibodies (NAbs) wane and agents can be
 reinfected. Deaths are requested via ``sim.people.request_death`` and finalized in
-``step_die``.
+``on_death``.
 
 Per-agent transmissibility is time-varying: each agent draws a constant
 overdispersion factor (``beta_dist``, mean 1.0) at init and a two-level viral-load
@@ -883,9 +883,9 @@ class COVID(ss.Infection):
         self.nab[uids] = np.clip(nab, 0.0, peak)
         return
 
-    def step_die(self, uids):
+    def on_death(self, uids):
         """Reset disease flags for agents who die this step (so they are not double-counted)."""
-        super().step_die(uids)
+        super().on_death(uids)
         self.infected[uids]     = False
         self.preinfectious[uids] = False
         self.symptomatic[uids]  = False
