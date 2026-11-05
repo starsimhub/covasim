@@ -8,7 +8,7 @@ There are no further major releases planned. If there is a specific bugfix or fe
 
 ## Latest versions (4.0.x)
 
-### Unreleased (Starsim 4)
+### Version 4.1.0 (2026-11-04)
 
 Covasim now runs on Starsim 4 (it previously required Starsim 3.7). The Covasim API is unchanged, apart from the points below; results agree with Covasim on Starsim 3 within noise (12 seeds of five scenarios), and a run is 1.5–2 times faster.
 
