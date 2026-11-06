@@ -746,8 +746,8 @@ class BaseVaccination(Intervention):
             self.doses[uids] += 1
             covid.vaccinate_agents(uids, self.label, self.index)
             if t is not None: # Back-date the dose to the step that starts on day t
-                covid.date_vaccinated[uids] = t + 1
-                covid.t_nab_event[uids] = t + 1
+                covid.date_vaccinated[uids] = t
+                covid.t_nab_event[uids] = t
         return uids
 
     def step(self):
@@ -1108,7 +1108,7 @@ class historical_vaccinate_prob(vaccinate_prob):
         """ Step the NAbs of the people vaccinated by this intervention forward a day, on day t before the start of the sim """
         uids = ss.uids(self.doses.nonzero()[0])
         if len(uids):
-            t_since = (t + 1 - covid.t_nab_event[uids]).astype(int) # In steps: day t is the step t + 1
+            t_since = (t - covid.t_nab_event[uids]).astype(int) # In steps: day t is the step t
             peak = covid.peak_nab[uids]
             nab = covid.nab[uids] + covid.nab_kin[t_since]*peak
             covid.nab[uids] = np.clip(nab, 0, peak) # NAbs can't go below 0 or above the peak
@@ -1218,7 +1218,7 @@ class historical_wave(Intervention):
             uids = alive[self._select[wave].rvs(alive)]
             days = self._timing[wave].rvs(uids) - days_prior
             before_start = days <= 0 # As in v3, skip infections that would be after the start of the sim
-            susceptible = covid.susceptible[uids] | (covid.ti_recovered[uids] <= days + 1) # Not infected in an earlier wave, or have since recovered; this also excludes the seed infections (v3 included them, then infected them again, which counted them twice)
+            susceptible = covid.susceptible[uids] | (covid.ti_recovered[uids] <= days) # Not infected in an earlier wave, or have since recovered; this also excludes the seed infections (v3 included them, then infected them again, which counted them twice)
             keep = before_start & susceptible
             uids, days = uids[keep], days[keep]
             reinfected = uids[~covid.susceptible[uids]] # Infected in an earlier wave: count those outcomes now, since they are replaced by the new infection
@@ -1239,7 +1239,7 @@ class historical_wave(Intervention):
                 date[uids] = date[uids] + days
             for day in np.unique(days): # Wane their NAbs from the day they were infected
                 covid.imprint_historical_nab(uids[days == day], day)
-            covid.infection_log.add_data(uids, day=days + 1, network='historical') # Dated by step, as the other infections are (day 0 is the first step)
+            covid.infection_log.add_data(uids, day=days, network='historical') # Dated by step, as the other infections are (day 0 is the first step)
 
         # Store the counts to add to the results in step(), since the COVID module resets them when it updates the states
         flows['reinfections'] += covid.flows['reinfections']

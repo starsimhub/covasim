@@ -40,7 +40,7 @@ def test_snapshot():
     assert people1 == people2, 'Snapshot options should match but do not'
     assert people3 != people4, 'Snapshot options should not match but do'
     assert len(people4) == pars['pop_size'], 'Snapshots should include everyone, including people who have died'
-    assert people4.count('exposed') == sim.results['n_exposed'][34], 'Snapshot should match the results on that day'
+    assert people4.count('exposed') == sim.results['n_exposed'][35], 'Snapshot should match the results at the start of the next day' # As in v3, the snapshot is at the end of the day; a stock in the results is at the start of the day
     return people5
 
 

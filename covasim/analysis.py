@@ -101,7 +101,7 @@ class Analyzer(cvc.V3Module, ss.Analyzer):
 
     @property
     def today(self):
-        """ The day the analyzer sees the people on (day 0 is the start day, before the first step), which days given to analyzers (e.g. ``days=10``) refer to; as for the results, the people as they are at the start of that day """
+        """ The day the analyzer sees the people on (day 0 is the start day), which days given to analyzers (e.g. ``days=10``) refer to; as in v3, the people as they are at the end of that day, i.e. as the stocks in the results at the start of the next day """
         return self.ti
 
 
@@ -1433,8 +1433,8 @@ class Calibration(sc.prettyobj):
         # Run the optimization
         bounded = {key:ss.par(best, bounds=[low, high]) for key,(best,low,high) in self.calib_pars.items()}
         sim = self.make_sim(bounded)
-        kwargs = sc.mergedicts(dict(n_trials=self.total_trials, n_workers=self.n_workers, storage=self.storage), kwargs)
-        self.fit = sim.fit(gof=self.mismatch, method='optuna', verbose=verbose, **kwargs)
+        kwargs = sc.mergedicts(dict(n_trials=self.total_trials, workers=self.n_workers, storage=self.storage), kwargs)
+        self.fit = sim.fit(loss=self.mismatch, method='optuna', verbose=verbose, **kwargs)
         names = {name:self.sim.starsim_names.get(name, name) for name in self.fit.pars} # The v3 names of the sim settings, e.g. pop_size for n_agents
         self.best_pars = sc.objdict({key:val for name,val in self.fit.pars.items() for key in self.calib_pars if names[name].split('.')[-1] == key}) # Named e.g. "custom_pars.test_prob" if the name is also another module's parameter
         self.df = self.fit.trials.rename(columns=names) # In trial order

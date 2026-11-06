@@ -157,7 +157,7 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
             msim.reduce()
             msim.summarize()
         """
-        self.check_run('reduce')
+        self._check_ran('reduce')
         bounds = sc.ifelse(bounds, 2)
         quantiles = sc.ifelse(quantiles, dict(low=0.1, high=0.9))
         if not isinstance(quantiles, dict):
@@ -1052,7 +1052,7 @@ def multi_run(sim, n_runs=4, reseed=None, noise=0.0, noisepar=None, iterpars=Non
         n_runs = None
     elif sim_args:
         pars = [sim_args]
-    opts = dict(noise=noise, noisepar=noisepar, keep_people=keep_people, run_args=run_args, par_args=par_args, parallel=parallel, n_cpus=n_cpus, verbose=verbose)
+    opts = dict(noise=noise, noisepar=noisepar, keep_people=keep_people, run_args=run_args, par_args=par_args, parallel=parallel, workers=n_cpus, verbose=verbose)
     msim = MultiSim(sim, n_runs=None if is_list else n_runs, pars=pars, **opts)
     if not do_run:
         msim.init_sims()

@@ -37,7 +37,7 @@ __all__ = ['COVID', 'v3_dist', 'v3_durs']
 def v3_dist(d, unit=None, round=False):
     """
     Convert a v3 distribution, e.g. ``dict(dist='lognormal_int', par1=4.5, par2=1.5)``, to a Starsim
-    distribution, e.g. ``ss.lognorm_ex(mean=4.5, std=1.5, round='nearest')``. The choices are those of
+    distribution, e.g. ``ss.lognormal(mean=4.5, std=1.5, round='nearest')``. The choices are those of
     v3's ``cv.sample()``: uniform, normal, normal_pos, normal_int, lognormal, lognormal_int, poisson, and
     neg_binomial (with an optional ``step``, as for ``beta_dist``).
 
@@ -71,7 +71,7 @@ def v3_dist(d, unit=None, round=False):
         c = abs(d['par1']) / d['par2']
         dist = ss.Dist(dist=sps.foldnorm, distname='normal_pos', c=c, scale=par2, round=round)
     elif name in ['lognorm', 'lognormal']:
-        dist = ss.lognorm_ex(mean=par1, std=par2, round=round)
+        dist = ss.lognormal(mean=par1, std=par2, round=round)
     elif name == 'poisson':
         dist = ss.poisson(lam=d['par1'], round=round)
     elif name == 'neg_binomial': # Mean par1 and dispersion par2, as v3's cv.n_neg_binomial()
@@ -86,7 +86,7 @@ def v3_dist(d, unit=None, round=False):
 def v3_durs(dur):
     """
     Convert v3 duration parameters to Starsim distributions, e.g. ``dur['exp2inf'] =
-    dict(dist='lognormal_int', par1=4.5, par2=1.5)`` becomes ``dur_exp2inf = ss.lognorm_ex(...)``.
+    dict(dist='lognormal_int', par1=4.5, par2=1.5)`` becomes ``dur_exp2inf = ss.lognormal(...)``.
     Durations are always rounded to the nearest whole day, as with v3's ``lognormal_int``.
 
     Args:
@@ -306,7 +306,7 @@ class COVID(ss.Infection):
         self._beta_dist = v3_dist(self.pars.beta_dist)
         self._nab_init = v3_dist(self.pars.nab_init)
         if self.pars.use_waning: # Created here so historical immunity interventions can extend it in their init_post()
-            self.nab_kin = cvimm.precompute_waning(self.t.npts, self.pars.nab_decay)
+            self.nab_kin = cvimm.precompute_waning(self.t.npts + 1, self.pars.nab_decay) # One more than the steps, for the initial infections, dated by the step before the first
         for var in self._variant_objs:
             var.process_days(sim)
         return
@@ -323,8 +323,8 @@ class COVID(ss.Infection):
 
     @property
     def today(self):
-        """ The day this step starts on (day 0 is the start day), which days given by the user (e.g. a variant's ``days=10``) refer to; the step's own index, ``self.ti``, is one more, since time point 0 is the start of the run """
-        return self.ti - 1
+        """ The day this step starts on (day 0 is the start day), which days given by the user (e.g. a variant's ``days=10``) refer to; the same as the step's own index, ``self.ti`` """
+        return self.ti
 
     @property
     def exposed(self):
@@ -430,7 +430,7 @@ class COVID(ss.Infection):
         for i in range(offset):  # Replay the daily updates from the day of the event to the day before the current step
             nab = np.clip(nab + kin[i] * peak, 0.0, peak)
         self.nab[uids] = nab
-        self.t_nab_event[uids] = int(event_day) + 1 # In steps, like the other dates: the step that starts on that day
+        self.t_nab_event[uids] = int(event_day) # In steps, like the other dates: the step that starts on that day
         return
 
     def set_prognoses(self, uids, sources=None, variant=None):
@@ -829,7 +829,7 @@ class COVID(ss.Infection):
         if len(new_dead):
             self.sim.people.request_death(new_dead)
             self.infected[new_dead] = False # As in v3, people don't transmit on the day they die
-        # Capture this step's flows for update_results(); reinfections are counted in set_prognoses()
+        # Capture this step's flows for record_flows(); reinfections are counted in set_prognoses()
         self.flows['symptomatic']  = len(new_symp)
         self.flows['severe']       = len(new_sev)
         self.flows['critical']     = len(new_crit)
@@ -996,11 +996,35 @@ class COVID(ss.Infection):
         )
         return
 
-    def update_results(self):
-        super().update_results()  # auto-counts the BoolState stocks (symptomatic, severe, ...; sim.results.n_symptomatic etc. as in v3)
+    def record_stocks(self):
+        """ Record the stocks, at the start of the step """
+        super().record_stocks()  # auto-counts the BoolState stocks (symptomatic, severe, ...; sim.results.n_symptomatic etc. as in v3)
         ti = self.ti
         res = self.results
-        res.n_infectious[ti] = int(np.count_nonzero(self.infectious))
+        infectious = self.infected & (self.ti_infectious < ti) # As at the end of the last step, before this step's state updates (the property infectious includes those who become infectious in this step)
+        res.n_infectious[ti] = int(np.count_nonzero(infectious))
+        res.n_exposed[ti] = int(np.count_nonzero(self.infected))
+
+        # By-variant stocks (counted from the variant of each agent)
+        for key, variants in [['n_exposed_by_variant', self.exposed_variant[self.infected.uids]],
+                              ['n_infectious_by_variant', self.infectious_variant[infectious.uids]]]:
+            variants = variants[np.isfinite(variants)].astype(int)
+            res[key][ti] = np.bincount(variants, minlength=self.nv)
+
+        # Population immunity summaries (means over alive agents, and over all variants for protection, as in v3)
+        if self.pars.use_waning:
+            nab = self.nab.values  # active (alive) values
+            res.pop_nabs[ti] = float(nab.mean()) if len(nab) else 0.0
+            auids = self.sim.people.auids
+            res.pop_protection[ti] = float(self.sus_imm[auids].mean()) if len(auids) else 0.0
+            res.pop_symp_protection[ti] = float(self.symp_imm[auids].mean()) if len(auids) else 0.0
+        return
+
+    def record_flows(self):
+        """ Record the flows, at the end of the step """
+        super().record_flows()
+        ti = self.ti
+        res = self.results
         # Flows (captured this timestep in step_state)
         res.new_infections[ti]  = res.infection[ti]
         res.new_infectious[ti]  = self.flows_by_variant['new_infectious'].sum()
@@ -1011,7 +1035,6 @@ class COVID(ss.Infection):
         res.new_deaths[ti]      = self.flows['deaths']
         res.new_known_deaths[ti] = self.flows['known_deaths']
         res.new_reinfections[ti] = self.flows['reinfections']
-        res.n_exposed[ti] = int(np.count_nonzero(self.infected))
         res.new_tests[ti]       = self.test_flows['tests']      # testing flows
         res.new_diagnoses[ti]   = self.test_flows['diagnoses']
         res.new_isolated[ti]    = self.test_flows['isolated'] # As in v3, people are isolated when they are diagnosed
@@ -1023,24 +1046,12 @@ class COVID(ss.Infection):
         n_tests = self.test_flows['tests']
         res.test_yield[ti]      = (self.test_flows['diagnoses'] / n_tests) if n_tests > 0 else 0.0
 
-        # By-variant flows (accumulated this step) and stocks (counted from the variant of each agent)
+        # By-variant flows (accumulated this step)
         fv = self.flows_by_variant
         res.new_infections_by_variant[ti]  = fv['new_infections']
         res.new_symptomatic_by_variant[ti] = fv['new_symptomatic']
         res.new_severe_by_variant[ti]      = fv['new_severe']
         res.new_infectious_by_variant[ti]  = fv['new_infectious']
-        for key, variants in [['n_exposed_by_variant', self.exposed_variant[self.infected.uids]],
-                              ['n_infectious_by_variant', self.infectious_variant[self.infectious.uids]]]:
-            variants = variants[np.isfinite(variants)].astype(int)
-            res[key][ti] = np.bincount(variants, minlength=self.nv)
-
-        # Population immunity summaries (means over alive agents, and over all variants for protection, as in v3)
-        if self.pars.use_waning:
-            nab = self.nab.values  # active (alive) values
-            res.pop_nabs[ti] = float(nab.mean()) if len(nab) else 0.0
-            auids = self.sim.people.auids
-            res.pop_protection[ti] = float(self.sus_imm[auids].mean()) if len(auids) else 0.0
-            res.pop_symp_protection[ti] = float(self.symp_imm[auids].mean()) if len(auids) else 0.0
         return
 
     def finalize_results(self):

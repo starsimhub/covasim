@@ -87,8 +87,8 @@ class V3Module:
 
     @property
     def today(self):
-        """ The day this step starts on (day 0 is the start day), which days given to interventions and analyzers (e.g. ``days=10``) refer to; the step's own index, ``self.ti``, is one more, since time point 0 is the start of the run """
-        return self.ti - 1
+        """ The day this step starts on (day 0 is the start day), which days given to interventions and analyzers (e.g. ``days=10``) refer to; the same as the step's own index, ``self.ti`` """
+        return self.ti
 
     def init_post(self):
         """ v3: initialize(self, sim) is called once the sim is initialized """
@@ -304,6 +304,13 @@ class V3Sim:
         return np.full(self.t.npts, self.pars.pop_scale)
 
     @property
+    def _steps_taken(self):
+        """ The number of steps taken so far, i.e. the next step to take (v3's ``sim.t`` between runs); during a step, ``sim.ti`` is the step being taken """
+        if not self.initialized or not self.loop.index:
+            return 0
+        return self.ti + 1
+
+    @property
     def npts(self):
         """ v3: the number of timepoints """
         if self.initialized and not self._is_v3_saved():
@@ -366,7 +373,7 @@ class V3Sim:
 
     def _add_network(self, network):
         """ Add a network to a sim that has been initialized but not yet run, e.g. via sim.people.contacts.add_layer() """
-        if self.ti > 0:
+        if self._steps_taken > 0:
             errormsg = f'Cannot add network "{network.name}" since the sim has already started running'
             raise RuntimeError(errormsg)
         self.add_module(network, 'networks')
@@ -423,7 +430,7 @@ class V3Sim:
         """
         if not self.initialized:
             self.init()
-        if self.ti == 0: # v3: store the parameters before the run, to restore afterwards
+        if self._steps_taken == 0: # v3: store the parameters before the run, to restore afterwards
             restore_pars = True if restore_pars is None else restore_pars
             self._orig_pars = None
             if restore_pars:
@@ -447,8 +454,8 @@ class V3Sim:
             if until > self.npts:
                 errormsg = f'Requested to run until t={until} but the simulation end is t={self.npts}'
                 raise ss.AlreadyRunError(errormsg)
-            if self.ti >= until or self.complete:
-                errormsg = f'Simulation is currently at t={self.ti}, requested to run until t={until} which has already been reached'
+            if self._steps_taken >= until or self.complete:
+                errormsg = f'Simulation is currently at t={self._steps_taken}, requested to run until t={until} which has already been reached'
                 raise ss.AlreadyRunError(errormsg)
 
         timelimit = getattr(self, 'timelimit', None)
@@ -458,8 +465,8 @@ class V3Sim:
         else: # Run one step at a time to check whether to stop; as in v3, the sim isn't finalized if it stops early
             T = sc.timer()
             until = self.npts if until is None else until
-            while self.ti < until and not self.complete:
-                super().run(until=self.t.timevec[self.ti], verbose=verbose, **kwargs)
+            while self._steps_taken < until and not self.complete:
+                super().run(until=self.t.timevec[self._steps_taken], verbose=verbose, **kwargs)
                 verbose = None # Already set by the first step
                 if timelimit is not None and T.toc(output=True) > timelimit:
                     sc.printv(f'Time limit ({timelimit} s) exceeded; call sim.finalize() to compute results if desired', 1, self.verbose)

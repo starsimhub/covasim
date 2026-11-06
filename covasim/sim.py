@@ -68,7 +68,7 @@ class Sim(cvc.V3Sim, ss.Sim):
                 pars[v3_key] = pars.pop(ss_key)
         if 'dur' in pars and not isinstance(pars['dur'], dict): # The Starsim sim duration, rather than the v3 durations
             dur = pars.pop('dur')
-            if isinstance(dur, ss.dur): # E.g. ss.years(1) is 365 days
+            if isinstance(dur, ss.Duration): # E.g. ss.years(1) is 365 days
                 dur = ss.days(dur).value
             pars['n_days'] = int(dur)
         if 'dt' in pars: # Covasim's timestep is always one day

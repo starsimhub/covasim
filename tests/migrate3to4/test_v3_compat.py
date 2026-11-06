@@ -438,7 +438,7 @@ def iv_subclass_builtin_apply():
             self.n_calls = getattr(self, 'n_calls', 0) + 1
             return super().apply(sim)
     s = rs(interventions=my_tp(symp_prob=0.5))
-    assert s.get_intervention().n_calls == s.npts - 1 # The override of a built-in intervention's apply() is called on every day (one step between each pair of time points)...
+    assert s.get_intervention().n_calls == s.npts # The override of a built-in intervention's apply() is called on every day (one step from each time point, as in v3)...
     assert s.results['cum_tests'][-1] > 0 # ...and super().apply() runs the built-in logic
 @probe
 def sim_immunity_without_connector():
@@ -796,7 +796,7 @@ def cv_calibration():
 def sim_t_in_function_is_int():
     ts = []
     def f(sim): ts.append(sim.ti)
-    rs(interventions=f); assert ts[0] == 1 and ts[-1] == 40 and isinstance(ts[0], (int, np.integer)), (ts[0], ts[-1], type(ts[0])) # The first step is ti == 1, since time point 0 is the start of the run
+    rs(interventions=f); assert ts[0] == 0 and ts[-1] == 40 and isinstance(ts[0], (int, np.integer)), (ts[0], ts[-1], type(ts[0])) # As in v3, the first step is ti == 0, the day it starts on
 @probe
 def sim_results_during_run():
     vals = []
