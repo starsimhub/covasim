@@ -1,7 +1,7 @@
 """
 The COVID-19 disease module for Covasim on the Starsim base.
 
-``cv.COVID(ss.Infection)`` is the COVID disease, including Covasim's full
+``cv.COVID(ss.AgentDisease)`` is the COVID disease, including Covasim's full
 natural-history prognosis tree, multiple variants, waning immunity, testing,
 quarantine, and vaccination:
 
@@ -15,12 +15,12 @@ age-conditional prognoses from ``parameters.get_prognoses`` (already conditional
 do not re-divide). Without waning immunity (``use_waning=False``), recovery confers
 permanent immunity; with it, neutralizing antibodies (NAbs) wane and agents can be
 reinfected. Deaths are requested via ``sim.people.request_death`` and finalized in
-``step_die``.
+``on_death``.
 
 Per-agent transmissibility is time-varying: each agent draws a constant
 overdispersion factor (``beta_dist``, mean 1.0) at init and a two-level viral-load
 kernel (``viral_dist``) over its infectious period, written to ``rel_trans`` each
-step before transmission. Transmission (``infect()``) follows ``ss.Infection.infect()``,
+step before transmission. Transmission (``infect()``) follows ``ss.AgentDisease.infect()``,
 with a loop over variants and the per-layer beta, isolation, and quarantine factors.
 """
 import numpy as np
@@ -37,7 +37,7 @@ __all__ = ['COVID', 'v3_dist', 'v3_durs']
 def v3_dist(d, unit=None, round=False):
     """
     Convert a v3 distribution, e.g. ``dict(dist='lognormal_int', par1=4.5, par2=1.5)``, to a Starsim
-    distribution, e.g. ``ss.lognorm_ex(mean=4.5, std=1.5, round='nearest')``. The choices are those of
+    distribution, e.g. ``ss.lognormal(mean=4.5, std=1.5, round='nearest')``. The choices are those of
     v3's ``cv.sample()``: uniform, normal, normal_pos, normal_int, lognormal, lognormal_int, poisson, and
     neg_binomial (with an optional ``step``, as for ``beta_dist``).
 
@@ -71,12 +71,12 @@ def v3_dist(d, unit=None, round=False):
         c = abs(d['par1']) / d['par2']
         dist = ss.Dist(dist=sps.foldnorm, distname='normal_pos', c=c, scale=par2, round=round)
     elif name in ['lognorm', 'lognormal']:
-        dist = ss.lognorm_ex(mean=par1, std=par2, round=round)
+        dist = ss.lognormal(mean=par1, std=par2, round=round)
     elif name == 'poisson':
         dist = ss.poisson(lam=d['par1'], round=round)
     elif name == 'neg_binomial': # Mean par1 and dispersion par2, as v3's cv.n_neg_binomial()
         step = d.get('step', 1)
-        dist = ss.nbinom(n=d['par2'], p=d['par2']/(d['par1']/step + d['par2']), round=round)
+        dist = ss.nbinom(mean=d['par1']/step, n=d['par2'], round=round)
     else:
         errormsg = f'Distribution "{d["dist"]}" is not supported; choices are uniform, normal, normal_pos, normal_int, lognormal, lognormal_int, poisson, and neg_binomial'
         raise ValueError(errormsg)
@@ -86,7 +86,7 @@ def v3_dist(d, unit=None, round=False):
 def v3_durs(dur):
     """
     Convert v3 duration parameters to Starsim distributions, e.g. ``dur['exp2inf'] =
-    dict(dist='lognormal_int', par1=4.5, par2=1.5)`` becomes ``dur_exp2inf = ss.lognorm_ex(...)``.
+    dict(dist='lognormal_int', par1=4.5, par2=1.5)`` becomes ``dur_exp2inf = ss.lognormal(...)``.
     Durations are always rounded to the nearest whole day, as with v3's ``lognormal_int``.
 
     Args:
@@ -101,7 +101,7 @@ def v3_durs(dur):
     return out
 
 
-class COVID(ss.Infection):
+class COVID(ss.AgentDisease):
     """COVID-19 disease with the full natural-history prognosis tree, multiple variants, waning immunity, testing, and quarantine.
 
     Args:
@@ -169,7 +169,7 @@ class COVID(ss.Infection):
         )
         self.update_pars(pars, **kwargs)
 
-        # The disease states (replacing those of ss.Infection)
+        # The disease states (replacing those of ss.AgentDisease)
         self.define_states(
             ss.BoolState('susceptible', default=True, label='Susceptible'),
             ss.BoolState('infected',                   label='Infected (exposed or infectious)'),
@@ -302,11 +302,11 @@ class COVID(ss.Infection):
         it's cheap, and used by cv.TransTree, cv.daily_stats, and sim.compute_r_eff()).
         """
         super().init_pre(sim)
-        self.infection_log = ss.InfectionLog(disease=self.name, networks=sim.networks.keys())
+        self.infection_log = ss.diseases.InfectionLog(disease=self.name, networks=sim.networks.keys())
         self._beta_dist = v3_dist(self.pars.beta_dist)
         self._nab_init = v3_dist(self.pars.nab_init)
         if self.pars.use_waning: # Created here so historical immunity interventions can extend it in their init_post()
-            self.nab_kin = cvimm.precompute_waning(self.t.npts, self.pars.nab_decay)
+            self.nab_kin = cvimm.precompute_waning(self.t.npts + 1, self.pars.nab_decay) # One more than the steps, for the initial infections, dated by the step before the first
         for var in self._variant_objs:
             var.process_days(sim)
         return
@@ -320,6 +320,11 @@ class COVID(ss.Infection):
         """Get a per-variant parameter (e.g. rel_symp_prob) for each of these agents, for the variant they are infected with"""
         values = np.array([self.variant_pars[self.variant_map[i]][key] for i in range(self.nv)])
         return values[self.exposed_variant[uids].astype(int)]
+
+    @property
+    def today(self):
+        """ The day this step starts on (day 0 is the start day), which days given by the user (e.g. a variant's ``days=10``) refer to; the same as the step's own index, ``self.ti`` """
+        return self.ti
 
     @property
     def exposed(self):
@@ -412,7 +417,7 @@ class COVID(ss.Infection):
         uids = ss.uids(uids)
         if not len(uids):
             return
-        offset = int(self.ti) - int(event_day)
+        offset = int(self.today) - int(event_day)
         if offset < 0:
             offset = 0
         # Extend the kernel so it covers the whole sim for these agents, as in v3
@@ -425,7 +430,7 @@ class COVID(ss.Infection):
         for i in range(offset):  # Replay the daily updates from the day of the event to the day before the current step
             nab = np.clip(nab + kin[i] * peak, 0.0, peak)
         self.nab[uids] = nab
-        self.t_nab_event[uids] = int(event_day)
+        self.t_nab_event[uids] = int(event_day) # In steps, like the other dates: the step that starts on that day
         return
 
     def set_prognoses(self, uids, sources=None, variant=None):
@@ -435,7 +440,7 @@ class COVID(ss.Infection):
         this variant's cross-immunity (``symp_imm``/``sev_imm``), as in v3 ``people.infect()``.
         """
         super().set_prognoses(uids, sources)  # logs the infection
-        ti = self.ti
+        ti = self.ti # Dated by the step whose start they happen at (the initial infections by the first step, as ss.AgentDisease dates them)
         p = self.pars
 
         # The variant of each new case
@@ -446,7 +451,7 @@ class COVID(ss.Infection):
         else: # Everyone has the wild variant
             var_of = np.zeros(len(uids), dtype=int)
 
-        # Add the day and variant to the transmission log; ss.Infection.step() adds the network for transmissions
+        # Add the day and variant to the transmission log; ss.AgentDisease.step() adds the network for transmissions
         log_data = dict(day=ti, variant=var_of)
         if sources is None or np.isscalar(sources): # Seed infections and importations have no network
             log_data['network'] = 'seed_infection' if variant is None else 'importation'
@@ -466,7 +471,7 @@ class COVID(ss.Infection):
         self.diagnosed[uids]   = False
         self.date_diagnosed[uids] = np.nan
         self.exposed_variant[uids] = var_of.astype(float)
-        self.ti_infected[uids] = ti
+        self.ti_infected[uids] = self.ti # Starsim's time of infection: 0 for the initial infections
         self.ti_exposed[uids]  = ti
         self.ti_infectious[uids] = ti + p.dur_exp2inf.rvs(uids)
         # Edge case: if dur_exp2inf rounds to 0 the agent is infectious-by-property THIS step, after
@@ -549,9 +554,9 @@ class COVID(ss.Infection):
             self.update_peak_nab(uids, symp_scale=symp_scale)
         return
 
-    def infect(self):
+    def transmit(self):
         """
-        Transmission by variant, calling ``ss.Infection.infect_route()`` for each variant and network (as in
+        Transmission by variant, calling ``ss.AgentDisease.transmit_route()`` for each variant and network (as in
         v3 ``sim.step()``). For each variant, only agents infectious with that variant transmit, scaled by the
         variant's ``rel_beta``, and susceptibility is reduced by immunity to that variant (``sus_imm``). Each
         network has its own beta multiplier (``beta_layer``), and isolation and quarantine factors.
@@ -560,7 +565,7 @@ class COVID(ss.Infection):
         (since v3 infected with each variant in turn). The new cases and the variant of each are stored in
         ``self._new_cases`` and ``self._new_case_variants`` for ``set_prognoses()``.
         """
-        betamap = self.validate_beta()
+        betamap = self.route_betas()
         dt = self.t.dt
         auids = self.sim.people.auids
         iso  = self.isolated.values # Isolated agents transmit less, and quarantined agents both transmit and acquire less (v3 compute_trans_sus)
@@ -579,7 +584,7 @@ class COVID(ss.Infection):
 
             for i, (nkey, route) in enumerate(self.sim.networks.items()):
                 beta_layer = self.get_layer_par('beta_layer', nkey)
-                betas = [b.to_prob(dt) if isinstance(b, ss.Rate) else b for b in betamap[ss.standardize_netkey(nkey)]]
+                betas = [b.to_prob(dt) if isinstance(b, ss.Rate) else b for b in betamap[ss.networks.standardize_netkey(nkey)]]
                 betas = [b*beta_layer for b in betas] # Linear in beta_layer, as in v3 (multiplying an ss.Rate isn't)
                 layer_trans, layer_sus = trans_vals, sus_vals
                 if any_iso:
@@ -590,7 +595,7 @@ class COVID(ss.Infection):
                     layer_sus = layer_sus * f_quar
                 rel_trans = self.rel_trans.asnew(layer_trans)
                 rel_sus = self.rel_sus.asnew(layer_sus)
-                targets, srcs, nets = self.infect_route(i, route, betas, rel_trans, rel_sus)
+                targets, srcs, nets = self.transmit_route(i, route, betas, rel_trans, rel_sus)
                 new_cases.append(targets)
                 sources.append(srcs)
                 networks.append(nets)
@@ -824,7 +829,7 @@ class COVID(ss.Infection):
         if len(new_dead):
             self.sim.people.request_death(new_dead)
             self.infected[new_dead] = False # As in v3, people don't transmit on the day they die
-        # Capture this step's flows for update_results(); reinfections are counted in set_prognoses()
+        # Capture this step's flows for record_flows(); reinfections are counted in set_prognoses()
         self.flows['symptomatic']  = len(new_symp)
         self.flows['severe']       = len(new_sev)
         self.flows['critical']     = len(new_crit)
@@ -878,9 +883,9 @@ class COVID(ss.Infection):
         self.nab[uids] = np.clip(nab, 0.0, peak)
         return
 
-    def step_die(self, uids):
+    def on_death(self, uids):
         """Reset disease flags for agents who die this step (so they are not double-counted)."""
-        super().step_die(uids)
+        super().on_death(uids)
         self.infected[uids]     = False
         self.preinfectious[uids] = False
         self.symptomatic[uids]  = False
@@ -905,8 +910,9 @@ class COVID(ss.Infection):
         """
         Define the results: the daily flows (new_*), cumulative counts (cum_*), stocks that aren't
         states (e.g. n_infectious), rates, immunity summaries, and results by variant. The stocks of
-        the states (e.g. n_symptomatic) and new_infections and cum_infections come from ss.Infection.
-        Counts are scaled by the population scale.
+        the states (e.g. symptomatic) and the result infection come from ss.AgentDisease; new_infections
+        is that result under its v3 name, and cum_infections, unlike infection.cum, includes the initial
+        infections. Counts are scaled by the population scale.
         """
         super().init_results()
 
@@ -915,12 +921,14 @@ class COVID(ss.Infection):
 
         self.define_results(
             R('n_infectious',  'Number infectious'),  # infectious is a property, not auto-counted
+            R('new_infections',  'New infections'),
             R('new_infectious',  'New infectious'),
             R('new_symptomatic', 'New symptomatic'),
             R('new_severe',      'New severe'),
             R('new_critical',    'New critical'),
             R('new_recoveries',  'New recoveries'),
             R('new_deaths',      'New deaths'),
+            R('cum_infections',  'Cumulative infections'),
             R('cum_infectious',  'Cumulative infectious'),
             R('cum_symptomatic', 'Cumulative symptomatic'),
             R('cum_severe',      'Cumulative severe'),
@@ -943,7 +951,7 @@ class COVID(ss.Infection):
             R('cum_doses',       'Cumulative vaccine doses'),
             R('new_vaccinated',  'Newly vaccinated people'),
             R('cum_vaccinated',  'Cumulative vaccinated people'),
-            R('new_quarantined', 'Newly quarantined people'),  # quarantine flow (n_quarantined is auto-counted)
+            R('new_quarantined', 'Newly quarantined people'),  # quarantine flow (the stock, quarantined, is auto-counted)
             R('cum_quarantined', 'Cumulative quarantined people'),
             R('new_isolated',    'Newly isolated people'), # Everyone who is diagnosed is isolated
             R('cum_isolated',    'Cumulative isolated people'),
@@ -988,40 +996,18 @@ class COVID(ss.Infection):
         )
         return
 
-    def update_results(self):
-        super().update_results()  # auto-counts the BoolState stocks (n_symptomatic, n_severe, ...)
+    def record_stocks(self):
+        """ Record the stocks, at the start of the step """
+        super().record_stocks()  # auto-counts the BoolState stocks (symptomatic, severe, ...; sim.results.n_symptomatic etc. as in v3)
         ti = self.ti
         res = self.results
-        res.n_infectious[ti] = int(np.count_nonzero(self.infectious))
-        # Flows (captured this timestep in step_state)
-        res.new_infectious[ti]  = self.flows_by_variant['new_infectious'].sum()
-        res.new_symptomatic[ti] = self.flows['symptomatic']
-        res.new_severe[ti]      = self.flows['severe']
-        res.new_critical[ti]    = self.flows['critical']
-        res.new_recoveries[ti]  = self.flows['recoveries']
-        res.new_deaths[ti]      = self.flows['deaths']
-        res.new_known_deaths[ti] = self.flows['known_deaths']
-        res.new_reinfections[ti] = self.flows['reinfections']
+        infectious = self.infected & (self.ti_infectious < ti) # As at the end of the last step, before this step's state updates (the property infectious includes those who become infectious in this step)
+        res.n_infectious[ti] = int(np.count_nonzero(infectious))
         res.n_exposed[ti] = int(np.count_nonzero(self.infected))
-        res.new_tests[ti]       = self.test_flows['tests']      # testing flows
-        res.new_diagnoses[ti]   = self.test_flows['diagnoses']
-        res.new_isolated[ti]    = self.test_flows['isolated'] # As in v3, people are isolated when they are diagnosed
-        res.new_doses[ti]       = self.vacc_flows['doses']      # vaccination flows
-        res.new_vaccinated[ti]  = self.vacc_flows['vaccinated']
-        self.vacc_flows = dict(doses=0, vaccinated=0) # Reset here rather than at the start of the step, so historical doses (given when the sim is initialized) are counted on day 0, as in v3
-        # Quarantine flow + test yield (the quarantine STOCK n_quarantined is auto-counted by Starsim).
-        res.new_quarantined[ti] = int(np.count_nonzero(self.date_quarantined.raw == ti))
-        n_tests = self.test_flows['tests']
-        res.test_yield[ti]      = (self.test_flows['diagnoses'] / n_tests) if n_tests > 0 else 0.0
 
-        # By-variant flows (accumulated this step) and stocks (counted from the variant of each agent)
-        fv = self.flows_by_variant
-        res.new_infections_by_variant[ti]  = fv['new_infections']
-        res.new_symptomatic_by_variant[ti] = fv['new_symptomatic']
-        res.new_severe_by_variant[ti]      = fv['new_severe']
-        res.new_infectious_by_variant[ti]  = fv['new_infectious']
+        # By-variant stocks (counted from the variant of each agent)
         for key, variants in [['n_exposed_by_variant', self.exposed_variant[self.infected.uids]],
-                              ['n_infectious_by_variant', self.infectious_variant[self.infectious.uids]]]:
+                              ['n_infectious_by_variant', self.infectious_variant[infectious.uids]]]:
             variants = variants[np.isfinite(variants)].astype(int)
             res[key][ti] = np.bincount(variants, minlength=self.nv)
 
@@ -1034,11 +1020,45 @@ class COVID(ss.Infection):
             res.pop_symp_protection[ti] = float(self.symp_imm[auids].mean()) if len(auids) else 0.0
         return
 
+    def record_flows(self):
+        """ Record the flows, at the end of the step """
+        super().record_flows()
+        ti = self.ti
+        res = self.results
+        # Flows (captured this timestep in step_state)
+        res.new_infections[ti]  = res.infection[ti]
+        res.new_infectious[ti]  = self.flows_by_variant['new_infectious'].sum()
+        res.new_symptomatic[ti] = self.flows['symptomatic']
+        res.new_severe[ti]      = self.flows['severe']
+        res.new_critical[ti]    = self.flows['critical']
+        res.new_recoveries[ti]  = self.flows['recoveries']
+        res.new_deaths[ti]      = self.flows['deaths']
+        res.new_known_deaths[ti] = self.flows['known_deaths']
+        res.new_reinfections[ti] = self.flows['reinfections']
+        res.new_tests[ti]       = self.test_flows['tests']      # testing flows
+        res.new_diagnoses[ti]   = self.test_flows['diagnoses']
+        res.new_isolated[ti]    = self.test_flows['isolated'] # As in v3, people are isolated when they are diagnosed
+        res.new_doses[ti]       = self.vacc_flows['doses']      # vaccination flows
+        res.new_vaccinated[ti]  = self.vacc_flows['vaccinated']
+        self.vacc_flows = dict(doses=0, vaccinated=0) # Reset here rather than at the start of the step, so historical doses (given when the sim is initialized) are counted on day 0, as in v3
+        # Quarantine flow + test yield (the quarantine stock, quarantined, is auto-counted by Starsim).
+        res.new_quarantined[ti] = int(np.count_nonzero(self.date_quarantined.raw == ti))
+        n_tests = self.test_flows['tests']
+        res.test_yield[ti]      = (self.test_flows['diagnoses'] / n_tests) if n_tests > 0 else 0.0
+
+        # By-variant flows (accumulated this step)
+        fv = self.flows_by_variant
+        res.new_infections_by_variant[ti]  = fv['new_infections']
+        res.new_symptomatic_by_variant[ti] = fv['new_symptomatic']
+        res.new_severe_by_variant[ti]      = fv['new_severe']
+        res.new_infectious_by_variant[ti]  = fv['new_infectious']
+        return
+
     def finalize_results(self):
         """Cumulate the daily flows into the cum_* results, and finalize the by-variant results."""
         super().finalize_results()
         res = self.results
-        stems = ['infectious', 'symptomatic', 'severe', 'critical', 'recoveries', 'deaths', 'known_deaths',
+        stems = ['infections', 'infectious', 'symptomatic', 'severe', 'critical', 'recoveries', 'deaths', 'known_deaths',
                  'tests', 'diagnoses', 'isolated', 'doses', 'vaccinated', 'quarantined', 'reinfections']
         for stem in stems:
             res[f'cum_{stem}'][:] = np.cumsum(res[f'new_{stem}'][:])
@@ -1056,13 +1076,13 @@ class COVID(ss.Infection):
         res.cum_infections_by_variant[:, 0] += n_seed
 
         # Derived results (v3 compute_states and compute_yield)
-        n_alive = np.asarray(self.sim.results['n_alive'], dtype=float)
-        n_susc = np.asarray(res.n_susceptible, dtype=float)
+        n_alive = np.asarray(self.sim.results.alive, dtype=float)
+        n_susc = np.asarray(res.susceptible, dtype=float)
         def divide(a, b):
             a, b = np.broadcast_arrays(np.asarray(a, dtype=float), np.asarray(b, dtype=float))
             return np.divide(a, b, out=np.zeros_like(a), where=b > 0)
         res.incidence[:] = divide(res.new_infections, n_susc)
-        res.frac_vaccinated[:] = divide(res.n_vaccinated, n_alive)
+        res.frac_vaccinated[:] = divide(res.vaccinated, n_alive)
         denom = divide(res.n_infectious, n_alive - res.cum_diagnoses) # Alive + undiagnosed people might test; infectious people will test positive
         res.rel_test_yield[:] = divide(res.test_yield, denom)
         self.compute_doubling()
@@ -1146,6 +1166,8 @@ class COVID(ss.Infection):
 
         initial_cases = super().init_post()
         self.n_initial_cases = len(initial_cases) if initial_cases is not None else 0 # As in v3, these are added to cum_infections
+        for flow in self.flows_by_variant.values(): # As for new_infections, the seeds are not new infections at time point 0, but are added to the cumulative counts in finalize_results()
+            flow[:] = 0
 
         # Make some of the other agents non-naive, so they can't be infected (the v3 people.make_nonnaive()).
         # Unlike v3, which chose them first and so removed some of the seed infections, they are chosen from the agents who weren't seeded.

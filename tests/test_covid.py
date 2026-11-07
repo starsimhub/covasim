@@ -63,6 +63,11 @@ def test_transmission(do_plot=False):
     assert s0.summary['cum_infections'] == pars['pop_infected']
     assert s0.summary['cum_infections'] < s1.summary['cum_infections'] < s2.summary['cum_infections']
 
+    # The v3 results match the Starsim result, except that cum_infections also includes the initial infections
+    res = s2.diseases.covid.results
+    assert np.array_equal(s2.results['new_infections'], res.infection)
+    assert s2.summary['cum_infections'] == res.infection.cum[-1] + pars['pop_infected']
+
     # People aren't infectious as soon as they are exposed
     ppl = s1.people
     assert np.all(ppl.date_infectious[ppl.infectious] > ppl.date_exposed[ppl.infectious])

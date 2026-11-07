@@ -4,9 +4,9 @@ Initialize Covasim by importing all the modules
 Convention is to use "import covasim as cv", and then to use all functions and
 classes directly, e.g. cv.Sim() rather than cv.sim.Sim().
 """
+# Last verified on: Starsim 4.0.0rc3 (84f1803ee)
 
-# Check that requirements are met and set options
-from . import requirements
+# Set options
 from .settings import *
 
 # Import the version and print the license unless verbosity is disabled, via e.g. os.environ['COVASIM_VERBOSE'] = 0

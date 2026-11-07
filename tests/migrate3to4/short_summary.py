@@ -248,8 +248,8 @@ def build_summary_testing(sim):
             'peak_n_infectious':  float(np.asarray(res['n_infectious']).max()),
             'cum_tests':          float(np.asarray(res['cum_tests']).max()),
             'cum_diagnoses':      float(np.asarray(res['cum_diagnoses']).max()),
-            'peak_n_quarantined': float(np.asarray(res['n_quarantined']).max()),
-            'peak_n_isolated':    float(np.asarray(res['n_isolated']).max()),
+            'peak_n_quarantined': float(np.asarray(res['quarantined']).max()),
+            'peak_n_isolated':    float(np.asarray(res['isolated']).max()),
         }
     summary = sim.summary  # v3.1.8
     return {
