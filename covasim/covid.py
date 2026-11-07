@@ -1,7 +1,7 @@
 """
 The COVID-19 disease module for Covasim on the Starsim base.
 
-``cv.COVID(ss.Infection)`` is the COVID disease, including Covasim's full
+``cv.COVID(ss.AgentDisease)`` is the COVID disease, including Covasim's full
 natural-history prognosis tree, multiple variants, waning immunity, testing,
 quarantine, and vaccination:
 
@@ -20,7 +20,7 @@ reinfected. Deaths are requested via ``sim.people.request_death`` and finalized 
 Per-agent transmissibility is time-varying: each agent draws a constant
 overdispersion factor (``beta_dist``, mean 1.0) at init and a two-level viral-load
 kernel (``viral_dist``) over its infectious period, written to ``rel_trans`` each
-step before transmission. Transmission (``infect()``) follows ``ss.Infection.infect()``,
+step before transmission. Transmission (``infect()``) follows ``ss.AgentDisease.infect()``,
 with a loop over variants and the per-layer beta, isolation, and quarantine factors.
 """
 import numpy as np
@@ -101,7 +101,7 @@ def v3_durs(dur):
     return out
 
 
-class COVID(ss.Infection):
+class COVID(ss.AgentDisease):
     """COVID-19 disease with the full natural-history prognosis tree, multiple variants, waning immunity, testing, and quarantine.
 
     Args:
@@ -169,7 +169,7 @@ class COVID(ss.Infection):
         )
         self.update_pars(pars, **kwargs)
 
-        # The disease states (replacing those of ss.Infection)
+        # The disease states (replacing those of ss.AgentDisease)
         self.define_states(
             ss.BoolState('susceptible', default=True, label='Susceptible'),
             ss.BoolState('infected',                   label='Infected (exposed or infectious)'),
@@ -440,7 +440,7 @@ class COVID(ss.Infection):
         this variant's cross-immunity (``symp_imm``/``sev_imm``), as in v3 ``people.infect()``.
         """
         super().set_prognoses(uids, sources)  # logs the infection
-        ti = self.ti # Dated by the step whose start they happen at (the initial infections by the first step, as ss.Infection dates them)
+        ti = self.ti # Dated by the step whose start they happen at (the initial infections by the first step, as ss.AgentDisease dates them)
         p = self.pars
 
         # The variant of each new case
@@ -451,7 +451,7 @@ class COVID(ss.Infection):
         else: # Everyone has the wild variant
             var_of = np.zeros(len(uids), dtype=int)
 
-        # Add the day and variant to the transmission log; ss.Infection.step() adds the network for transmissions
+        # Add the day and variant to the transmission log; ss.AgentDisease.step() adds the network for transmissions
         log_data = dict(day=ti, variant=var_of)
         if sources is None or np.isscalar(sources): # Seed infections and importations have no network
             log_data['network'] = 'seed_infection' if variant is None else 'importation'
@@ -556,7 +556,7 @@ class COVID(ss.Infection):
 
     def transmit(self):
         """
-        Transmission by variant, calling ``ss.Infection.transmit_route()`` for each variant and network (as in
+        Transmission by variant, calling ``ss.AgentDisease.transmit_route()`` for each variant and network (as in
         v3 ``sim.step()``). For each variant, only agents infectious with that variant transmit, scaled by the
         variant's ``rel_beta``, and susceptibility is reduced by immunity to that variant (``sus_imm``). Each
         network has its own beta multiplier (``beta_layer``), and isolation and quarantine factors.
@@ -565,7 +565,7 @@ class COVID(ss.Infection):
         (since v3 infected with each variant in turn). The new cases and the variant of each are stored in
         ``self._new_cases`` and ``self._new_case_variants`` for ``set_prognoses()``.
         """
-        betamap = self.validate_beta()
+        betamap = self.route_betas()
         dt = self.t.dt
         auids = self.sim.people.auids
         iso  = self.isolated.values # Isolated agents transmit less, and quarantined agents both transmit and acquire less (v3 compute_trans_sus)
@@ -910,7 +910,7 @@ class COVID(ss.Infection):
         """
         Define the results: the daily flows (new_*), cumulative counts (cum_*), stocks that aren't
         states (e.g. n_infectious), rates, immunity summaries, and results by variant. The stocks of
-        the states (e.g. symptomatic) and the result infection come from ss.Infection; new_infections
+        the states (e.g. symptomatic) and the result infection come from ss.AgentDisease; new_infections
         is that result under its v3 name, and cum_infections, unlike infection.cum, includes the initial
         infections. Counts are scaled by the population scale.
         """
