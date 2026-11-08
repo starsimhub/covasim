@@ -173,12 +173,16 @@ class V3Sim:
             return sc.datedelta(self['start_day'], days=self['n_days'], as_date=False) # A string, as in v3
         elif key == 'rand_seed':
             return self.pars.rand_seed
-        elif key == 'pop_scale': # Before initialization, Starsim may not have calculated this yet
-            if self.pars.pop_scale is not None:
-                return self.pars.pop_scale
+        elif key == 'pop_scale': # Starsim's is total_pop/n_agents; before initialization, from Covasim's pop_scale or scaled_pop
+            if self.initialized:
+                return self.pop_scale
+            elif self._v3_pars['pop_scale'] is not None:
+                return self._v3_pars['pop_scale']
             else:
                 return self.pars.total_pop/self.pars.n_agents if self.pars.total_pop else 1.0
-        elif key in ['verbose', 'rescale', 'rescale_threshold', 'rescale_factor']:
+        elif key == 'rescale': # True, or a dict of the rescaling options (see ss.Sim)
+            return bool(self.pars.rescale)
+        elif key == 'verbose':
             return self.pars[key]
         elif key == 'beta': # Stored as a rate; v3 used the daily probability
             beta = covid.pars.beta
@@ -187,7 +191,7 @@ class V3Sim:
             if (not self.initialized) and (self._v3_contacts is not None):
                 return self._v3_contacts
             return cvnet.get_contacts(self._v3_networks())
-        elif key in self._v3_pars: # location, scaled_pop, variants, and dur
+        elif key in self._v3_pars: # location, scaled_pop, variants, dur, and the rescaling options
             return self._v3_pars[key]
         elif key == 'n_variants':
             return covid.nv
@@ -231,16 +235,21 @@ class V3Sim:
         elif key == 'rand_seed':
             self.pars.rand_seed = value
         elif key == 'pop_scale': # Starsim calculates the total population from this, so only one of them can be set
-            self.pars.pop_scale = value
+            self._v3_pars['pop_scale'] = value
             self.pars.total_pop = None
             self._v3_pars['scaled_pop'] = None
         elif key == 'scaled_pop': # Likewise
             self.pars.total_pop = value
-            self.pars.pop_scale = None
+            self._v3_pars['pop_scale'] = None
             self._v3_pars['scaled_pop'] = value
         elif key == 'dur': # Converted to the COVID duration parameters (e.g. dur_exp2inf) when the sim is initialized
             self._v3_pars['dur'] = value
-        elif key in ['verbose', 'rescale', 'rescale_threshold', 'rescale_factor']:
+        elif key in ['rescale', 'rescale_threshold', 'rescale_factor']: # Starsim's rescale= is the dict of the options, or False
+            if key != 'rescale':
+                self._v3_pars[key] = value
+                value = bool(self.pars.rescale)
+            self.pars.rescale = dict(threshold=self._v3_pars['rescale_threshold'], factor=self._v3_pars['rescale_factor']) if value else False
+        elif key == 'verbose':
             self.pars[key] = value
         elif key in ['interventions', 'analyzers']:
             if not self.initialized:
@@ -301,7 +310,7 @@ class V3Sim:
             return self.__dict__['rescale_vec']
         if self.pars.rescale:
             return self.results.pop_scale.values
-        return np.full(self.t.npts, self.pars.pop_scale)
+        return np.full(self.t.npts, self.pop_scale)
 
     @property
     def _steps_taken(self):
@@ -479,7 +488,7 @@ class V3Sim:
         return self
 
     def finalize(self):
-        """ v3: restore the COVID parameters changed by interventions, if run(restore_pars=True), and print the summary if verbose """
+        """ v3: restore the COVID parameters changed by interventions, if run(restore_pars=True), compute sim.summary, and print it if verbose """
         verbose = self.verbose # The value for this run, which Starsim's finalize() resets to the sim's own value
         super().finalize()
         orig_pars = getattr(self, '_orig_pars', None)
@@ -487,6 +496,7 @@ class V3Sim:
             for key,val in orig_pars.items():
                 self.diseases.covid.pars[key] = val
             self._orig_pars = None
+        self.compute_summary() # v3: sim.summary
         if verbose > 0: # As in v3, print the summary
             self.summarize(full=False)
         return
@@ -739,10 +749,17 @@ class V3People:
         if source is not None:
             source = ss.uids(np.asarray(source)[unique][keep])
         if len(uids):
-            covid.set_prognoses(uids, sources=source, variant=int(variant))
-            if layer is not None:
-                covid.infection_log.add_data(uids, network=layer)
+            covid.exposed_variant[uids] = int(variant) # The variant they are infected with, read by set_prognoses()
+            if source is not None: # Logged with their sources, which infect() doesn't know
+                covid.infection_log.add_entries(uids, source)
+            covid.infect(uids, log=source is None)
+            if layer is not None or source is None:
+                covid.infection_log.add_data(uids, network=layer if layer is not None else 'importation')
         return uids
+
+    def person(self, ind):
+        """ v3: the attributes of one person (``people.get_person()`` in v4) """
+        return self.get_person(ind)
 
     def true(self, key):
         """ v3: the UIDs of people for whom this state is true """
@@ -916,7 +933,10 @@ class V3MultiSim:
 
     def summarize(self, output=False):
         """ v3: print a moderate length description of the MultiSim (use show() in v4) """
-        return self.show(output=output)
+        text = self.show() # Returned as text, not printed
+        if output:
+            return str(text)
+        print(text)
 
     def brief(self, output=False):
         """ v3: print (or return) a one-line description of the MultiSim """

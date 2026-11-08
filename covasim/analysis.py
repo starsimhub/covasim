@@ -1421,7 +1421,7 @@ class Calibration(sc.prettyobj):
         Args:
             calib_pars (dict): if supplied, overwrite stored calib_pars
             verbose (bool): whether to print a summary of the results
-            kwargs (dict): passed to ``sim.fit()``, e.g. n_trials=200
+            kwargs (dict): settings of the Optuna method (``ss.fit.method('optuna', ...)``), e.g. n_trials=200, or the data, weights, or rand_seed of ``sim.fit()``
         """
         if calib_pars is not None:
             self.calib_pars = calib_pars
@@ -1433,8 +1433,10 @@ class Calibration(sc.prettyobj):
         # Run the optimization
         bounded = {key:ss.par(best, bounds=[low, high]) for key,(best,low,high) in self.calib_pars.items()}
         sim = self.make_sim(bounded)
-        kwargs = sc.mergedicts(dict(n_trials=self.total_trials, workers=self.n_workers, storage=self.storage), kwargs)
-        self.fit = sim.fit(loss=self.mismatch, method='optuna', verbose=verbose, **kwargs)
+        fit_keys = ['pars', 'data', 'weights', 'rand_seed'] # The other keywords are settings of the method, e.g. n_trials=200
+        fit_kw = {key:kwargs.pop(key) for key in list(kwargs) if key in fit_keys}
+        method = ss.fit.method('optuna', **sc.mergedicts(dict(n_trials=self.total_trials, workers=self.n_workers, storage=self.storage), kwargs))
+        self.fit = sim.fit(loss=self.mismatch, method=method, verbose=verbose, **fit_kw)
         names = {name:self.sim.starsim_names.get(name, name) for name in self.fit.pars} # The v3 names of the sim settings, e.g. pop_size for n_agents
         self.best_pars = sc.objdict({key:val for name,val in self.fit.pars.items() for key in self.calib_pars if names[name].split('.')[-1] == key}) # Named e.g. "custom_pars.test_prob" if the name is also another module's parameter
         self.df = self.fit.trials.rename(columns=names) # In trial order

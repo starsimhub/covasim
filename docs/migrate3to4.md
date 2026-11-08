@@ -1,6 +1,6 @@
 # Migrating from Covasim v3 to v4
 
-Covasim v4 is built on the [Starsim](https://starsim.org) framework: `cv.Sim` is a subclass of `ss.Sim`, the population is an `ss.People`, contact layers are `ss.Network`s, and the COVID disease logic is in a single `cv.COVID` module (an `ss.Infection`). The v3 API is preserved, so most v3 code runs on v4 without changes. This guide lists what does need to change, and how to make those changes.
+Covasim v4 is built on the [Starsim](https://starsim.org) framework: `cv.Sim` is a subclass of `ss.Sim`, the population is an `ss.People`, contact layers are `ss.Network`s, and the COVID disease logic is in a single `cv.COVID` module (an `ss.AgentDisease`). The v3 API is preserved, so most v3 code runs on v4 without changes. This guide lists what does need to change, and how to make those changes.
 
 ## What stays the same
 

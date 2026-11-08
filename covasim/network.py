@@ -47,8 +47,7 @@ def make_networks(pop_type='random', contacts=None, clustered=None):
     elif pop_type == 'hybrid':
         hybrid = ssl.HybridNet(
             household_size = c['h'],
-            contacts = dict(s=c['s'], w=c['w'], c=c['c']),
-            beta = dict(h=1.0, s=1.0, w=1.0, c=1.0), # Per-layer transmissibility is applied by the disease
+            n_contacts = dict(s=c['s'], w=c['w'], c=c['c']),
             method = 'uniform', # As in v3, targets are chosen uniformly
             clustered = clustered,
         )
@@ -75,9 +74,9 @@ def get_contacts(networks):
     """
     def mean(val):
         if isinstance(val, ss.poisson):
-            return val.pars.lam
+            return val.pars.mean
         elif isinstance(val, ss.constant):
-            return val.pars.v
+            return val.pars.value
         elif isinstance(val, ss.Dist):
             return val # The mean isn't available for other distributions, so return the distribution itself
         return val
@@ -86,7 +85,7 @@ def get_contacts(networks):
     for net in networks:
         if isinstance(net, ssl.HybridNet): # Not yet expanded into the four networks
             contacts['h'] = mean(net.pars.household_size)
-            contacts.update({key:mean(val) for key,val in net.pars.contacts.items()})
+            contacts.update({key:mean(val) for key,val in net.pars.n_contacts.items()})
         elif isinstance(net, ssl.ClusterNet):
             contacts[net.name] = mean(net.pars.cluster_size)
         elif 'n_contacts' in net.pars:

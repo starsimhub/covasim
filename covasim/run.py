@@ -86,9 +86,15 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
     run_options = ss.MultiSim.run_options + ['noise', 'noisepar'] # Passed to make_run()
 
     def __init__(self, sims=None, base_sim=None, label=None, n_runs=None, initialize=False, inplace=False, **kwargs):
-        """ As for ss.MultiSim, except that by default the original sims are not modified when they are run (the v3 behavior) """
-        super().__init__(sims=sims, base_sim=base_sim, label=label, n_runs=n_runs, initialize=initialize, inplace=inplace, **keep_people(kwargs))
+        """ As for ss.MultiSim, with the v3 defaults: the original sims are not modified when they are run, and a single sim is run 4 times """
+        if n_runs is None and isinstance(sims, ss.Sim) and kwargs.get('pars') is None:
+            n_runs = 4
+        super().__init__(sims=sims, label=label, n_runs=n_runs, inplace=inplace, **v3_options(kwargs))
+        if base_sim is not None:
+            self.base_sim = base_sim
         self.which = None # Whether the runs have been reduced or combined
+        if initialize:
+            self.init_sims()
         return
 
     def make_run(self, sim, values, seed, noise=0.0, noisepar=None):
@@ -125,7 +131,7 @@ class MultiSim(cvc.V3MultiSim, ss.MultiSim):
             msim.run()
             msim.run(run_args=dict(until='2020-06-01'))
         """
-        super().run(**keep_people(kwargs))
+        super().run(**v3_options(kwargs))
         self.which = None
         if reduce:
             self.reduce()
@@ -961,13 +967,16 @@ class Scenarios(cvc.V3Scenarios):
 
 #%% Running functions
 
-def keep_people(kwargs):
-    """ The options for running sims, with v3's keep_people as Starsim's shrink (its opposite) """
+def v3_options(kwargs):
+    """ The options for running sims, with v3's keep_people as Starsim's shrink (its opposite), and parallel=False as workers=1 """
     kwargs = dict(kwargs)
     if 'keep_people' in kwargs:
         keep = kwargs.pop('keep_people')
         if keep is not None:
             kwargs['shrink'] = not keep
+    if 'parallel' in kwargs:
+        if not kwargs.pop('parallel'):
+            kwargs['workers'] = 1
     return kwargs
 
 

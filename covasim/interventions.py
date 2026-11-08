@@ -386,7 +386,7 @@ class test_num(BaseTest):
         # With dynamic rescaling, correct for the uninfected people outside of the population who would test
         n_requested = n_tests # As in v3, record the number of tests requested, which includes those outside the population
         scale = self.sim.current_scale
-        pop_scale = self.sim.pars.pop_scale
+        pop_scale = self.sim.pop_scale
         if scale < pop_scale: # We still have rescaling to do
             in_pop_tot_prob = test_probs.sum()*scale # Total "testing weight" of people in the subsampled population
             out_pop_tot_prob = (pop_scale - scale)*len(self.sim.people) # Find out how many people are missing and assign them each weight 1
@@ -912,7 +912,7 @@ class vaccinate_num(BaseVaccination):
             if scheduled_today:
                 self._scheduled.setdefault(day + 1, set()).update(scheduled_today) # Defer any extras
             return ss.uids()
-        n_agents = randround(n_doses / sim.pars.pop_scale, self._round)
+        n_agents = randround(n_doses / sim.pop_scale, self._round)
 
         # First, see how many scheduled second doses we are going to deliver
         scheduled = np.fromiter(scheduled_today, dtype=int) # Everyone scheduled today
@@ -1234,7 +1234,9 @@ class historical_wave(Intervention):
                 continue
 
             # Infect them as if on day 0 (the first step), then move the dates of their infection and outcomes back
-            covid.set_prognoses(uids, variant=mapping[self.variants[wave]])
+            covid.susceptible[uids] = True # Those infected in an earlier wave had recovered by then (see above)
+            covid.exposed_variant[uids] = mapping[self.variants[wave]] # The variant they are infected with, read by set_prognoses()
+            covid.infect(uids)
             for date in dates:
                 date[uids] = date[uids] + days
             for day in np.unique(days): # Wane their NAbs from the day they were infected

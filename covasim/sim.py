@@ -111,8 +111,8 @@ class Sim(cvc.V3Sim, ss.Sim):
                 pars[key] = v3.pop(key)
         self.timelimit     = v3.pop('timelimit', defaults['timelimit'])
         self.stopping_func = v3.pop('stopping_func', defaults['stopping_func'])
-        for key in ['rescale', 'rescale_threshold', 'rescale_factor']: # Dynamic rescaling, done by Starsim
-            pars[key] = v3.pop(key, defaults[key])
+        rescale_opts = {key:v3.pop(f'rescale_{key}', defaults[f'rescale_{key}']) for key in ['threshold', 'factor']} # Dynamic rescaling, done by Starsim
+        pars['rescale'] = rescale_opts if v3.pop('rescale', defaults['rescale']) else False
         if end_day is not None: # As in v3, an end_day takes precedence over n_days
             n_days = int(sc.daydiff(start_day, end_day))
         if pop_type not in ['random', 'hybrid']:
@@ -129,7 +129,7 @@ class Sim(cvc.V3Sim, ss.Sim):
 
         # Location-specific data: the age distribution, and the household size. The People are created when the
         # sim is initialized (so pop_size can still be changed).
-        self._v3_pars = dict(location=location, scaled_pop=total_pop) # v3 parameters that aren't stored by the Starsim modules, for sim['key']
+        self._v3_pars = dict(location=location, scaled_pop=total_pop, **{f'rescale_{k}':v for k,v in rescale_opts.items()}) # v3 parameters that aren't stored by the Starsim modules, for sim['key']
         self._load_location(location, verbose)
 
         # One network per contact layer. For the default networks, keep the contacts, so that sim['contacts'] can be
@@ -174,12 +174,12 @@ class Sim(cvc.V3Sim, ss.Sim):
         if (covid is not None) and covid.pars.use_waning and (not has_crossimmunity):
             connectors.append(cvconn.CrossImmunity())
 
-        # Absolute population scaling: each agent represents pop_scale real people. Starsim computes one from the
-        # other, so only pass one of them.
+        # Absolute population scaling: each agent represents pop_scale real people. Starsim takes the number of people
+        # (total_pop), so a pop_scale is kept, and the number of people worked out from it when the sim is initialized.
         if total_pop is not None:
             pars['total_pop'] = total_pop
-        elif pop_scale is not None:
-            pars['pop_scale'] = pop_scale
+            pop_scale = None
+        self._v3_pars['pop_scale'] = pop_scale
 
         super().__init__(pars=pars, label=label, people=people, networks=networks, diseases=diseases, connectors=connectors,
                          n_agents=pop_size, start=ss.date(start_day), dur=ss.days(n_days), dt=ss.days(1),
@@ -226,6 +226,8 @@ class Sim(cvc.V3Sim, ss.Sim):
         if self.pars.n_agents < 0:
             errormsg = f'Population size cannot be negative ({self.pars.n_agents})'
             raise ValueError(errormsg)
+        if self._v3_pars['pop_scale'] is not None: # The number of people, from the number of agents, which may have changed (e.g. sim.new(pop_size=...))
+            self.pars.total_pop = self._v3_pars['pop_scale']*self.pars.n_agents
         if self.pars.get('people') is None:
             self.pars.people = cvppl.People(self.pars.n_agents, age_data=self._age_data)
         ivs = self.pars.interventions # v3: interventions can be defined as dicts, e.g. dict(which='change_beta', pars=dict(days=10, changes=0.5))
