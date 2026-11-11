@@ -4,6 +4,8 @@
 
 Covasim is a stochastic agent-based simulator for performing COVID-19 analyses. These include projections of indicators such as numbers of infections and peak hospital demand. Covasim can also be used to explore the potential impact of different interventions, including social distancing, school closures, testing, contact tracing, quarantine, and vaccination.
 
+**Note:** Covasim is now part of the Starsim framework; please see [starsim.org](https://starsim.org) for our current work on agent-based disease modeling. If you recently upgraded from Covasim v3 to Covasim v4 and would like help with the migration, please [reach out to us](info@covasim.org) or [open an issue](https://github.com/starsimhub/covasim/issues/new/choose) and we would be very happy to help you upgrade and/or fix any bugs you come across.
+
 The original scientific paper describing Covasim is available at <http://paper.covasim.org>. The recommended citation is:
 
 > **Covasim: an agent-based model of COVID-19 dynamics and interventions**. Kerr CC, Stuart RM, Mistry D, Abeysuriya RG, Rosenfeld R, Hart G, Núñez RC, Cohen JA, Selvaraj P, Hagedorn B, George L, Jastrzębski M, Izzo A, Fowler G, Palmer A, Delport D, Scott N, Kelly S, Bennette C, Wagner B, Chang S, Oron AP, Wenger E, Panovska-Griffiths J, Famulare M, Klein DJ (2021). *PLOS Computational Biology* **17** (7): e1009149. doi: <https://doi.org/10.1371/journal.pcbi.1009149>.
@@ -17,8 +19,6 @@ The Covasim webapp is available at <https://app.covasim.org>, and the repository
 Covasim was developed by the [Institute for Disease Modeling](https://idmod.org/), with additional contributions from the [University of Copenhagen](https://www.math.ku.dk/english), the [Burnet Institute](https://www.burnet.edu.au/), [GitHub](https://github.com/), and [Microsoft](https://www.microsoft.com/en-us/ai/ai-for-health-covid-data).
 
 Questions or comments can be directed to <info@covasim.org>, or on this project's [GitHub](https://github.com/starsimhub/covasim) page. Full information about Covasim is provided in the [documentation](https://docs.covasim.org).
-
-**Note:** Covasim is now part of the Starsim framework; please see [starsim.org](https://starsim.org) for our current work on agent-based disease modeling.
 
 
 ## Background
@@ -101,7 +101,6 @@ The model consists of two core classes: the `Person` class (which contains infor
 The structure of the `covasim` folder is as follows, roughly in the order in which the modules are imported, building from most fundamental to most complex:
 
 - `version.py`: Version, date, and license information.
-- `requirements.py`: A simple module to check that imports succeeded, and turn off features if they didn't.
 - `utils.py`: Functions for choosing random numbers, many based on Numba, plus other helper functions.
 - `misc.py`: Miscellaneous helper functions.
 - `settings.py`: User-customizable options for Covasim (e.g. default font size).

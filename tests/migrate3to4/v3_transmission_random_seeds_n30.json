@@ -1,0 +1,182 @@
+[
+  {
+    "cum_infections": 13177.0,
+    "peak_prevalence": 0.34505879409557166,
+    "peak_n_infectious": 4805.0,
+    "_seed": 0
+  },
+  {
+    "cum_infections": 11170.0,
+    "peak_prevalence": 0.33388363599979987,
+    "peak_n_infectious": 4391.0,
+    "_seed": 1
+  },
+  {
+    "cum_infections": 12361.0,
+    "peak_prevalence": 0.3495922757516634,
+    "peak_n_infectious": 4785.0,
+    "_seed": 2
+  },
+  {
+    "cum_infections": 11510.0,
+    "peak_prevalence": 0.3514635976982737,
+    "peak_n_infectious": 4639.0,
+    "_seed": 3
+  },
+  {
+    "cum_infections": 8540.0,
+    "peak_prevalence": 0.2974892467740322,
+    "peak_n_infectious": 3583.0,
+    "_seed": 4
+  },
+  {
+    "cum_infections": 9506.0,
+    "peak_prevalence": 0.30754226267880364,
+    "peak_n_infectious": 3810.0,
+    "_seed": 5
+  },
+  {
+    "cum_infections": 11507.0,
+    "peak_prevalence": 0.3419393575502852,
+    "peak_n_infectious": 4519.0,
+    "_seed": 6
+  },
+  {
+    "cum_infections": 14078.0,
+    "peak_prevalence": 0.3552486740718503,
+    "peak_n_infectious": 4972.0,
+    "_seed": 7
+  },
+  {
+    "cum_infections": 9211.0,
+    "peak_prevalence": 0.30070035017508756,
+    "peak_n_infectious": 3670.0,
+    "_seed": 8
+  },
+  {
+    "cum_infections": 10936.0,
+    "peak_prevalence": 0.3352346642649855,
+    "peak_n_infectious": 4328.0,
+    "_seed": 9
+  },
+  {
+    "cum_infections": 13800.0,
+    "peak_prevalence": 0.35069548684078855,
+    "peak_n_infectious": 4897.0,
+    "_seed": 10
+  },
+  {
+    "cum_infections": 8422.0,
+    "peak_prevalence": 0.29315863172634526,
+    "peak_n_infectious": 3495.0,
+    "_seed": 11
+  },
+  {
+    "cum_infections": 12563.0,
+    "peak_prevalence": 0.36390473331331935,
+    "peak_n_infectious": 4986.0,
+    "_seed": 12
+  },
+  {
+    "cum_infections": 12844.0,
+    "peak_prevalence": 0.3467253714914695,
+    "peak_n_infectious": 4840.0,
+    "_seed": 13
+  },
+  {
+    "cum_infections": 12422.0,
+    "peak_prevalence": 0.3555088351604345,
+    "peak_n_infectious": 4900.0,
+    "_seed": 14
+  },
+  {
+    "cum_infections": 7789.0,
+    "peak_prevalence": 0.2748374187093547,
+    "peak_n_infectious": 3209.0,
+    "_seed": 15
+  },
+  {
+    "cum_infections": 10478.0,
+    "peak_prevalence": 0.32941353082465974,
+    "peak_n_infectious": 4185.0,
+    "_seed": 16
+  },
+  {
+    "cum_infections": 9864.0,
+    "peak_prevalence": 0.3197418451070642,
+    "peak_n_infectious": 3993.0,
+    "_seed": 17
+  },
+  {
+    "cum_infections": 11910.0,
+    "peak_prevalence": 0.3385862224223323,
+    "peak_n_infectious": 4595.0,
+    "_seed": 18
+  },
+  {
+    "cum_infections": 11230.0,
+    "peak_prevalence": 0.3465579347608565,
+    "peak_n_infectious": 4544.0,
+    "_seed": 19
+  },
+  {
+    "cum_infections": 9611.0,
+    "peak_prevalence": 0.3042673470408725,
+    "peak_n_infectious": 3787.0,
+    "_seed": 20
+  },
+  {
+    "cum_infections": 11842.0,
+    "peak_prevalence": 0.3512282983939561,
+    "peak_n_infectious": 4706.0,
+    "_seed": 21
+  },
+  {
+    "cum_infections": 13350.0,
+    "peak_prevalence": 0.36417312984738553,
+    "peak_n_infectious": 5121.0,
+    "_seed": 22
+  },
+  {
+    "cum_infections": 12172.0,
+    "peak_prevalence": 0.3298314072740007,
+    "peak_n_infectious": 4540.0,
+    "_seed": 23
+  },
+  {
+    "cum_infections": 11030.0,
+    "peak_prevalence": 0.34867894315452364,
+    "peak_n_infectious": 4493.0,
+    "_seed": 24
+  },
+  {
+    "cum_infections": 13452.0,
+    "peak_prevalence": 0.34635976982737054,
+    "peak_n_infectious": 4863.0,
+    "_seed": 25
+  },
+  {
+    "cum_infections": 13815.0,
+    "peak_prevalence": 0.3461596197147861,
+    "peak_n_infectious": 4825.0,
+    "_seed": 26
+  },
+  {
+    "cum_infections": 8967.0,
+    "peak_prevalence": 0.2949974987493747,
+    "peak_n_infectious": 3576.0,
+    "_seed": 27
+  },
+  {
+    "cum_infections": 9484.0,
+    "peak_prevalence": 0.3101120224044809,
+    "peak_n_infectious": 3814.0,
+    "_seed": 28
+  },
+  {
+    "cum_infections": 13288.0,
+    "peak_prevalence": 0.361166700020012,
+    "peak_n_infectious": 5019.0,
+    "_seed": 29
+  }
+]

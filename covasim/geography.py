@@ -1,63 +1,52 @@
+"""
+Geography: where agents live, which region and sewershed they are in.
 
-'''
-Geographic helpers: place agents on a map using a population-density raster.
+Nothing in this file is specific to any one place. The caller supplies, as sim parameters:
 
-Nothing in this file is specific to any one place. The caller supplies a raster of
-population counts (a GeoTIFF in longitude/latitude, for example from WorldPop), and
-these functions turn it into agent coordinates in kilometres, which can then be used
-for location-aware contact networks such as make_rank_based_contacts().
+- ``boundary_shapefile``: region polygons (GeoJSON or shapefile, with ``region_code``, ``region_name``, and optionally ``population``)
+- ``density_raster``: a population-density raster (a GeoTIFF of people per pixel, in longitude/latitude, for example from WorldPop), and optionally ``density_bbox``, the window of it to read
+- ``people_coords``: the location of each agent, as an (N, 2) array of longitude and latitude
+- ``sewershed_file``: sewershed polygons (with a ``sid`` property); see sewersheds.py
 
-Functions:
-    load_density_raster(path, bbox)
-        Read the raster file (a GeoTIFF) into a grid of people per cell. bbox optionally
-        reads only a window of the raster instead of the whole file.
-    sample_coords_from_density(raster, pop_size)
-        Take the loaded raster and place the agents: pick a raster cell for each agent with
-        probability proportional to its population, then a random spot inside that cell.
-        Returns (longitude, latitude) in degrees.
-    lonlat_to_km(lonlat)
-        Convert the (longitude, latitude) points sampled from the raster into a flat map in
-        km (x, y), so that straight-line distance is a real distance. Accurate for areas up
-        to about county size.
-    assign_coords(pars)
-        The entry point. Reads the raster path (density_raster) and the optional window
-        (density_bbox) from pars, then loads the raster, samples agent locations from it and
-        converts them to km. Returns an (N, 2) array of x, y in km.
+``assign_geography()`` uses these to set the people's states ``x`` and ``y`` (their home
+location, in degrees of longitude and latitude), ``region``, and ``sewershed``, when the
+people are initialized (before the networks are made, so a network such as ``cv.RankNet``
+can use the locations):
 
-How it is used (pop_type='rank'):
-    1. The raster is passed in as a Sim parameter, so a different raster places the agents
-       somewhere else:
-           sim = cv.Sim(pop_type='rank', pop_size=N, density_raster='path/to/raster.tif')
-       To read only part of a large raster, also pass
-           density_bbox=(lon_min, lat_min, lon_max, lat_max)
-       Both parameters default to None in make_pars().
-    2. make_randpop() calls assign_density_based_coords(pars) and passes the resulting x, y array to
-       make_rank_based_contacts().
-    If no raster is given, agents are spread uniformly over a 10 x 10 km square, which is
-    only useful for testing.
+1. With a boundary file, people are placed inside its polygons: following the density raster,
+   if given, with ``pop_type='rank'`` (each person's region is then the polygon they land in);
+   otherwise, the regions are chosen in proportion to the ``population`` column (or the area),
+   and people are placed uniformly within them.
+2. Otherwise, the locations are ``people_coords``, if given; or, for ``pop_type='rank'``, drawn
+   from the density raster, or (with no raster) spread uniformly over a 10 x 10 km square,
+   which is only useful for testing.
+3. With a sewershed file, each person's sewershed is the polygon they live in.
 
-With a boundary file (boundary_shapefile) as well, agents are still placed according to the raster, but only inside
-the boundary polygons (sample_coords_within_boundaries()); their region is the polygon they land in
-(assign_regions_from_coords()) and the region 'population' column is not used. Locations then stay in longitude/latitude,
-so they can be matched to sewershed polygons; only the contact network converts them to km.
-
-The Sim's 'location' parameter (which loads national age and household data) is not used
-here; only density_raster and density_bbox decide where agents are placed.
+Region codes and sewershed IDs are stored as integers (see ``integer_ids()``); the original
+codes are in ``sim.region_labels`` and ``sim.sewershed_labels``.
 
 The raster library (rasterio) is an optional dependency, only needed by
 load_density_raster(): pip install rasterio
-
-'''
+"""
 
 import numpy as np
+import pandas as pd
 from . import misc as cvm
+from . import sewersheds as cvsew
 
-__all__ = ['load_density_raster', 'sample_coords_from_density', 'sample_coords_within_boundaries', 'assign_regions_from_coords',
-           'lonlat_to_km', 'assign_density_based_coords']
+__all__ = ['geo_pars', 'load_density_raster', 'sample_coords_from_density', 'sample_coords_within_boundaries', 'assign_regions_from_coords',
+           'lonlat_to_km', 'lonlat_to_xyz_km', 'assign_density_based_coords', 'load_population_regions', 'assign_regions', 'assign_coords',
+           'assign_geography']
+
+# The sim parameters that say where agents live (see cv.make_pars())
+geo_pars = ['boundary_shapefile', 'sewershed_file', 'people_coords', 'density_raster', 'density_bbox']
+
+km_per_deg_lon = 111.320 # At the equator; multiply by cos(latitude) elsewhere
+km_per_deg_lat = 110.574
 
 
 def load_density_raster(path, bbox=None):
-    '''
+    """
     Read a population-count GeoTIFF (people per pixel) in longitude/latitude.
 
     Args:
@@ -67,7 +56,7 @@ def load_density_raster(path, bbox=None):
     Returns:
         dict with 'counts' (2D array of people per pixel), 'lons' (1D pixel-centre longitudes),
         'lats' (1D pixel-centre latitudes), 'dlon', 'dlat' (pixel size in degrees)
-    '''
+    """
     try:
         import rasterio # Optional dependency
         from rasterio.windows import from_bounds
@@ -101,7 +90,7 @@ def load_density_raster(path, bbox=None):
 
 
 def sample_coords_from_density(raster, pop_size):
-    '''
+    """
     Draw pop_size (lon, lat) points: pick a pixel with probability proportional
     to its population count, then place the agent uniformly within the pixel.
 
@@ -111,7 +100,7 @@ def sample_coords_from_density(raster, pop_size):
 
     Returns:
         (pop_size, 2) array of longitude, latitude in degrees
-    '''
+    """
     counts = raster['counts']
     probs = counts.ravel()/counts.sum()
     pix = np.random.choice(probs.size, size=pop_size, p=probs)
@@ -122,7 +111,7 @@ def sample_coords_from_density(raster, pop_size):
 
 
 def sample_coords_within_boundaries(raster, boundaries, pop_size, max_tries=100):
-    '''
+    """
     Draw pop_size (lon, lat) points from a population-density raster, but only inside the boundary polygons.
 
     Pixels whose centre is outside every polygon get zero weight; the rest are chosen in proportion to
@@ -137,7 +126,7 @@ def sample_coords_within_boundaries(raster, boundaries, pop_size, max_tries=100)
 
     Returns:
         (pop_size, 2) array of longitude, latitude in degrees
-    '''
+    """
     import shapely # Imported here since only the boundary-based placement needs it
 
     boundary = shapely.union_all(boundaries.geometry.values) # All regions as one shape
@@ -160,7 +149,7 @@ def sample_coords_within_boundaries(raster, boundaries, pop_size, max_tries=100)
 
 
 def assign_regions_from_coords(lonlat, boundaries):
-    '''
+    """
     Give each agent the region_code of the boundary polygon that contains its location.
     Points on a shared edge count as inside both polygons. Where polygons overlap, an agent in
     several polygons is assigned to one of them at random (equal probability) and a warning
@@ -172,7 +161,7 @@ def assign_regions_from_coords(lonlat, boundaries):
 
     Returns:
         array of region_code values, one per agent
-    '''
+    """
     import shapely
     labels = boundaries['region_code'].to_numpy()
     lonlat = np.asarray(lonlat, dtype=float)
@@ -196,7 +185,7 @@ def assign_regions_from_coords(lonlat, boundaries):
 
 
 def lonlat_to_km(lonlat):
-    '''
+    """
     Convert (lon, lat) in degrees to (x, y) in km, using an equirectangular projection
     about the mean latitude. This is accurate for areas of city to county size, so that
     straight-line distance between two rows is a good distance in km. It is not suitable
@@ -207,83 +196,192 @@ def lonlat_to_km(lonlat):
 
     Returns:
         (N, 2) array of x, y in km, centred on the mean location
-    '''
+    """
+    lonlat = np.asarray(lonlat, dtype=float)
     lon0, lat0 = lonlat[:, 0].mean(), lonlat[:, 1].mean()
-    kx = 111.320*np.cos(np.radians(lat0)) # km per degree of longitude at this latitude
-    ky = 110.574 # km per degree of latitude
-    return np.column_stack(((lonlat[:, 0]-lon0)*kx, (lonlat[:, 1]-lat0)*ky))
+    kx = km_per_deg_lon*np.cos(np.radians(lat0)) # km per degree of longitude at this latitude
+    return np.column_stack(((lonlat[:, 0]-lon0)*kx, (lonlat[:, 1]-lat0)*km_per_deg_lat))
 
 
-def _get_par(pars, key, default=None):
-    ''' Read a parameter from either a dict or a Sim (which supports sim[key] but not .get()) '''
-    try:
-        return pars[key]
-    except (KeyError, AttributeError): # sciris' KeyNotFoundError is a KeyError
-        return default
-
-def assign_density_based_coords(pars):
-    '''
-    Assign each agent an (x, y) location in km, sampled from a population-density raster.
-
-    Steps:
-        1. Read the raster path and optional window from pars.
-        2. Load the raster (a grid of people per cell).
-        3. Sample a (longitude, latitude) for each agent from the raster.
-        4. Convert those degrees to km.
-
-    Args:
-        pars (dict or Sim): needs 'pop_size'; optionally 'density_raster' (path to the .tif)
-                            and 'density_bbox' (lon_min, lat_min, lon_max, lat_max)
-
-    Returns:
-        (N, 2) array of x, y in km. If no raster is given, agents are spread uniformly over
-        a 10 x 10 km square, which is only useful for testing.
-    '''
-
-    # 1. Read the inputs
-    pop_size = int(pars['pop_size'])                  # Number of agents to place
-    path     = _get_par(pars, 'density_raster')       # Path to the raster file (None if not supplied)
-    bbox     = _get_par(pars, 'density_bbox')         # Optional (lon_min, lat_min, lon_max, lat_max) window
-
-    # No raster: fall back to a 10 x 10 km test square
-    if path is None:
-        return np.random.uniform(0, 10, size=(pop_size, 2))
-
-    # 2. Load the raster: a grid of people per cell, plus the longitude/latitude of each cell
-    raster = load_density_raster(path, bbox)
-
-    # 3. Sample a (longitude, latitude) for each agent: a cell chosen in proportion to its population,
-    #    then a random spot inside that cell
-    lonlat = sample_coords_from_density(raster, pop_size)
-
-    # 4. Convert degrees to km, so that straight-line distance between agents is a real distance
-    xy = lonlat_to_km(lonlat)
-
-    return xy
-
-
-#********************
-#Additional
- 
 def lonlat_to_xyz_km(lonlat, radius=6371.0):
-    '''
+    """
     Convert (lon, lat) in degrees to 3D points (x, y, z) in km on a sphere the size of the Earth.
- 
+
     The straight-line (chord) distance between two such points grows with the distance
     along the surface, so which points are nearest, second nearest, and so on is exactly the
     same as with great-circle distances, at any scale and anywhere on the globe. Use these
     as the coordinates for rank-based (nearest-neighbour) calculations. Chord lengths are
     very slightly shorter than surface distances (0.04% at 1,000 km); for rankings this
     makes no difference. The Earth is treated as a sphere, ignoring its slight flattening.
- 
+
     Args:
         lonlat (array): (N, 2) array of longitude, latitude in degrees
         radius (float): sphere radius in km (default: mean Earth radius)
- 
+
     Returns:
         (N, 3) array of x, y, z in km
-    '''
+    """
     lon = np.radians(lonlat[:, 0])
     lat = np.radians(lonlat[:, 1])
     return radius*np.column_stack((np.cos(lat)*np.cos(lon), np.cos(lat)*np.sin(lon), np.sin(lat)))
- 
+
+
+def assign_density_based_coords(pars):
+    """
+    Assign each agent a (longitude, latitude) location, sampled from a population-density raster.
+
+    Args:
+        pars (dict or Sim): needs 'pop_size'; optionally 'density_raster' (path to the .tif)
+                            and 'density_bbox' (lon_min, lat_min, lon_max, lat_max)
+
+    Returns:
+        (N, 2) array of longitude and latitude in degrees. If no raster is given, agents are spread uniformly over
+        a 10 x 10 km square at longitude and latitude 0, which is only useful for testing.
+
+    | New in the v4 port: returns degrees rather than km, as the other ways of placing agents do (use lonlat_to_km() for km).
+    """
+    pop_size = int(pars['pop_size'])
+    path = pars['density_raster'] if 'density_raster' in pars else None
+    bbox = pars['density_bbox'] if 'density_bbox' in pars else None
+    if path is None: # No raster: a 10 x 10 km test square
+        km = np.random.uniform(0, 10, size=(pop_size, 2))
+        return np.column_stack((km[:, 0]/km_per_deg_lon, km[:, 1]/km_per_deg_lat))
+    raster = load_density_raster(path, bbox) # A grid of people per cell, plus the longitude/latitude of each cell
+    return sample_coords_from_density(raster, pop_size) # A cell chosen in proportion to its population, then a random spot inside it
+
+
+def load_population_regions(filename):
+    """
+    Load the region polygons of a boundary file (GeoJSON or shapefile, with columns region_code and region_name,
+    and optionally population), with the probability of a person being in each region: in proportion to its
+    population, or, with no population column, to its area.
+    """
+    import geopandas as gpd
+    regions = gpd.read_file(filename)
+
+    required = {'region_code', 'region_name'}
+    missing = required - set(regions.columns)
+    if missing:
+        raise ValueError(f'Population boundary file is missing columns: {missing}')
+    if regions.empty:
+        raise ValueError('Population boundary file contains no regions.')
+
+    if regions.crs is not None and not regions.crs.equals('EPSG:4326'): # Agent coordinates are longitude/latitude
+        regions = regions.to_crs('EPSG:4326')
+
+    if 'population' in regions.columns:
+        regions['population'] = pd.to_numeric(regions['population'], errors='raise')
+        if (regions['population'] < 0).any():
+            raise ValueError('Population cannot be negative.')
+        total_population = regions['population'].sum()
+        if total_population <= 0:
+            raise ValueError('Total population must be greater than zero.')
+        regions['probability'] = regions['population'] / total_population
+    else: # No population data: spread people evenly over the area, i.e. weight each region by its area
+        cvm.warn('The boundary file has no "population" column, so regions are weighted by their area. '
+                 'Add a "population" column to weight by population (it is not needed when pop_type="rank" uses a density_raster).')
+        geometry = regions.geometry if regions.crs is not None else regions.geometry.set_crs('EPSG:4326')
+        area = geometry.to_crs('EPSG:6933').area # An equal-area projection, so areas are comparable
+        regions['probability'] = area / area.sum()
+
+    regions['region_num'] = cvsew.integer_ids(regions['region_code'], name='region_code', minimum=None) # Integer ID used in people.region
+    return regions
+
+
+def assign_regions(pars, population_data):
+    """ Choose a region (its region_code) for each of the pop_size agents, in proportion to the region probabilities (from load_population_regions()) """
+    pop_size = int(pars['pop_size'])
+    labels = population_data['region_code'].to_numpy()
+    probabilities = population_data['probability'].to_numpy()
+    return np.random.choice(labels, size=pop_size, p=probabilities)
+
+
+def assign_coords(assigned_region_codes, population_data):
+    """
+    Generate coordinates for agents based on their assigned region geometry, uniformly within the polygon.
+
+    Args:
+        assigned_region_codes (array): the region_code of each agent
+        population_data (GeoDataFrame): from load_population_regions()
+
+    Returns:
+        (N, 2) array of longitude and latitude
+    """
+    import shapely
+    geoms = dict(zip(population_data['region_code'], population_data.geometry))
+    codes = np.asarray(assigned_region_codes)
+    coords = np.zeros((len(codes), 2))
+    for code in np.unique(codes): # Rejection sampling inside each region's polygon, for all of its agents at once
+        geom = geoms[code]
+        inds = np.flatnonzero(codes == code)
+        minx, miny, maxx, maxy = geom.bounds
+        todo = inds
+        while len(todo):
+            x = np.random.uniform(minx, maxx, size=len(todo))
+            y = np.random.uniform(miny, maxy, size=len(todo))
+            inside = shapely.contains_xy(geom, x, y)
+            coords[todo[inside], 0] = x[inside]
+            coords[todo[inside], 1] = y[inside]
+            todo = todo[~inside]
+    return coords
+
+
+def assign_geography(people, pars, pop_type=None):
+    """
+    Set the home location (``x`` and ``y``, in degrees of longitude and latitude), ``region``, and
+    ``sewershed`` of each person, from the geography parameters (see the top of this file). Called when
+    the people are initialized.
+
+    Args:
+        people (People): the people, with ``x``, ``y``, ``region``, and ``sewershed`` states
+        pars (dict): the geography parameters (``geo_pars``), plus ``pop_size``
+        pop_type (str): the population type; with 'rank', people are always given locations, since the network needs them
+
+    Returns:
+        Two dicts: {integer region ID: region_code} and {integer sewershed ID: original sid}
+    """
+    uids = people.auids
+    n = len(uids)
+    pars = dict(pars, pop_size=n)
+    coords = pars.get('people_coords')
+    region_labels = {}
+
+    # Regions and locations from a boundary file
+    boundary_file = pars.get('boundary_shapefile')
+    if boundary_file is not None:
+        if coords is not None:
+            errormsg = 'Give either boundary_shapefile (to place people within it) or people_coords, not both'
+            raise ValueError(errormsg)
+        population_data = load_population_regions(boundary_file)
+        if pop_type == 'rank' and pars.get('density_raster') is not None:
+            # Place people according to the population-density raster, but only inside the boundary polygons;
+            # each person's region is the polygon they land in
+            bbox = pars['density_bbox'] if pars.get('density_bbox') is not None else tuple(population_data.total_bounds) # Read only the raster window around the boundaries
+            raster = load_density_raster(pars['density_raster'], bbox)
+            coords = sample_coords_within_boundaries(raster, population_data, n)
+            regions = assign_regions_from_coords(coords, population_data)
+        else: # Regions in proportion to the 'population' column, then uniform within each polygon
+            regions = assign_regions(pars, population_data)
+            coords = assign_coords(regions, population_data)
+        region_nums = dict(zip(population_data['region_code'], population_data['region_num']))
+        people.region[uids] = np.array([region_nums[code] for code in regions])
+        region_labels = dict(zip(population_data['region_num'].tolist(), population_data['region_code'].tolist()))
+
+    # Locations without a boundary file
+    elif coords is None and pop_type == 'rank':
+        coords = assign_density_based_coords(pars)
+
+    # Store the locations
+    if coords is not None:
+        coords = np.asarray(coords, dtype=float)
+        if coords.shape != (n, 2):
+            errormsg = f'people_coords must have shape (pop_size, 2) = {(n, 2)}, not {coords.shape}'
+            raise ValueError(errormsg)
+        if not np.isfinite(coords).all():
+            raise ValueError('people_coords must contain finite values')
+        people.x[uids] = coords[:, 0]
+        people.y[uids] = coords[:, 1]
+
+    # Sewersheds
+    sewershed_labels = cvsew.assign_sewersheds(people, pars.get('sewershed_file'))
+    return region_labels, sewershed_labels

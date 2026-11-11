@@ -5,6 +5,11 @@ project:
   output-dir: _site
   title: "Covasim"
   execute-dir: file
+  render: # Render all pages except the AI migration skill, which isn't a docs page
+    - "**/*.md"
+    - "**/*.qmd"
+    - "**/*.ipynb"
+    - "!migrate3to4/"
   resources:
     - objects.json
     - objects.inv
@@ -51,6 +56,8 @@ website:
         text: Tutorials
       - href: whatsnew.md
         text: What's new
+      - href: migrate3to4.md
+        text: v3 → v4 migration
       - href: faq.md
         text: FAQ
       - href: api/index.qmd
@@ -92,8 +99,13 @@ website:
             - tutorials/tut_deployment.ipynb
             - tutorials/tut_tips.ipynb
             - tutorials/tut_advanced.ipynb
+            - tutorials/tut_wastewater.ipynb
+            - tutorials/tut_sequence_evol.ipynb
+            - tutorials/tut_clinical_sequencing.ipynb
         - href: whatsnew.md
           text: "**What's new**"
+        - href: migrate3to4.md
+          text: "**v3 → v4 migration**"
         - href: faq.md
           text: "**FAQ**"
         - href: api/index.qmd
@@ -130,7 +142,6 @@ website:
         - api/people.qmd
         - api/plotting.qmd
         - api/population.qmd
-        - api/requirements.qmd
         - api/run.qmd
         - api/settings.qmd
         - api/sim.qmd
@@ -157,7 +168,6 @@ quartodoc:
       - people
       - plotting
       - population
-      - requirements
       - run
       - settings
       - sim
@@ -191,7 +201,7 @@ interlinks:
     matplotlib:
       url: https://matplotlib.org/stable/
     sciris:
-      url: https://docs.sciris.org/en/latest/
+      url: https://docs.sciris.org/
     starsim:
       url: https://docs.starsim.org/
   autolink: true

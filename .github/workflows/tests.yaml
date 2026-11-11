@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        python-version: ['3.13']
+        python-version: ['3.11', '3.13', '3.14']
     name: Run tests
     steps:
       - name: Checkout sources
@@ -25,9 +25,41 @@ jobs:
         run: pip install -e .[test]
       - name: Run integration tests
         working-directory: ./tests
-        run: pytest -v test_*.py unittests/test_*.py -n auto --durations=0 --junitxml=test-results.xml
+        run: pytest -v test_*.py -n auto --durations=0 --junitxml=test-results.xml
       - name: Publish test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: tests/test-results.xml
+          check_name: Test results (${{ matrix.python-version }})
+          junit_files: tests/test-results.xml
+
+  migrate3to4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        python-version: ['3.11', '3.14']
+    name: Run migration tests
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@master
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Covasim
+        run: pip install -e .[test]
+      - name: Run migration tests
+        working-directory: ./tests
+        run: pytest -v migrate3to4/test_*.py -n auto --durations=0 --junitxml=test-results.xml
+      - name: Smoke-check regression compare CLI (no-baseline mode)
+        working-directory: ./tests
+        run: python migrate3to4/compare.py --baseline /tmp/no_baseline.json
+      - name: Publish test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: Migration test results (${{ matrix.python-version }})
+          junit_files: tests/test-results.xml

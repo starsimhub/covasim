@@ -1,9 +1,9 @@
-'''
+"""
 Tests for covasim/clinical.py
 
 Run from the tests/ directory:
     pytest test_clinical.py -v
-'''
+"""
 
 import pytest
 import covasim as cv
@@ -14,7 +14,7 @@ import covasim as cv
 # ---------------------------------------------------------------------------
 
 def make_clinical_sim(cs, n_days=30, pop_size=500, pop_infected=50, rand_seed=42):
-    '''Small sim with sequence tracking and a ClinicalSequencer analyzer.'''
+    """Small sim with sequence tracking and a ClinicalSequencer analyzer."""
     sim = cv.Sim(
         pop_size=pop_size,
         pop_infected=pop_infected,
@@ -35,7 +35,7 @@ def make_clinical_sim(cs, n_days=30, pop_size=500, pop_infected=50, rand_seed=42
 
 
 def all_released_agent_ids(cs):
-    '''Set of agent IDs appearing in any released batch.'''
+    """Set of agent IDs appearing in any released batch."""
     ids = set()
     for batch in cs.samples.values():
         for s in batch:
@@ -48,7 +48,7 @@ def all_released_agent_ids(cs):
 # ---------------------------------------------------------------------------
 
 def test_batch_size_one_releases_on_collection_days():
-    '''batch_size=1 should release specimens on the same day they are collected.'''
+    """batch_size=1 should release specimens on the same day they are collected."""
     sample_days = [5, 10, 15, 20]
     cs = cv.ClinicalSequencer(
         days=sample_days,
@@ -66,7 +66,7 @@ def test_batch_size_one_releases_on_collection_days():
 
 
 def test_batch_size_one_matches_collected_count():
-    '''Each release day should contain exactly the specimens collected that day.'''
+    """Each release day should contain exactly the specimens collected that day."""
     cs = cv.ClinicalSequencer(
         days=[10, 20],
         n_samples=5,
@@ -87,7 +87,7 @@ def test_batch_size_one_matches_collected_count():
 # ---------------------------------------------------------------------------
 
 def test_batch_threshold_delays_release():
-    '''No sequences released until pending queue reaches batch_size.'''
+    """No sequences released until pending queue reaches batch_size."""
     cs = cv.ClinicalSequencer(
         days=[5, 10, 15],
         n_samples=3,
@@ -103,7 +103,7 @@ def test_batch_threshold_delays_release():
 
 
 def test_batch_releases_exactly_batch_size():
-    '''First release should contain exactly sequencing_batch_size specimens.'''
+    """First release should contain exactly sequencing_batch_size specimens."""
     cs = cv.ClinicalSequencer(
         days=[5, 10, 15, 20],
         n_samples=3,
@@ -119,7 +119,7 @@ def test_batch_releases_exactly_batch_size():
 
 
 def test_batch_fifo_order():
-    '''Released specimens should be the oldest collected (FIFO).'''
+    """Released specimens should be the oldest collected (FIFO)."""
     cs = cv.ClinicalSequencer(
         days=[5, 10, 15, 20],
         n_samples=3,
@@ -140,7 +140,7 @@ def test_batch_fifo_order():
 
 
 def test_pending_remainder_discarded():
-    '''Specimens below batch_size at end of sim stay pending and are never released.'''
+    """Specimens below batch_size at end of sim stay pending and are never released."""
     cs = cv.ClinicalSequencer(
         days=[10],
         n_samples=7,
@@ -155,7 +155,7 @@ def test_pending_remainder_discarded():
 
 
 def test_pending_agents_not_in_samples():
-    '''Agent IDs in the pending queue must not appear in released samples.'''
+    """Agent IDs in the pending queue must not appear in released samples."""
     cs = cv.ClinicalSequencer(
         days=[10],
         n_samples=7,
@@ -165,7 +165,7 @@ def test_pending_agents_not_in_samples():
     sim = make_clinical_sim(cs, n_days=15)
     cs = sim.get_analyzer('ClinicalSequencer')
 
-    pending_ids = {s.agent_id for s in cs._pending}
+    pending_ids = {s.agent_id for s in cs.pending}
     released_ids = all_released_agent_ids(cs)
     assert pending_ids.isdisjoint(released_ids)
 
@@ -175,7 +175,7 @@ def test_pending_agents_not_in_samples():
 # ---------------------------------------------------------------------------
 
 def test_to_fasta_empty_before_release():
-    '''to_fasta returns empty string for days with no released batch.'''
+    """to_fasta returns empty string for days with no released batch."""
     cs = cv.ClinicalSequencer(
         days=[5, 10],
         n_samples=3,
@@ -190,7 +190,7 @@ def test_to_fasta_empty_before_release():
 
 
 def test_to_fasta_record_count_matches_batch():
-    '''to_fasta should emit one record per released specimen.'''
+    """to_fasta should emit one record per released specimen."""
     cs = cv.ClinicalSequencer(
         days=[5, 10, 15, 20],
         n_samples=3,
@@ -207,7 +207,7 @@ def test_to_fasta_record_count_matches_batch():
 
 
 def test_to_fasta_header_uses_collection_day():
-    '''FASTA headers should reflect each specimen's collection day, not release day.'''
+    """FASTA headers should reflect each specimen's collection day, not release day."""
     cs = cv.ClinicalSequencer(
         days=[5, 10, 15, 20],
         n_samples=3,

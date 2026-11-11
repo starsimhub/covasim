@@ -1,6 +1,6 @@
-'''
+"""
 Test that the parameters and data files are being created correctly.
-'''
+"""
 
 #%% Imports
 import os
@@ -14,6 +14,7 @@ def test_parameters():
     sc.heading('Model parameters')
     pars = cv.make_pars()
     sc.pp(pars)
+    assert cv.make_pars(beta=0.02, version='3.1.2', verbose=0)['beta'] == 0.02 # Keyword parameters take precedence over the version's
     return pars
 
 
@@ -53,6 +54,8 @@ def test_age_structure():
 
     with pytest.raises(ValueError):
         cv.data.loaders.get_age_distribution(not_available)
+    assert cv.data.get_household_size('UK') == cv.data.get_household_size('United Kingdom') # Aliases work for the household data too
+    assert len(cv.data.get_age_distribution('Cape Verde')) # Every listed alias loads
 
     return age_data
 

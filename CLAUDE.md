@@ -18,7 +18,8 @@ All test commands run **from the `tests/` directory**:
 
 ```
 cd tests
-./run_tests                # all integration tests, parallel, with timings
+./run_tests                # regular integration tests, parallel, with timings
+./run_tests 3to4           # only the v3 to v4 migration tests (all = both)
 ./check_coverage           # tests + HTML coverage report (htmlcov/index.html)
 ./check_style              # pylint over ../covasim
 ./check_everything         # integration + unit tests + coverage + docs

@@ -1,208 +1,40 @@
-'''
+"""
 Set the defaults across each of the different files.
 
-To change the default precision from 32 bit (default) to 64 bit, use::
+The precision (32 bit by default, or 64 bit) is shared with Starsim; to change
+it, use::
 
     cv.options.set(precision=64)
-'''
+"""
 
 import numpy as np
 import numba as nb
 import sciris as sc
+import starsim as ss
 from .settings import options as cvo # To set options
 
-# Specify all externally visible functions this file defines -- other things are available as e.g. cv.defaults.default_int
+# Specify all externally visible functions this file defines
 __all__ = ['default_float', 'default_int', 'get_default_colors', 'get_default_plots']
 
 
 #%% Specify what data types to use
 
-result_float = np.float64 # Always use float64 for results, for simplicity
+# Floats are the same as Starsim's, which follow ss.options.precision (set by cv.options.set(precision=...))
+default_float = ss.dtypes.float
+nbfloat       = ss.dtypes.nbfloat
+
+# Integers for the contact arrays (population.py) and the Numba functions (utils.py); Starsim always uses int64
 if cvo.precision == 32:
-    default_float = np.float32
-    default_int   = np.int32
-    nbfloat       = nb.float32
-    nbint         = nb.int32
+    default_int = np.int32
+    nbint       = nb.int32
 elif cvo.precision == 64: # pragma: no cover
-    default_float = np.float64
-    default_int   = np.int64
-    nbfloat       = nb.float64
-    nbint         = nb.int64
+    default_int = np.int64
+    nbint       = nb.int64
 else:
     raise NotImplementedError(f'Precision must be either 32 bit or 64 bit, not {cvo.precision}')
 
 
-#%% Define all properties of people
-
-class PeopleMeta(sc.prettyobj):
-    ''' For storing all the keys relating to a person and people '''
-
-    def __init__(self):
-
-        # Set the properties of a person
-        self.person = [
-            'uid',              # Int
-            'age',              # Float
-            'sex',              # Float
-            'region',           # Int
-            'sewershed',         # Int: 0 default catchment, -1 outside supplied polygons
-            'x',                # Float64 home coordinate
-            'y',                # Float64 home coordinate
-            'symp_prob',        # Float
-            'severe_prob',      # Float
-            'crit_prob',        # Float
-            'death_prob',       # Float
-            'rel_trans',        # Float
-            'rel_sus',          # Float
-            'n_infections',     # Int
-            'n_breakthroughs',  # Int
-        ]
-
-        # Set the states that a person can be in: these are all booleans per person -- used in people.py
-        self.states = [
-            'susceptible',
-            'naive',
-            'exposed',
-            'infectious',
-            'symptomatic',
-            'severe',
-            'critical',
-            'tested',
-            'diagnosed',
-            'recovered',
-            'known_dead',
-            'dead',
-            'known_contact',
-            'quarantined',
-            'isolated',
-            'vaccinated',
-        ]
-
-        # Variant states -- these are ints
-        self.variant_states = [
-            'exposed_variant',
-            'infectious_variant',
-            'recovered_variant',
-        ]
-
-        # Variant states -- these are ints, by variant
-        self.by_variant_states = [
-            'exposed_by_variant',
-            'infectious_by_variant',
-        ]
-
-        # Immune states, by variant
-        self.imm_states = [
-            'sus_imm',  # Float, by variant
-            'symp_imm', # Float, by variant
-            'sev_imm',  # Float, by variant
-        ]
-
-        # Neutralizing antibody states
-        self.nab_states = [
-            'peak_nab',    # Float, peak neutralization titre relative to convalescent plasma
-            'nab',         # Float, current neutralization titre relative to convalescent plasma
-            't_nab_event', # Int, time since nab-conferring event
-        ]
-
-        # Additional vaccination states
-        self.vacc_states = [
-            'doses',          # Number of doses given per person
-            'vaccine_source', # index of vaccine that individual received
-        ]
-
-        # Set the dates various events took place: these are floats per person -- used in people.py
-        self.dates = [f'date_{state}' for state in self.states] # Convert each state into a date
-        self.dates.append('date_pos_test') # Store the date when a person tested which will come back positive
-        self.dates.append('date_end_quarantine') # Store the date when a person comes out of quarantine
-        self.dates.append('date_end_isolation') # Store the date when a person comes out of isolation
-
-        # Duration of different states: these are floats per person -- used in people.py
-        self.durs = [
-            'dur_exp2inf',
-            'dur_inf2sym',
-            'dur_sym2sev',
-            'dur_sev2crit',
-            'dur_disease',
-        ]
-
-        self.all_states = self.person + self.states + self.variant_states + self.by_variant_states + self.imm_states + self.nab_states + self.vacc_states + self.dates + self.durs
-
-        # Validate
-        self.state_types = ['person', 'states', 'variant_states', 'by_variant_states', 'imm_states',
-                            'nab_states', 'vacc_states', 'dates', 'durs', 'all_states']
-        for state_type in self.state_types:
-            states = getattr(self, state_type)
-            n_states        = len(states)
-            n_unique_states = len(set(states))
-            if n_states != n_unique_states: # pragma: no cover
-                errormsg = f'In {state_type}, only {n_unique_states} of {n_states} state names are unique'
-                raise ValueError(errormsg)
-
-        return
-
-
-
 #%% Define other defaults
-
-# A subset of the above states are used for results
-result_stocks = {
-    'susceptible': 'Number susceptible',
-    'exposed':     'Number exposed',
-    'infectious':  'Number infectious',
-    'symptomatic': 'Number symptomatic',
-    'severe':      'Number of severe cases',
-    'critical':    'Number of critical cases',
-    'recovered':   'Number recovered',
-    'dead':        'Number dead',
-    'diagnosed':   'Number of confirmed cases',
-    'known_dead':  'Number of confirmed deaths',
-    'quarantined': 'Number in quarantine',
-    'isolated':    'Number in isolation',
-    'vaccinated':  'Number of people vaccinated',
-}
-
-result_stocks_by_variant = {
-    'exposed_by_variant':    'Number exposed by variant',
-    'infectious_by_variant': 'Number infectious by variant',
-}
-
-# The types of result that are counted as flows -- used in sim.py; value is the label suffix
-result_flows = {
-    'infections':   'infections',
-    'reinfections': 'reinfections',
-    'infectious':   'infectious',
-    'symptomatic':  'symptomatic cases',
-    'severe':       'severe cases',
-    'critical':     'critical cases',
-    'recoveries':   'recoveries',
-    'deaths':       'deaths',
-    'tests':        'tests',
-    'diagnoses':    'diagnoses',
-    'known_deaths': 'known deaths',
-    'quarantined':  'quarantined people',
-    'isolated':     'isolated people',
-    'doses':        'vaccine doses',
-    'vaccinated':   'vaccinated people'
-}
-
-result_flows_by_variant = {
-    'infections_by_variant':  'infections by variant',
-    'symptomatic_by_variant': 'symptomatic by variant',
-    'severe_by_variant':      'severe by variant',
-    'infectious_by_variant':  'infectious by variant',
-}
-
-result_imm = {
-    'pop_nabs':       'Population average nabs',
-    'pop_protection': 'Population average protective immunity'
-}
-
-# Define new and cumulative flows
-new_result_flows = [f'new_{key}' for key in result_flows.keys()]
-cum_result_flows = [f'cum_{key}' for key in result_flows.keys()]
-new_result_flows_by_variant = [f'new_{key}' for key in result_flows_by_variant.keys()]
-cum_result_flows_by_variant = [f'cum_{key}' for key in result_flows_by_variant.keys()]
 
 # Parameters that can vary by variant
 variant_pars = [
@@ -213,17 +45,7 @@ variant_pars = [
     'rel_death_prob',
 ]
 
-# Immunity is broken down according to 3 axes, as listed here
-immunity_axes = ['sus', 'symp', 'sev']
-
-# Immunity protection also varies depending on your infection history
-immunity_sources = [
-    'asymptomatic',
-    'mild',
-    'severe',
-]
-
-# Default age data, based on Seattle 2018 census data -- used in population.py
+# Default age data, based on Seattle 2018 census data
 default_age_data = np.array([
     [ 0,  4, 0.0605],
     [ 5,  9, 0.0607],
@@ -248,11 +70,13 @@ default_age_data = np.array([
 
 
 def get_default_colors():
-    '''
-    Specify plot colors -- used in sim.py.
+    """
+    Specify the plot colors of the results, by result name without its prefix
+    (e.g. "infections" for "cum_infections"). The plotting functions use
+    ``cv.defaults.default_colors``, which is built once from this.
 
     NB, includes duplicates since stocks and flows are named differently.
-    '''
+    """
     c = sc.objdict()
     c.susceptible           = '#4d771e'
     c.exposed               = '#c78f65'
@@ -267,7 +91,7 @@ def get_default_colors():
     c.diagnosed             = c.diagnoses
     c.quarantined           = '#5c399c'
     c.isolated              = '#9756ff'
-    c.doses                 = c.quarantined # TODO: new color
+    c.doses                 = c.quarantined
     c.vaccinated            = c.quarantined
     c.recoveries            = '#9e1149'
     c.recovered             = c.recoveries
@@ -285,6 +109,9 @@ def get_default_colors():
     c.pop_protection        = '#9e1149'
     c.pop_symp_protection   = '#b86113'
     return c
+
+# Build the colors once, since they are looked up for every line plotted
+default_colors = get_default_colors()
 
 
 # Define the 'overview plots', i.e. the most useful set of plots to explore different aspects of a simulation
@@ -328,24 +155,32 @@ overview_variant_plots = [
 ]
 
 def get_default_plots(which='default', kind='sim', sim=None):
-    '''
-    Specify which quantities to plot; used in sim.py.
+    """
+    Specify which quantities to plot.
 
     Args:
-        which (str):  'default' or 'overview' or 'all' or 'seir'
-    '''
+        which (str): 'default', 'overview', 'variant', 'overview-variant', 'seir', or 'all'
+        kind (str): 'sim' for a single sim, or 'scens' for scenarios and multisims (which have different default plots)
+        sim (Sim): the sim; only needed for which='all', which plots every result key of the sim
+
+    Returns:
+        A dict of lists of result keys (keyed by plot title), or a list of result keys (one plot each)
+    """
+    if which is None:
+        which = 'default'
     which = str(which).lower() # To make comparisons easier
 
     # Check that kind makes sense
     sim_kind   = 'sim'
     scens_kind = 'scens'
     kindmap = {
-        None:      sim_kind,
-        'sim':     sim_kind,
-        'default': sim_kind,
-        'msim':    scens_kind,
-        'scen':    scens_kind,
-        'scens':   scens_kind,
+        None:        sim_kind,
+        'sim':       sim_kind,
+        'default':   sim_kind,
+        'msim':      scens_kind,
+        'scen':      scens_kind,
+        'scens':     scens_kind,
+        'scenarios': scens_kind,
     }
     if kind not in kindmap.keys():
         errormsg = f'Expecting "sim" or "scens", not "{kind}"'
@@ -354,7 +189,7 @@ def get_default_plots(which='default', kind='sim', sim=None):
         is_sim = kindmap[kind] == sim_kind
 
     # Default plots -- different for sims and scenarios
-    if which in ['none', 'default']:
+    if which == 'default':
 
         if is_sim:
             plots = sc.odict({
@@ -394,6 +229,9 @@ def get_default_plots(which='default', kind='sim', sim=None):
 
     # Plot absolutely everything
     elif which == 'all': # pragma: no cover
+        if sim is None:
+            errormsg = 'To get all the result keys with which="all", the sim must be supplied'
+            raise ValueError(errormsg)
         plots = sim.result_keys('all')
 
     # Show an overview plus variants
@@ -443,7 +281,7 @@ def get_default_plots(which='default', kind='sim', sim=None):
         ]
 
     else: # pragma: no cover
-        errormsg = f'The choice which="{which}" is not supported: choices are "default", "overview", "all", "variant", "overview-variant", or "seir", along with any result key (see sim.results_keys(\'all\') for options)'
+        errormsg = f'The choice which="{which}" is not supported: choices are "default", "overview", "all", "variant", "overview-variant", or "seir", along with any result key (see sim.result_keys(\'all\') for options)'
         raise ValueError(errormsg)
 
     return plots

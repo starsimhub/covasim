@@ -1,6 +1,6 @@
-'''
+"""
 Tests of the numerical utilities for the model.
-'''
+"""
 
 #%% Imports and settings
 import pytest
@@ -114,6 +114,8 @@ def test_samples(do_plot=False, verbose=True):
 
     with pytest.raises(NotImplementedError):
         cv.sample(dist='not_found')
+    assert 0 <= cv.sample() <= 1 # The default is a single draw from Unif(0,1)
+    assert cv.sample(dist='poisson', par1=3) >= 0 # A single sample works for every distribution
 
     # Do statistical tests
     tol = 1/np.sqrt(n/50/len(choices)) # Define acceptable tolerance -- broad to avoid false positives

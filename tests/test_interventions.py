@@ -1,9 +1,9 @@
-'''
+"""
 Tests covering all the built-in interventions, mostly taken
 from the intervention's docstrings.
 
 See also test_immunity.py for tests of vaccines.
-'''
+"""
 
 #%% Housekeeping
 
@@ -13,14 +13,14 @@ import pylab as pl
 import covasim as cv
 import pytest
 
-verbose = -1
+verbose = 0
 do_plot = 0 # Whether to plot when run interactively
 cv.options.set(interactive=False) # Assume not running interactively
 csv_file  = sc.thispath() / 'example_data.csv'
 
 
 def test_all_interventions(do_plot=False):
-    ''' Test all interventions supported by Covasim '''
+    """ Test all interventions supported by Covasim """
     sc.heading('Testing default interventions')
 
     # Default parameters, using the random layer
@@ -36,7 +36,7 @@ def test_all_interventions(do_plot=False):
     hsim = cv.Sim(hpars)
 
     def make_sim(which='r', interventions=None):
-        ''' Helper function to avoid having to recreate the sim each time '''
+        """ Helper function to avoid having to recreate the sim each time """
         if   which == 'r': sim = sc.dcp(rsim)
         elif which == 'h': sim = sc.dcp(hsim)
         sim['interventions'] = interventions
@@ -141,6 +141,58 @@ def test_all_interventions(do_plot=False):
     return
 
 
+def test_intervention_effects():
+    sc.heading('Testing that interventions have the expected effects')
+
+    pars = dict(pop_size=2000, pop_infected=20, n_days=60, verbose=verbose)
+    baseline = cv.Sim(pars).run()
+
+    # Setting beta to zero stops transmission, so only the initial infections remain
+    sim = cv.Sim(pars, interventions=cv.change_beta(days=0, changes=0)).run()
+    assert sim.summary['cum_infections'] == pars['pop_infected']
+
+    # Changes in beta are relative to the original value, so a change of 1 restores it
+    sim = cv.Sim(pars, interventions=cv.change_beta(days=[20, 40], changes=[0.3, 1.0]))
+    sim.run(until=30)
+    assert np.isclose(sim['beta'], 0.3*baseline['beta'])
+    sim.run()
+    assert np.isclose(sim['beta'], baseline['beta'])
+
+    # Days and changes can also be arrays
+    sim = cv.Sim(pars, interventions=cv.change_beta(days=np.arange(60), changes=np.linspace(0.5, 1.0, 60)))
+    sim.run(until=30)
+    assert np.isclose(sim['beta'], np.linspace(0.5, 1.0, 60)[29]*baseline['beta'])
+
+    # Clipping edges removes contacts, then puts them back
+    sim = cv.Sim(pars, interventions=cv.clip_edges(days=[20, 40], changes=[0.5, 1.0]))
+    sim.initialize()
+    n_contacts = len(sim.people.contacts['a'])
+    sim.run(until=30)
+    assert np.isclose(len(sim.people.contacts['a']), 0.5*n_contacts, rtol=0.05)
+    sim.run()
+    assert np.isclose(len(sim.people.contacts['a']), n_contacts, rtol=0.05)
+
+    # On a dynamic layer, which is recreated each day, the clipping lasts until the next change
+    sim = cv.Sim(pars, dynam_layer=dict(a=1), interventions=cv.clip_edges(days=[20, 40], changes=[0.5, 1.0]))
+    sim.initialize()
+    n_contacts = len(sim.people.contacts['a'])
+    sim.run(until=30)
+    assert np.isclose(len(sim.people.contacts['a']), 0.5*n_contacts, rtol=0.05) # Still clipped 10 days later
+
+    # Changing beta in one layer doesn't change the parameters after the run
+    sim = cv.Sim(pars, pop_type='hybrid', interventions=cv.change_beta(days=10, changes=0, layers='s'))
+    sim.initialize()
+    orig = sim['beta_layer']['s']
+    sim.run()
+    assert sim['beta_layer']['s'] == orig > 0 # The original value is restored
+
+    # Dynamic parameters change the parameter on the given day
+    sim = cv.Sim(pars, interventions=cv.dynamic_pars(rel_severe_prob=dict(days=0, vals=3.0))).run()
+    assert sim.summary['cum_severe'] > baseline.summary['cum_severe']
+
+    return sim
+
+
 def test_data_interventions():
     sc.heading('Testing data interventions and other special cases')
 
@@ -175,6 +227,7 @@ if __name__ == '__main__':
     T = sc.tic()
 
     test_all_interventions(do_plot=do_plot)
+    test_intervention_effects()
     test_data_interventions()
 
     sc.toc(T)

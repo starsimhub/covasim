@@ -6,8 +6,19 @@ This file describes each of the input parameters in Covasim. Note: the overall i
 
 - `pop_size` = Number of agents, i.e., people susceptible to SARS-CoV-2
 - `pop_infected` = Number of initial infections
-- `pop_type` = What type of population data to use -- 'random' (fastest), 'synthpops' (best), 'hybrid' (compromise)
+- `pop_type` = What type of population data to use -- 'random' (fastest), 'synthpops' (best), 'hybrid' (compromise), 'rank' (contacts mostly with people who live nearby; see `cv.RankNet`)
+- `clustered` = For `hybrid`: whether schools and workplaces are random networks, as in v3 (False, the default), or clusters whose members all know each other (True)
 - `location` = What location to load data from -- default Seattle
+
+## Geography parameters
+
+These say where people live (`people.x` and `people.y`, in degrees of longitude and latitude), and which region (`people.region`) and sewershed (`people.sewershed`) they are in; see `geography.py`.
+
+- `boundary_shapefile` = Optional path to a boundary file (GeoJSON/shapefile with `region_code`, `region_name`, and optionally `population`), used to assign regions and locations; None means a single region with no locations
+- `sewershed_file` = Optional path to a sewershed polygon file (GeoJSON/shapefile with a `sid` property); None means one whole-population catchment
+- `people_coords` = Optional array of shape (pop_size, 2) with the longitude and latitude of each person
+- `density_raster` = Path to a population-density GeoTIFF (people per pixel), used to place people when `pop_type='rank'` (inside `boundary_shapefile`, if given); None uses a 10 x 10 km test square
+- `density_bbox` = Optional (lon_min, lat_min, lon_max, lat_max) window of that raster to read
 
 ## Simulation parameters
 
@@ -32,6 +43,8 @@ This file describes each of the input parameters in Covasim. Note: the overall i
 - `beta_dist` = Distribution to draw individual level transmissibility; see <https://wellcomeopenresearch.org/articles/5-67>
 - `viral_dist` = The time varying viral load (transmissibility); estimated from Lescure 2020, Lancet, <https://doi.org/10.1016/S1473-3099(20)30200-0>
 - `asymp_factor` = Multiply beta by this factor for asymptomatic cases; no statistically significant difference in transmissibility: <https://www.sciencedirect.com/science/article/pii/S1201971220302502>
+- `shedding` = Viral shedding into wastewater by day since becoming infectious, drawn for each person from [shedding_hub](https://github.com/shedding-hub/shedding-hub) (the arguments of its `select()`, and the `dispersion`); None to not calculate it
+- `evo_pars` = Sequence evolution and variant fitness (disabled by default): `enable`, the genome length `L`, the `reference` sequence (or a FASTA file), the molecular clock rate `mol_clock_rate`, the substitution model `sub_model`, and the fitness model (`fitness_model`, `fitness_data_path`, `fitness_scale`); see `sequence_evolution.py` and `fitness.py`
 
 ## Network parameters
 

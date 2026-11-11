@@ -1,4 +1,4 @@
-'''
+"""
 Define average household size for each country.
 
 This is the following file:
@@ -6,7 +6,7 @@ This is the following file:
 https://population.un.org/household/exceldata/population_division_UN_Houseshold_Size_and_Composition_2019.xlsx
 
 expressed as a function.
-'''
+"""
 
 data = {
  'Afghanistan'                        : 8.036,

@@ -1,7 +1,24 @@
 #!/bin/bash
-# Run the integration tests. Requires pytest-parallel:
-#   pip install pytest-parallel
+# Run the integration tests. Requires pytest-xdist:
+#   pip install pytest-xdist
+#
+# Usage:
+#   ./run_tests       # Run the regular tests
+#   ./run_tests 3to4  # Run only the v3 to v4 migration tests
+#   ./run_tests all   # Run both
 
 export COVASIM_INTERACTIVE=0 # Don't show plots
 export COVASIM_WARNINGS='error' # Convert warnings to errors
-pytest test_*.py -n auto --ignore=manual --durations=0
+
+if [ "$1" == "3to4" ]; then
+    tests="migrate3to4/test_*.py"
+elif [ "$1" == "all" ]; then
+    tests="test_*.py migrate3to4/test_*.py"
+elif [ -z "$1" ]; then
+    tests="test_*.py"
+else
+    echo "Unknown argument \"$1\": use no argument, \"3to4\", or \"all\""
+    exit 1
+fi
+
+pytest $tests -n auto --ignore=manual --durations=0

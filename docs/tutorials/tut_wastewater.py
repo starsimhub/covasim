@@ -74,7 +74,8 @@ plt.close()
 # We then look at the overall shedding (total for all agents) and the shedding in each sewershed at each time point. This is the signal a wastewater treatment plant would see for its catchment.
 
 # %%
-sewersheds = np.asarray(sim.people.sewershed)
+n_agents = sim.people.n_uids # Agents ever created; viral_shedding_hist has a row for each, including those who died
+sewersheds = sim.people.sewershed.raw[:n_agents] # .raw: every agent, not only those alive at the end
 plt.figure(figsize=(12, 6))
 for sid in np.unique(sewersheds):
     mask = sewersheds == sid
@@ -106,7 +107,6 @@ plt.close()
 
 # Paths are relative to docs/tutorials/ — run the notebook from that directory.
 ref_fasta         = 'sars-2-data/NC_045512_Hu-1.fasta'
-fitness_data_path = '../../data/nt_fitness.csv'
 ay4_fasta         = 'sars-2-data/variants/AY.4_consensus.fasta'
 ba2_fasta         = 'sars-2-data/variants/BA.2.9_consensus.fasta'
 xbb15_fasta       = 'sars-2-data/variants/XBB.1.5.18_consensus.fasta'
@@ -156,7 +156,7 @@ sim = cv.Sim(
             reference         = ref_fasta,
             mol_clock_rate    = 1e-6,
             fitness_model     = 'bloom_nt',           # Bloom lab nt_fitness.csv https://github.com/jbloomlab/SARS2-mut-fitness
-            fitness_data_path = fitness_data_path,
+                                                      # (the default fitness_data_path is the copy in the repository's data folder)
             fitness_scale     = 0.05,                 # multiplies log-fitness sum before exp()
         ),
     ),
@@ -191,8 +191,8 @@ variant_names = list(sim['variant_map'].values())   # e.g. ['wild', 'AY.4', 'BA.
 n_steps = sim.npts
 
 # Per-variant infectious counts from the standard Covasim result.
-# Shape: (n_variants, n_steps).
-n_inf = np.array(sim.results['variant']['n_infectious_by_variant'].values)
+# Shape: (n_variants, n_steps), i.e. the transpose of the result, which has one column per variant.
+n_inf = sim.results['variant']['n_infectious_by_variant'].values.T
 total = n_inf.sum(axis=0)
 total[total == 0] = 1  # avoid division by zero on days with no infections
 
@@ -345,7 +345,7 @@ dual = cv.Sim(
         pop_type     = 'rank',
         density_raster = 'san-diego-data/san_diego_county_ppp_2020.tif',
         evo_pars     = dict(enable=True, reference=ref_fasta, mol_clock_rate=1e-6,
-                            fitness_model='bloom_nt', fitness_data_path=fitness_data_path, fitness_scale=0.05),
+                            fitness_model='bloom_nt', fitness_scale=0.05),
         boundary_shapefile = 'san-diego-data/sandiego_zip_boundaries.geojson',
         sewershed_file     = 'san-diego-data/sandiego_sewersheds.geojson',
     ),
@@ -381,17 +381,19 @@ from matplotlib.patches import Patch
 outline = gpd.GeoSeries([region_gdf.union_all()], crs=region_gdf.crs) # The whole area covered by the boundary file
 
 def add_unmonitored_outline(ax):
-    '''Hatch the whole area, beneath the sewersheds, so the areas that are not monitored by wastewater stand out'''
+    """Hatch the whole area, beneath the sewersheds, so the areas that are not monitored by wastewater stand out"""
     outline.plot(ax=ax, facecolor='white', edgecolor='0.6', hatch='///', linewidth=0.8, zorder=0)
     ax.legend(handles=[Patch(facecolor='white', edgecolor='0.6', hatch='///', label='Not in a sewershed')], loc='upper left', bbox_to_anchor=(0, 0.02), frameon=False, fontsize=8)
 
 people = dual.people
-shedding_by_agent = dual.results['viral_shedding_hist'].sum(axis=1) # Cumulative shedding per agent
-diagnosed = ~np.isnan(people.date_diagnosed) # Everyone who was ever diagnosed
+shedding_by_agent = dual.results['viral_shedding_hist'].sum(axis=1) # Cumulative shedding per agent, for every agent ever created
+n_agents = people.n_uids
+sewershed_all = people.sewershed.raw[:n_agents] # .raw: every agent, including those who died, to match the rows of viral_shedding_hist
+diagnosed = ~np.isnan(people.date_diagnosed) # Everyone alive at the end who was ever diagnosed
 
 # Wastewater: cumulative shedding per capita (per resident) in each sewershed
 for sid in sewershed_gdf['sid_num']:
-    sewershed_gdf.loc[sewershed_gdf['sid_num'] == sid, 'shedding_per_capita'] = shedding_by_agent[people.sewershed == sid].mean()
+    sewershed_gdf.loc[sewershed_gdf['sid_num'] == sid, 'shedding_per_capita'] = shedding_by_agent[sewershed_all == sid].mean()
 sewershed_gdf['label'] = sewershed_gdf['sid'] # Plant name
 
 # Clinical: diagnosed cases per region
@@ -428,14 +430,14 @@ from matplotlib.colors import Normalize
 from PIL import Image
 
 class RecordViralLoad(cv.Analyzer):
-    '''Save every agent's viral load (relative transmissibility, 0 if not infectious) on every day'''
+    """Save every agent's viral load (relative transmissibility, 0 if not infectious) on every day"""
 
     def initialize(self, sim):
         super().initialize(sim)
-        self.viral_load = np.zeros((sim['pop_size'], sim.npts))
+        self.viral_load = np.zeros((sim['pop_size'], sim.npts)) # One row per agent (by UID), including those who die
 
     def apply(self, sim):
-        self.viral_load[:, sim.t] = sim.people.viral_load
+        self.viral_load[sim.people.auids, self.today] = sim.people.viral_load.values # The agents alive today
 
 # A small simulation (1,000 agents) with the same boundaries, sewersheds and testing
 small = cv.Sim(
@@ -454,6 +456,7 @@ small.run()
 viral_load_hist = small.get_analyzer('viral_load').viral_load # (n_agents, n_days)
 small_people = small.people
 small_diagnosed = ~np.isnan(small_people.date_diagnosed)
+small_sewershed = small_people.sewershed.raw[:small_people.n_uids] # Every agent, to match the rows of the histories
 n_days = small.npts
 shedding_hist = small.results['viral_shedding_hist'] # (n_agents, n_days)
 
@@ -466,7 +469,7 @@ for k, code in enumerate(region_gdf['region_num']):
     diag_days = small_people.date_diagnosed[in_region & small_diagnosed].astype(int)
     clinical_ts[k] = 1000*np.bincount(diag_days[diag_days < n_days], minlength=n_days)/in_region.sum() if in_region.any() else np.nan # ZIPs with nobody in the simulation are left blank
 for k, sid in enumerate(sewershed_gdf['sid_num']):
-    wastewater_ts[k] = shedding_hist[small_people.sewershed == sid].mean(axis=0)
+    wastewater_ts[k] = shedding_hist[small_sewershed == sid].mean(axis=0)
 
 def smooth(ts):
     return pd.DataFrame(ts.T).rolling(7, min_periods=1).mean().to_numpy().T # 7-day trailing mean
@@ -477,10 +480,10 @@ clinical_ts, wastewater_ts = smooth(clinical_ts), smooth(wastewater_ts)
 # (lower zorder) the infectious agents, and below the map lines (zorder 1: grey agents, 2: ZIP outlines, 3: infectious agents).
 agent_cmap = plt.get_cmap('RdPu')
 agent_norm = Normalize(vmin=0, vmax=viral_load_hist.max())
-agent_xy = np.column_stack((small_people.x, small_people.y))
+agent_xy = np.column_stack((small_people.x.raw[:small_people.n_uids], small_people.y.raw[:small_people.n_uids])) # Every agent, to match the rows of viral_load_hist
 
 def agents_on_day(day):
-    ''' Locations of the non-infectious agents, and locations and viral loads of the infectious ones '''
+    """ Locations of the non-infectious agents, and locations and viral loads of the infectious ones """
     load = viral_load_hist[:, day]
     infectious = load > 0
     return agent_xy[~infectious], agent_xy[infectious], load[infectious]
@@ -520,10 +523,10 @@ def update(day):
     fig.suptitle(f'Day {day}')
 
 def save_gif(fig, update, n_frames, path, duration=100):
-    '''
+    """
     Draw every frame (update(i) redraws frame i), then save one GIF that uses a single colour palette for all of them.
     (Matplotlib's PillowWriter builds a new 256-colour palette for each frame, which makes colours shift slightly between frames.)
-    '''
+    """
     frames = []
     for i in range(n_frames):
         update(i)
@@ -564,7 +567,7 @@ outbreak = cv.Sim(
     n_days       = 100,
     rand_seed    = 3,
     evo_pars     = dict(enable=True, reference=ref_fasta, mol_clock_rate=1e-6,
-                        fitness_model='bloom_nt', fitness_data_path=fitness_data_path, fitness_scale=0.05),
+                        fitness_model='bloom_nt', fitness_scale=0.05),
     variants     = [tree_ay4],
     verbose      = 0,
 )
@@ -594,8 +597,8 @@ roots = [k for k in range(len(log)) if parent[k] is None]
 ROOT_LEN = 0.001 # The seeds join at the root with a branch this long, so that no tree ever has branch lengths that are all 0 (baltic would rescale it)
 
 def to_newick(day, measure):
-    ''' Newick string of the infections up to `day`. Every infected person is a tip, on the day they were infected.
-    measure='days' or 'mutations' sets what branch lengths mean '''
+    """ Newick string of the infections up to `day`. Every infected person is a tip, on the day they were infected.
+    measure='days' or 'mutations' sets what branch lengths mean """
     at = lambda k: date[k] if measure == 'days' else n_muts[k] # Where an infection sits on the x axis
     def subtree(k, parent_at):
         kids = [c for c in children[k] if date[c] <= day]
@@ -603,7 +606,8 @@ def to_newick(day, measure):
             return f'tip{k}:{at(k) - parent_at}'
         parts = [subtree(c, at(k)) for c in kids] + [f'tip{k}:0'] # The infected person is also a tip, where their lineage splits
         return f'({",".join(parts)}):{at(k) - parent_at}'
-    return '(' + ','.join(subtree(r, -ROOT_LEN) for r in roots if date[r] <= day) + '):0;' # The seeds and imports join at the root
+    root_at = min(at(r) for r in roots) - ROOT_LEN # The seed infections are dated day -1, the step before the first
+    return '(' + ','.join(subtree(r, root_at) for r in roots if date[r] <= day) + '):0;' # The seeds and imports join at the root
 
 # Tips are always drawn in the same order, so that the tree in the GIF grows without shuffling
 tip_order = []
@@ -659,7 +663,7 @@ plt.close()
 # **The outbreak over time.** The tree on each day, with everyone infected so far as a tip, next to the number of infectious agents of each variant. Each frame is one day.
 
 # %%
-n_infectious = np.array(outbreak.results['variant']['n_infectious_by_variant'].values) # (variant, day)
+n_infectious = outbreak.results['variant']['n_infectious_by_variant'].values.T # (variant, day)
 fig, (ax_tree, ax_counts) = plt.subplots(1, 2, figsize=(14, 7), gridspec_kw=dict(width_ratios=[2, 1]))
 for v, name in outbreak['variant_map'].items():
     ax_counts.plot(np.arange(n_days), n_infectious[v], color=palette[name], label=name)

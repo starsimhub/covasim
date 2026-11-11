@@ -1,9 +1,9 @@
-'''
+"""
 Tests for covasim/fitness.py and extract_founding_mutations alignment.
 
 Run from the tests/ directory:
     pytest test_fitness.py -v
-'''
+"""
 
 import csv
 import io
@@ -27,7 +27,7 @@ from covasim.sequence_evolution import (
 # ---------------------------------------------------------------------------
 
 def _write_csv(rows):
-    '''Write a list of dicts to a temp CSV file; return the path.'''
+    """Write a list of dicts to a temp CSV file; return the path."""
     f = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, newline='')
     fieldnames = list(rows[0].keys())
     writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -38,7 +38,7 @@ def _write_csv(rows):
 
 
 def _write_fasta(seq, header='seq'):
-    '''Write a sequence to a temp FASTA file; return the path.'''
+    """Write a sequence to a temp FASTA file; return the path."""
     f = tempfile.NamedTemporaryFile(mode='w', suffix='.fasta', delete=False)
     f.write(f'>{header}\n{seq}\n')
     f.close()

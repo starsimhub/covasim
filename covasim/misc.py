@@ -1,6 +1,6 @@
-'''
+"""
 Miscellaneous functions that do not belong anywhere else
-'''
+"""
 
 import re
 import inspect
@@ -9,9 +9,9 @@ import numpy as np
 import pandas as pd
 import pylab as pl
 import sciris as sc
+import starsim as ss
 import collections as co
 from pathlib import Path
-from distutils.version import LooseVersion
 from . import version as cvv
 from .settings import options as cvo
 
@@ -27,23 +27,24 @@ date_range = sc.daterange
 
 #%% Loading/saving functions
 
-__all__ += ['load_data', 'load', 'save', 'savefig']
+__all__ += ['load_data', 'load', 'save', 'diff_sims', 'savefig']
 
 
 def load_data(datafile, calculate=True, check_date=True, verbose=True, start_day=None, **kwargs):
-    '''
+    """
     Load data for comparing to the model output, either from file or from a dataframe.
 
     Args:
         datafile (str or df): if a string, the name of the file to load (either Excel or CSV); if a dataframe, use directly
         calculate (bool): whether to calculate cumulative values from daily counts
         check_date (bool): whether to check that a 'date' column is present
+        verbose (bool): whether to print the cumulative columns that are added
         start_day (date): if the 'date' column is provided as integer number of days, consider them relative to this
-        kwargs (dict): passed to pd.read_excel()
+        kwargs (dict): passed to the pandas reader (pd.read_csv(), pd.read_excel(), or pd.read_json())
 
     Returns:
         data (dataframe): pandas dataframe of the loaded data
-    '''
+    """
 
     # Load data
     if isinstance(datafile, Path): # Convert to a string
@@ -60,7 +61,7 @@ def load_data(datafile, calculate=True, check_date=True, verbose=True, start_day
             errormsg = f'Currently loading is only supported from .csv, .xls/.xlsx, and .json files, not "{datafile}"'
             raise NotImplementedError(errormsg)
     elif isinstance(datafile, pd.DataFrame):
-        data = datafile
+        data = datafile.copy() # Don't modify the user's dataframe
     else: # pragma: no cover
         errormsg = f'Could not interpret data {type(datafile)}: must be a string or a dataframe'
         raise TypeError(errormsg)
@@ -82,7 +83,7 @@ def load_data(datafile, calculate=True, check_date=True, verbose=True, start_day
             errormsg = f'Required column "date" not found; columns are {data.columns}'
             raise ValueError(errormsg)
         else:
-            if data['date'].dtype == np.int64: # If it's integers, treat it as days from the start day
+            if pd.api.types.is_integer_dtype(data['date']): # If it's integers, treat it as days from the start day
                 data['date'] = sc.date(data['date'].values, start_date=start_day)
             else: # Otherwise, use Pandas to convert it
                 data['date'] = pd.to_datetime(data['date']).dt.date
@@ -92,17 +93,16 @@ def load_data(datafile, calculate=True, check_date=True, verbose=True, start_day
 
 
 def load(*args, do_migrate=True, update=True, verbose=True, **kwargs):
-    '''
+    """
     Convenience method for sc.loadobj() and equivalent to cv.Sim.load() or
     cv.Scenarios.load().
 
     Args:
-        filename (str): file to load
-        do_migrate (bool): whether to migrate if loading an old object
-        update (bool): whether to modify the object to reflect the new version
-        verbose (bool): whether to print migration information
-        args (list): passed to sc.loadobj()
-        kwargs (dict): passed to sc.loadobj()
+        do_migrate (bool): ignored (v3 objects cannot be migrated to v4); kept for backwards compatibility
+        update (bool): ignored; kept for backwards compatibility
+        verbose (bool): whether to print a note when loading an object from an older version
+        args (list): passed to sc.loadobj(), e.g. the filename
+        kwargs (dict): passed to sc.loadobj(), e.g. filename and folder
 
     Returns:
         Loaded object
@@ -111,21 +111,20 @@ def load(*args, do_migrate=True, update=True, verbose=True, **kwargs):
 
         sim = cv.load('calib.sim') # Equivalent to cv.Sim.load('calib.sim')
         scens = cv.load(filename='school-closures.scens', folder='schools')
-    '''
+    """
     obj = sc.loadobj(*args, **kwargs)
-    if hasattr(obj, 'version'):
-        v_curr = cvv.__version__
-        v_obj = obj.version
-        cmp = check_version(v_obj, verbose=False)
-        if cmp != 0:
-            print(f'Note: you have Covasim v{v_curr}, but are loading an object from v{v_obj}')
-            if do_migrate:
-                obj = migrate(obj, update=update, verbose=verbose)
+    version = getattr(obj, 'version', None) # A v4 sim has the current version; a v4 MultiSim or Scenarios has none
+    is_v3 = False
+    if type(obj).__module__.startswith('covasim') and (version is not None): # Not e.g. a Starsim sim, which stores the Starsim version
+        is_v3 = sc.compareversions(version, '<4.0.0')
+    if is_v3: # A pre-v4 object: the data can be read, but it can't be rerun
+        if verbose:
+            print(f'Note: you have Covasim v{cvv.__version__}, but are loading an object from v{version}; its results can be read, but it cannot be rerun')
     return obj
 
 
 def save(*args, **kwargs):
-    '''
+    """
     Convenience method for sc.saveobj() and equivalent to cv.Sim.save() or
     cv.Scenarios.save().
 
@@ -142,13 +141,147 @@ def save(*args, **kwargs):
 
         cv.save('calib.sim', sim) # Equivalent to sim.save('calib.sim')
         cv.save(filename='school-closures.scens', folder='schools', obj=scens)
-    '''
+    """
     filepath = sc.saveobj(*args, **kwargs)
     return filepath
 
 
+def diff_sims(sim1, sim2, skip_key_diffs=False, skip=None, output=False, die=False, verbose=True, atol=1e-9, rtol=0):
+    """
+    Compute the difference of the summaries of two simulations, and print any
+    values which differ, as a table with the difference, the ratio, and the
+    direction of the change (↑, ↓, or ≈ for a change of less than 0.1%).
+
+    Args:
+        sim1 (Sim/dict): either a run simulation or its sim.summary dictionary
+        sim2 (Sim/dict): ditto
+        skip_key_diffs (bool): whether to skip keys that don't match between sims
+        skip (list): a list of keys to skip
+        output (bool): whether to return the differences as a string (otherwise print)
+        die (bool): whether to raise an exception if the sims don't match
+        verbose (bool): whether to print "Sims match" if they do (and output=False)
+        atol (float): the absolute tolerance for values to count as equal (default 1e-9)
+        rtol (float): the relative tolerance for values to count as equal (default 0)
+
+    Returns:
+        If output=True, a string describing the differences (empty if the sims match)
+
+    **Example**::
+
+        s1 = cv.Sim(beta=0.01)
+        s2 = cv.Sim(beta=0.02)
+        s1.run()
+        s2.run()
+        cv.diff_sims(s1, s2)
+    """
+    # Get the summaries
+    if isinstance(sim1, ss.Sim):
+        sim1 = sim1.compute_summary(output=True, require_run=True)
+    if isinstance(sim2, ss.Sim):
+        sim2 = sim2.compute_summary(output=True, require_run=True)
+    for sim in [sim1, sim2]:
+        if not isinstance(sim, dict):
+            errormsg = f'Cannot compare object of type {type(sim)}, must be a sim or a sim.summary dict'
+            raise TypeError(errormsg)
+
+    # Compare keys
+    keymatchmsg = ''
+    sim1_keys = set(sim1.keys())
+    sim2_keys = set(sim2.keys())
+    if (sim1_keys != sim2_keys) and (not skip_key_diffs):
+        keymatchmsg = "Keys don't match!\n"
+        missing = sorted(sim1_keys - sim2_keys)
+        extra   = sorted(sim2_keys - sim1_keys)
+        if missing:
+            keymatchmsg += f'  Missing sim1 keys: {missing}\n'
+        if extra:
+            keymatchmsg += f'  Extra sim2 keys: {extra}\n'
+
+    # Compare values
+    mismatches = {}
+    skip = sc.tolist(skip)
+    for key in sim2.keys(): # To ensure order
+        if (key in sim1_keys) and (key not in skip): # If a key is missing, don't count it as a mismatch
+            val1 = sim1[key]
+            val2 = sim2[key]
+            try:
+                same = np.isclose(val1, val2, atol=atol, rtol=rtol, equal_nan=True)
+            except TypeError: # Non-numeric values, e.g. None from a NaN saved to JSON
+                same = (val1 == val2)
+            if not same:
+                mismatches[key] = {'sim1': val1, 'sim2': val2}
+
+    # Make a table of the mismatches
+    valmatchmsg = ''
+    if len(mismatches):
+        valmatchmsg = '\nThe following values differ between the two simulations:\n'
+        df = pd.DataFrame.from_dict(mismatches).transpose()
+        diff   = []
+        ratio  = []
+        change = []
+        small_change = 1e-3 # Define a small change, e.g. a rounding error
+        for mdict in mismatches.values():
+            old = mdict['sim1']
+            new = mdict['sim2']
+            numeric = sc.isnumber(old) and sc.isnumber(new)
+            if numeric and (old > 0):
+                this_diff  = new - old
+                this_ratio = new/old
+                abs_ratio  = max(this_ratio, sc.safedivide(1.0, this_ratio, default=np.inf)) # Ratio of the larger value to the smaller one, so always ≥1
+
+                # Set the character to use
+                if abs_ratio < 1+small_change:
+                    change_char = '≈'
+                elif new > old:
+                    change_char = '↑'
+                else:
+                    change_char = '↓'
+
+                # Set how many repeats it should have
+                repeats = 1
+                if abs_ratio >= 1.1:
+                    repeats = 2
+                if abs_ratio >= 2:
+                    repeats = 3
+                if abs_ratio >= 10:
+                    repeats = 4
+
+                this_change = change_char*repeats
+            else:
+                this_diff   = np.nan
+                this_ratio  = np.nan
+                this_change = 'N/A'
+
+            diff.append(this_diff)
+            ratio.append(this_ratio)
+            change.append(this_change)
+
+        df['diff'] = diff
+        df['ratio'] = ratio
+        for col in ['sim1', 'sim2', 'diff', 'ratio']:
+            df[col] = pd.to_numeric(df[col], errors='coerce').round(decimals=3)
+        df['change'] = change
+        valmatchmsg += str(df)
+
+    # Raise an error if mismatches were found
+    mismatchmsg = keymatchmsg + valmatchmsg
+    if mismatchmsg:
+        if die:
+            raise ValueError(mismatchmsg)
+        elif output:
+            return mismatchmsg
+        else:
+            print(mismatchmsg)
+    else:
+        if output:
+            return mismatchmsg
+        elif verbose:
+            print('Sims match')
+    return
+
+
 def savefig(filename=None, comments=None, fig=None, **kwargs):
-    '''
+    """
     Wrapper for Matplotlib's ``pl.savefig()`` function which automatically stores
     Covasim metadata in the figure.
 
@@ -161,17 +294,17 @@ def savefig(filename=None, comments=None, fig=None, **kwargs):
         filename (str/list): name of the file to save to (default, timestamp); can also be a list of names
         comments (str/dict): additional metadata to save to the figure
         fig      (fig/list): figure to save (by default, current one); can also be a list of figures
-        kwargs   (dict):     passed to ``fig.savefig()``
+        kwargs   (dict):     passed to ``fig.savefig()``; a ``metadata`` dict is stored along with the Covasim metadata
 
     **Example**::
 
         cv.Sim().run().plot()
         cv.savefig()
-    '''
+    """
 
     # Handle inputs
     dpi = kwargs.pop('dpi', 150)
-    metadata = kwargs.pop('metadata', {})
+    metadata = sc.mergedicts(kwargs.pop('metadata', None)) # Copy, so the Covasim keys aren't added to the user's dict
 
     if fig is None:
         fig = pl.gcf()
@@ -186,7 +319,6 @@ def savefig(filename=None, comments=None, fig=None, **kwargs):
         errormsg = f'You have supplied {len(figlist)} figures and {len(filenamelist)} filenames: these must be the same length'
         raise ValueError(errormsg)
 
-    metadata = {}
     metadata['Covasim version'] = cvv.__version__
     gitinfo = git_info()
     for key,value in gitinfo['covasim'].items():
@@ -203,195 +335,14 @@ def savefig(filename=None, comments=None, fig=None, **kwargs):
 
         # Handle different formats
         lcfn = thisfilename.lower() # Lowercase filename
+        this_metadata = metadata
         if lcfn.endswith('pdf') or lcfn.endswith('svg'):
-            metadata = {'Keywords':str(metadata)} # PDF and SVG doesn't support storing a dict
+            this_metadata = {'Keywords':str(metadata)} # PDF and SVG doesn't support storing a dict
 
         # Save the figure
-        thisfig.savefig(thisfilename, dpi=dpi, metadata=metadata, **kwargs)
+        thisfig.savefig(thisfilename, dpi=dpi, metadata=this_metadata, **kwargs)
 
     return filename
-
-
-#%% Migration functions
-
-__all__ += ['migrate']
-
-def migrate_lognormal(pars, revert=False, verbose=True):
-    '''
-    Small helper function to automatically migrate the standard deviation of lognormal
-    distributions to match pre-v2.1.0 runs (where it was treated as the variance instead).
-    To undo the migration, run with revert=True.
-
-    Args:
-        pars (dict): the parameters dictionary; or, alternatively, the sim object the parameters will be taken from
-        revert (bool): whether to reverse the update rather than make it
-        verbose (bool): whether to print out the old and new values
-    '''
-    # Handle different input types
-    from . import base as cvb # To avoid circular imports
-    if isinstance(pars, cvb.BaseSim):
-        pars = pars.pars # It's actually a sim, not a pars object
-
-    # Convert each value to the square root, since squared in the new version
-    for key,dur in pars['dur'].items():
-        if 'lognormal' in dur['dist']:
-            old = dur['par2']
-            if revert:
-                new = old**2
-            else:
-                new = np.sqrt(old)
-            dur['par2'] = new
-            if verbose > 1:
-                print(f'  Updating {key} std from {old:0.2f} to {new:0.2f}')
-
-    # Store whether migration has occurred so we don't accidentally do it twice
-    if not revert:
-        pars['migrated_lognormal'] = True
-    else:
-        pars.pop('migrated_lognormal', None)
-
-    return
-
-
-def migrate_variants(pars, verbose=True):
-    '''
-    Small helper function to add necessary variant parameters.
-    '''
-    pars['use_waning']   = False
-    pars['n_variants']   = 1
-    pars['variants']     = []
-    pars['variant_map']  = {}
-    pars['variant_pars'] = {}
-    pars['vaccine_map']  = {}
-    pars['vaccine_pars'] = {}
-    return
-
-
-def migrate(obj, update=True, verbose=True, die=False):
-    '''
-    Define migrations allowing compatibility between different versions of saved
-    files. Usually invoked automatically upon load, but can be called directly by
-    the user to load custom objects, e.g. lists of sims.
-
-    Currently supported objects are sims, multisims, scenarios, and people.
-
-    Args:
-        obj (any): the object to migrate
-        update (bool): whether to update version information to current version after successful migration
-        verbose (bool): whether to print warnings if something goes wrong
-        die (bool): whether to raise an exception if something goes wrong
-
-    Returns:
-        The migrated object
-
-    **Example**::
-
-        sims = cv.load('my-list-of-sims.obj')
-        sims = [cv.migrate(sim) for sim in sims]
-    '''
-    from . import base as cvb # To avoid circular imports
-    from . import run as cvr
-    from . import interventions as cvi
-
-    unknown_version = '1.9.9' # For objects without version information, store the "last" version before 2.0.0
-
-    # Migrations for simulations
-    if isinstance(obj, cvb.BaseSim):
-        sim = obj
-
-        # Recursively migrate people if needed
-        if sim.people:
-            sim.people = migrate(sim.people, update=update)
-
-        # Migration from <2.0.0 to 2.0.0
-        if sc.compareversions(sim.version, '<2.0.0'): # Migrate from <2.0 to 2.0
-            if verbose: print(f'Migrating sim from version {sim.version} to version {cvv.__version__}')
-
-            # Add missing attribute
-            if not hasattr(sim, '_default_ver'):
-                sim._default_ver = None
-
-            # Rename intervention attribute
-            tps = sim.get_interventions(cvi.test_prob)
-            for tp in tps: # pragma: no cover
-                try:
-                    tp.sensitivity = tp.test_sensitivity
-                    del tp.test_sensitivity
-                except:
-                    pass
-
-        # Migration from <2.1.0 to 2.1.0
-        if sc.compareversions(sim.version, '<2.1.0'):
-            if verbose:
-                print(f'Migrating sim from version {sim.version} to version {cvv.__version__}')
-                print('Note: updating lognormal stds to restore previous behavior; see v2.1.0 changelog for details')
-            migrate_lognormal(sim.pars, verbose=verbose)
-
-        # Migration from <3.0.0 to 3.0.0
-        if sc.compareversions(sim.version, '<3.0.0'):
-            if verbose:
-                print(f'Migrating sim from version {sim.version} to version {cvv.__version__}')
-                print('Adding variant parameters')
-            migrate_variants(sim.pars, verbose=verbose)
-
-        # Migration from <3.1.1 to 3.1.1
-        if sc.compareversions(sim.version, '<3.1.1'):
-            sim._legacy_trans = True
-
-    # Migrations for People
-    elif isinstance(obj, cvb.BasePeople): # pragma: no cover
-        ppl = obj
-
-        # Migration from <2.0.0 to 2.0
-        if not hasattr(ppl, 'version'): # For people prior to 2.0
-            if verbose: print(f'Migrating people from version <2.0 to "unknown version" ({unknown_version})')
-            cvb.set_metadata(ppl, version=unknown_version) # Set all metadata
-
-        # # Migration from <3.1.2 to 3.1.2
-        if sc.compareversions(ppl.version, '<3.1.2'):
-            if verbose:
-                print(f'Migrating people from version {ppl.version} to version {cvv.__version__}')
-                print('Adding infected_initialized')
-            if not hasattr(ppl, 'infected_initialized'):
-                ppl.infected_initialized = True
-
-    # Migrations for MultiSims -- use recursion
-    elif isinstance(obj, cvr.MultiSim):
-        msim = obj
-        msim.base_sim = migrate(msim.base_sim, update=update)
-        msim.sims = [migrate(sim, update=update) for sim in msim.sims]
-        if not hasattr(msim, 'version'): # For msims prior to 2.0
-            if verbose: print(f'Migrating multisim from version <2.0 to "unknown version" ({unknown_version})')
-            cvb.set_metadata(msim, version=unknown_version) # Set all metadata
-            msim.label = None
-
-    # Migrations for Scenarios
-    elif isinstance(obj, cvr.Scenarios):
-        scens = obj
-        scens.base_sim = migrate(scens.base_sim, update=update)
-        for key,simlist in scens.sims.items():
-            scens.sims[key] = [migrate(sim, update=update) for sim in simlist] # Nested loop
-        if not hasattr(scens, 'version'): # For scenarios prior to 2.0
-            if verbose: print(f'Migrating scenarios from version <2.0 to "unknown version" ({unknown_version})')
-            cvb.set_metadata(scens, version=unknown_version) # Set all metadata
-            scens.label = None
-
-    # Unreconized object type
-    else:
-        errormsg = f'Object {obj} of type {type(obj)} is not understood and cannot be migrated: must be a sim, multisim, scenario, or people object'
-        warn(errormsg, errtype=TypeError, verbose=verbose, die=die)
-        if die:
-            raise TypeError(errormsg)
-        elif verbose: # pragma: no cover
-            print(errormsg)
-            return
-
-    # If requested, update the stored version to the current version
-    if update:
-        obj.version = cvv.__version__
-
-    return obj
-
 
 
 #%% Versioning functions
@@ -400,7 +351,7 @@ __all__ += ['git_info', 'check_version', 'check_save_version', 'get_version_pars
 
 
 def git_info(filename=None, check=False, comments=None, old_info=None, die=False, indent=2, verbose=True, frame=2, **kwargs):
-    '''
+    """
     Get current git information and optionally write it to disk. Simplest usage
     is cv.git_info(__file__)
 
@@ -421,7 +372,7 @@ def git_info(filename=None, check=False, comments=None, old_info=None, die=False
         cv.git_info(__file__) # Writes to disk
         cv.git_info('covasim_version.gitinfo') # Writes to disk
         cv.git_info('covasim_version.gitinfo', check=True) # Checks that current version matches saved file
-    '''
+    """
 
     # Handle the case where __file__ is supplied as the argument
     if isinstance(filename, str) and filename.endswith('.py'):
@@ -461,8 +412,8 @@ def git_info(filename=None, check=False, comments=None, old_info=None, die=False
 
 
 def check_version(expected, die=False, verbose=True):
-    '''
-    Get current git information and optionally write it to disk. The expected
+    """
+    Check the installed version of Covasim against an expected version. The expected
     version string may optionally start with '>=' or '<=' (== is implied otherwise),
     but other operators (e.g. ~=) are not supported. Note that e.g. '>' is interpreted
     to mean '>='.
@@ -470,11 +421,15 @@ def check_version(expected, die=False, verbose=True):
     Args:
         expected (str): expected version information
         die (bool): whether or not to raise an exception if the check fails
+        verbose (bool): whether to print a note if the versions differ
+
+    Returns:
+        -1 if the installed version is older than expected, 0 if it is the same, and 1 if it is newer
 
     **Example**::
 
         cv.check_version('>=1.7.0', die=True) # Will raise an exception if an older version is used
-    '''
+    """
     if expected.startswith('>'):
         valid = 1
     elif expected.startswith('<'):
@@ -495,7 +450,7 @@ def check_version(expected, die=False, verbose=True):
 
 
 def check_save_version(expected=None, filename=None, die=False, verbose=True, **kwargs):
-    '''
+    """
     A convenience function that bundles check_version with git_info and saves
     automatically to disk from the calling file. The idea is to put this at the
     top of an analysis script, and commit the resulting file, to keep track of
@@ -511,7 +466,7 @@ def check_save_version(expected=None, filename=None, die=False, verbose=True, **
         cv.check_save_version()
         cv.check_save_version('1.3.2', filename='script.gitinfo', comments='This is the main analysis script')
         cv.check_save_version('1.7.2', folder='gitinfo', comments={'SynthPops':sc.gitinfo(sp.__file__)})
-    '''
+    """
 
     # First, check the version if supplied
     if expected:
@@ -526,7 +481,7 @@ def check_save_version(expected=None, filename=None, die=False, verbose=True, **
 
 
 def get_version_pars(version, verbose=True):
-    '''
+    """
     Function for loading parameters from the specified version.
 
     Parameters will be loaded for Covasim 'as at' the requested version i.e. the
@@ -544,12 +499,12 @@ def get_version_pars(version, verbose=True):
 
     Returns:
         Dictionary of parameters from that version
-    '''
+    """
 
     # Construct a sorted list of available parameters based on the files in the regression folder
     regression_folder = sc.thisdir(__file__, 'regression', aspath=True)
     available_versions = [x.stem.replace('pars_v','') for x in regression_folder.iterdir() if x.suffix=='.json']
-    available_versions = sorted(available_versions, key=LooseVersion)
+    available_versions = sorted(available_versions, key=lambda v: tuple(int(part) for part in v.split('.'))) # e.g. '3.1.2' -> (3,1,2), so versions sort numerically
 
     # Find the highest parameter version that is <= the requested version
     version_comparison = [sc.compareversions(version, v)>=0 for v in available_versions]
@@ -560,7 +515,7 @@ def get_version_pars(version, verbose=True):
         raise ValueError(errormsg)
 
     # Load the parameters
-    pars = sc.loadjson(filename=regression_folder/f'pars_v{target_version}.json', folder=regression_folder)
+    pars = sc.loadjson(filename=regression_folder/f'pars_v{target_version}.json')
     if verbose:
         print(f'Loaded parameters from {target_version}')
 
@@ -568,7 +523,7 @@ def get_version_pars(version, verbose=True):
 
 
 def get_png_metadata(filename, output=False):
-    '''
+    """
     Read metadata from a PNG file. For use with images saved with cv.savefig().
     Requires pillow, an optional dependency. Metadata retrieval for PDF and SVG
     is not currently supported.
@@ -581,15 +536,10 @@ def get_png_metadata(filename, output=False):
         cv.Sim().run(do_plot=True)
         cv.savefig('covasim.png')
         cv.get_png_metadata('covasim.png')
-    '''
-    try:
-        import PIL
-    except ImportError as E: # pragma: no cover
-        errormsg = f'Pillow import failed ({str(E)}), please install first (pip install pillow)'
-        raise ImportError(errormsg) from E
-    im = PIL.Image.open(filename)
+    """
+    info = sc.loadmetadata(filename, load_all=True) # All the metadata in the image
     metadata = {}
-    for key,value in im.info.items():
+    for key,value in info.items():
         if key.startswith('Covasim'):
             metadata[key] = value
             if not output:
@@ -607,15 +557,15 @@ __all__ += ['get_doubling_time', 'compute_gof']
 
 
 def get_doubling_time(sim, series=None, interval=None, start_day=None, end_day=None, moving_window=None, exp_approx=False, max_doubling_time=100, eps=1e-3, verbose=None):
-    '''
+    """
     Alternate method to calculate doubling time (one is already implemented in
-    the sim object).
+    the sim object). By default, the doubling time is calculated over the whole series.
 
     **Examples**::
 
         cv.get_doubling_time(sim, interval=[3,30]) # returns the doubling time over the given interval (single float)
         cv.get_doubling_time(sim, interval=[3,30], moving_window=3) # returns doubling times calculated over moving windows (array)
-    '''
+    """
 
     # Set verbose level
     if verbose is None:
@@ -639,10 +589,14 @@ def get_doubling_time(sim, series=None, interval=None, start_day=None, end_day=N
             sc.printv(f"Interval should be a list/array/tuple of length 2, not {len(interval)}. Resetting to length of series.", 1, verbose)
             interval = [0,len(series)]
         start_day, end_day = interval[0], interval[1]
+    if start_day is None:
+        start_day = 0
+    if end_day is None:
+        end_day = len(series) - 1
 
-    if len(series) < end_day:
-        sc.printv(f"End day {end_day} is after the series ends ({len(series)}). Resetting to length of series.", 1, verbose)
-        end_day = len(series)
+    if end_day > len(series) - 1:
+        sc.printv(f"End day {end_day} is after the series ends ({len(series)}). Resetting to the last day of the series.", 1, verbose)
+        end_day = len(series) - 1
     int_length = end_day - start_day
 
     # Deal with moving window
@@ -681,6 +635,8 @@ def get_doubling_time(sim, series=None, interval=None, start_day=None, end_day=N
                 if r > 1:
                     doubling_time = int_length * np.log(2) / np.log(r)
                     doubling_time = min(doubling_time, max_doubling_time)  # Otherwise, it's unbounded
+                else: # Not growing
+                    doubling_time = max_doubling_time
             else: # pragma: no cover
                 raise ValueError("Can't calculate doubling time with exponential approximation when initial value is zero.")
         else:
@@ -705,7 +661,7 @@ def get_doubling_time(sim, series=None, interval=None, start_day=None, end_day=N
 
 
 def compute_gof(actual, predicted, normalize=True, use_frac=False, use_squared=False, as_scalar='none', eps=1e-9, skestimator=None, estimator=None, **kwargs):
-    '''
+    """
     Calculate the goodness of fit. By default use normalized absolute error, but
     highly customizable. For example, mean squared error is equivalent to
     setting normalize=False, use_squared=True, as_scalar='mean'.
@@ -723,7 +679,7 @@ def compute_gof(actual, predicted, normalize=True, use_frac=False, use_squared=F
         kwargs      (dict):  passed to the scikit-learn or custom estimator
 
     Returns:
-        gofs (arr): array of goodness-of-fit values, or a single value if as_scalar is True
+        gofs (arr): array of goodness-of-fit values, or a single value if as_scalar is 'sum', 'mean', or 'median'
 
     **Examples**::
 
@@ -731,15 +687,15 @@ def compute_gof(actual, predicted, normalize=True, use_frac=False, use_squared=F
         x2 = np.cumsum(np.random.random(100))
 
         e1 = compute_gof(x1, x2) # Default, normalized absolute error
-        e2 = compute_gof(x1, x2, normalize=False, use_frac=False) # Fractional error
+        e2 = compute_gof(x1, x2, normalize=False, use_frac=True) # Fractional error
         e3 = compute_gof(x1, x2, normalize=False, use_squared=True, as_scalar='mean') # Mean squared error
         e4 = compute_gof(x1, x2, skestimator='mean_squared_error') # Scikit-learn's MSE method
         e5 = compute_gof(x1, x2, as_scalar='median') # Normalized median absolute error -- highly robust
-    '''
+    """
 
     # Handle inputs
-    actual    = np.array(sc.dcp(actual), dtype=float)
-    predicted = np.array(sc.dcp(predicted), dtype=float)
+    actual    = np.array(actual, dtype=float) # This is a copy
+    predicted = np.array(predicted, dtype=float)
 
     # Scikit-learn estimator is supplied: use that
     if skestimator is not None: # pragma: no cover
@@ -765,7 +721,7 @@ def compute_gof(actual, predicted, normalize=True, use_frac=False, use_squared=F
     # Default case: calculate it manually
     else:
         # Key step -- calculate the mismatch!
-        gofs = abs(np.array(actual) - np.array(predicted))
+        gofs = abs(actual - predicted)
 
         if normalize and not use_frac:
             actual_max = abs(actual).max()
@@ -797,7 +753,7 @@ def compute_gof(actual, predicted, normalize=True, use_frac=False, use_squared=F
 __all__ += ['help']
 
 def help(pattern=None, source=False, ignorecase=True, flags=None, context=False, output=False):
-    '''
+    """
     Get help on Covasim in general, or search for a word/expression.
 
     Args:
@@ -816,7 +772,7 @@ def help(pattern=None, source=False, ignorecase=True, flags=None, context=False,
         cv.help('lognormal', source=True, context=True)
 
     | New in version 3.1.2.
-    '''
+    """
     defaultmsg = '''
 For general help using Covasim, the best place to start is the docs:
 
@@ -842,12 +798,15 @@ For help on Covasim options, see cv.options.help().
         flags = sc.tolist(flags)
         if ignorecase:
             flags.append(re.I)
+        flag = 0 # re.findall() takes a single combined value
+        for f in flags:
+            flag |= f
 
-        def func_ok(fucname, func):
-            ''' Skip certain functions '''
+        def func_ok(funcname, func):
+            """ Skip certain functions """
             excludes = [
-                fucname.startswith('_'),
-                fucname in ['help', 'options', 'default_float', 'default_int'],
+                funcname.startswith('_'),
+                funcname in ['help', 'options', 'default_float', 'default_int'],
                 inspect.ismodule(func),
             ]
             ok = not(any(excludes))
@@ -861,7 +820,7 @@ For help on Covasim options, see cv.options.help().
         for funcname in funcs:
             f = getattr(cv, funcname)
             if source: string = inspect.getsource(f)
-            else:      string = f.__doc__
+            else:      string = f.__doc__ or '' # In case there's no docstring
             docstrings[funcname] = string
 
         # Find matches
@@ -870,7 +829,7 @@ For help on Covasim options, see cv.options.help().
 
         for k,docstring in docstrings.items():
             for l,line in enumerate(docstring.splitlines()):
-                if re.findall(pattern, line, *flags):
+                if re.findall(pattern, line, flags=flag):
                     linenos[k].append(str(l))
                     matches[k].append(line)
 
@@ -909,7 +868,7 @@ For help on Covasim options, see cv.options.help().
 
 
 def warn(msg, category=None, verbose=None, die=None):
-    ''' Helper function to handle warnings -- not for the user '''
+    """ Helper function to handle warnings -- not for the user """
 
     # Handle inputs
     warnopt = cvo.warnings if not die else 'error'

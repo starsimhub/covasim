@@ -1,7 +1,7 @@
-'''
+"""
 Tests for things that are not tested in other files, typically because they are
 corner cases or otherwise not part of major workflows.
-'''
+"""
 
 #%% Imports and settings
 import os
@@ -11,7 +11,7 @@ import sciris as sc
 import covasim as cv
 
 do_plot = 1
-verbose = -1
+verbose = 0
 debug   = 1 # This runs without parallelization; faster with pytest
 csv_file  = os.path.join(sc.thisdir(), 'example_data.csv')
 xlsx_file = os.path.join(sc.thisdir(), 'example_data.xlsx')
@@ -19,7 +19,7 @@ cv.options(interactive=False) # Assume not running interactively
 
 
 def remove_files(*args):
-    ''' Remove files that were created '''
+    """ Remove files that were created """
     for path in args:
         if os.path.exists(path):
             print(f'Removing {path}')
@@ -40,14 +40,13 @@ def test_base():
     sim.run()
 
     # Check setting invalid key
-    with pytest.raises(sc.KeyNotFoundError):
-        po = cv.ParsObj(pars={'a':2, 'b':3})
-        po.update_pars({'c':4})
+    with pytest.raises(KeyError):
+        sim.update_pars({'not_a_par':4})
 
     # Printing result
-    r = cv.Result()
+    r = sim.results['cum_infections']
     print(r)
-    print(r.npts)
+    print(len(r))
 
     # Day and date conversion
     daystr = '2020-04-04'
@@ -81,23 +80,14 @@ def test_basepeople():
     sim = cv.Sim(pop_size=100, verbose=verbose)
     sim.initialize()
 
-    # BasePeople methods
+    # People methods
     ppl = sim.people
-    ppl.get(['susceptible', 'infectious'])
     ppl.keys()
-    ppl.person_keys()
     ppl.state_keys()
     ppl.date_keys()
-    ppl.dur_keys()
     ppl.indices()
-    ppl._resize_arrays(new_size=200) # This only resizes the arrays, not actually create new people
-    ppl._resize_arrays(new_size=100) # Change back
     ppl.to_df()
-    ppl.to_arr()
     ppl.person(50)
-    people = ppl.to_list()
-    ppl.from_list(people)
-    ppl.make_edgelist([{'new_key':[0,1,2]}])
     ppl.brief()
 
     # Contacts methods
@@ -114,7 +104,8 @@ def test_basepeople():
     # Layer methods
     hospitals_layer = cv.Layer()
     contacts.add_layer(hospitals=hospitals_layer)
-    contacts.pop_layer('hospitals')
+    with pytest.raises(ValueError):
+        contacts.pop_layer('hospitals') # Layers can't be removed from a sim
     df = hospitals_layer.to_df()
     hospitals_layer.from_df(df)
 
@@ -145,11 +136,8 @@ def test_basepeople():
     s2 = cv.Sim(pars, dynam_layer={'c':0})
     s2.run()
     assert cv.diff_sims(s1, s2, output=True)
-
-    # Create a bare People object
-    ppl = cv.People(100)
-    with pytest.raises(sc.KeyNotFoundError): # Need additional parameters
-        ppl.initialize()
+    with pytest.raises(ValueError):
+        cv.diff_sims({'a':1, 'b':2}, {'a':1}, die=True) # Keys that are in only one sim are reported
 
     return
 
@@ -169,6 +157,11 @@ def test_misc():
 
     with pytest.raises(NotImplementedError):
         cv.load_data('example_data.unsupported_extension')
+
+    df = sc.dataframe(date=np.arange(3, dtype=np.int32), new_tests=[1,2,3])
+    data = cv.load_data(df, start_day='2020-03-01', verbose=False)
+    assert data['date'].iloc[0] == cv.date('2020-03-01') # Integer dates of any integer type are days from the start day
+    assert 'cum_tests' not in df.columns # The user's dataframe isn't modified
 
     # Dates
     d1 = cv.date('2020-04-04')
@@ -283,33 +276,12 @@ def test_population():
         sim = cv.Sim(pop_type='not_an_option')
         sim.initialize()
 
-    # Save/load
-    sim = cv.Sim(pop_size=100)
-    sim.initialize()
-    sim.people.save(pop_path)
-    cv.Sim(pop_size=100, popfile=pop_path)
-    with pytest.raises(ValueError):
-        sim = cv.Sim(pop_size=101, popfile=pop_path)
-        sim.initialize()
-
-    remove_files(pop_path)
+    # Loading a population is not supported in v4
+    with pytest.raises(NotImplementedError):
+        cv.Sim(pop_size=100, popfile=pop_path)
 
     return
 
-
-
-def test_requirements():
-    sc.heading('Testing requirements')
-
-    cv.requirements.min_versions['sciris'] = '99.99.99'
-    with pytest.raises(ImportError):
-        cv.requirements.check_sciris()
-
-    cv.requirements.check_synthpops()
-
-    print('↑ Should print various requirements warnings')
-
-    return
 
 
 def test_run():
@@ -368,56 +340,17 @@ def test_run():
 def test_sim():
     sc.heading('Testing sim')
 
-    # Test resetting layer parameters
     sim = cv.Sim(pop_size=100, label='test_label')
-    sim.reset_layer_pars()
-    sim.initialize()
-    sim.reset_layer_pars()
-
-    # Test validation
-    sim['pop_size'] = 'invalid'
-    with pytest.raises(ValueError):
-        sim.validate_pars()
-    sim['pop_size'] = 100 # Restore
-
-    # Handle missing start day
-    sim['start_day'] = None
-    sim.validate_pars()
-
-    # Can't have an end day before the start day
-    sim['end_day'] = '2019-01-01'
-    with pytest.raises(ValueError):
-        sim.validate_pars()
-
-    # Can't have both end_days and n_days None
-    sim['end_day'] = None
-    sim['n_days'] = None
-    with pytest.raises(ValueError):
-        sim.validate_pars()
-    sim['n_days'] = 30 # Restore
-
-    # Check layer pars are internally consistent
-    sim['quar_factor'] = {'invalid':30}
-    with pytest.raises(sc.KeyNotFoundError):
-        sim.validate_pars()
-    sim.reset_layer_pars() # Restore
-
-    # Check mismatch with population
-    for key in ['beta_layer', 'contacts', 'quar_factor']:
-        sim[key] = {'invalid':1}
-    with pytest.raises(sc.KeyNotFoundError):
-        sim.validate_pars()
-    sim.reset_layer_pars() # Restore
 
     # Convert interventions dict to intervention
     sim['interventions'] = {'which': 'change_beta', 'pars': {'days': 10, 'changes': 0.5}}
-    sim.validate_pars()
+    sim.initialize()
 
     # Check conversion to absolute parameters
     cv.parameters.absolute_prognoses(sim['prognoses'])
 
     # Test intervention functions and results analyses
-    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.t==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.t}')))).run() # ...This is not the recommended way of defining interventions.
+    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.diseases.covid.today==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.ti}')))).run() # ...This is not the recommended way of defining interventions.
 
     # Test other outputs
     sim = cv.Sim(pop_size=100, verbose=0, n_days=30)
@@ -435,7 +368,7 @@ def test_sim():
 def test_settings():
     sc.heading('Testing settings')
     cv.options.help()
-    cv.options.set(numba_parallel=False) # Don't actually change the default, but call this method
+    cv.options.set(numba_cache=True) # Don't actually change the default, but call this method
     return
 
 
@@ -451,7 +384,6 @@ if __name__ == '__main__':
     test_misc()
     test_plotting()
     test_population()
-    test_requirements()
     test_run()
     test_sim()
     test_settings()

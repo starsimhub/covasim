@@ -5,9 +5,8 @@ data/epi_data
 .idea
 .vscode
 .DS_Store
-._*
-data/cache/worldpop
-test_data/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -143,13 +142,13 @@ dmypy.json
 # Node.js and NPM
 node_modules
 
-# Bygyl outputs
+# Wastewater fork: downloaded data and Bygul outputs
+._*
+data/cache/worldpop
+test_data/
 reads/
 data/cache/*
 population_data.csv
 
 # Output of the wastewater tutorial (Bygul simulated reads)
 amplicon_reads/
-
-# PDF plots saved by the wastewater tutorial script
-# tut_outputs/

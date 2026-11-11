@@ -1,6 +1,6 @@
-'''
+"""
 Test the rank-based population type (pop_type='rank'). Needs no raster or optional packages.
-'''
+"""
 import os
 import numpy as np
 import pytest
@@ -10,7 +10,7 @@ sd_dir = os.path.join(os.path.dirname(__file__), '..', 'docs', 'tutorials', 'san
 
 
 def test_rank_population():
-    ''' pop_type='rank' should give a single static contact layer and run '''
+    """ pop_type='rank' should give a single static contact layer and run """
     pars = cv.make_pars(pop_type='rank')
     assert pars['contacts'] == {'a': 20}
     assert pars['dynam_layer'] == {'a': 0} # Static, so the rank structure is never redrawn
@@ -21,17 +21,17 @@ def test_rank_population():
 
 
 def test_rank_population_workers():
-    ''' use_workers=True should build the same kind of layer. It needs at least 4,000 agents to use more than one worker,
-    and stays on one core if the computer cannot run workers, so it passes on any machine '''
-    sim = cv.Sim(pop_type='rank', pop_size=20000, n_days=5, verbose=0)
-    sim.initialize(use_workers=True)
+    """ use_workers=True should build the same kind of layer. It needs at least 4,000 agents to use more than one worker,
+    and stays on one core if the computer cannot run workers, so it passes on any machine """
+    sim = cv.Sim(pop_type='rank', pop_size=20000, n_days=5, verbose=0, networks=cv.RankNet(name='a', use_workers=True))
+    sim.initialize()
     sim.run()
     assert list(sim.people.contacts.keys()) == ['a']
     assert len(sim.people.contacts['a']) > 0
 
 
 def test_rank_population_uses_boundary_coords():
-    ''' With a boundary file, rank contacts must be built from the same locations as people.x/y and the sewersheds '''
+    """ With a boundary file, rank contacts must be built from the same locations as people.x/y and the sewersheds """
     sim = cv.Sim(pop_type='rank', pop_size=4000, n_days=2, verbose=0,
                  boundary_shapefile=os.path.join(sd_dir, 'boundaries.geojson'),
                  sewershed_file=os.path.join(sd_dir, 'sewersheds.geojson'))
@@ -49,7 +49,7 @@ def test_rank_population_uses_boundary_coords():
 
 
 def test_rank_population_density_within_boundaries(tmp_path):
-    ''' With a raster and boundaries, people follow the raster density but stay inside the boundary polygons '''
+    """ With a raster and boundaries, people follow the raster density but stay inside the boundary polygons """
     pytest.importorskip('rasterio')
     import rasterio
     from rasterio.transform import from_origin
@@ -80,7 +80,7 @@ def test_rank_population_density_within_boundaries(tmp_path):
 
 
 def test_assign_regions_from_coords():
-    ''' Regions follow the polygon containing each point; edges count; overlaps are random and warned about '''
+    """ Regions follow the polygon containing each point; edges count; overlaps are random and warned about """
     import geopandas as gpd
     from shapely.geometry import box
     from covasim.geography import assign_regions_from_coords

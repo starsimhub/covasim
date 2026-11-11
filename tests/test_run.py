@@ -1,6 +1,6 @@
-'''
+"""
 Tests for run options (multisims and scenarios)
-'''
+"""
 
 #%% Imports and settings
 import os
@@ -75,6 +75,11 @@ def test_multisim_reduce(do_plot=do_plot): # If being run via pytest, turn off
     msim = cv.MultiSim(sim, n_runs=n_runs, noise=0.1)
     msim.run(verbose=verbose, reduce=True)
 
+    # The best estimate is between the low and high bounds
+    res = msim.results['cum_infections']
+    assert np.all(res.low <= res.values) and np.all(res.values <= res.high)
+    assert res.low[-1] < res.high[-1] # The runs are different, so the bounds are too
+
     if do_plot:
         msim.plot()
 
@@ -93,6 +98,8 @@ def test_multisim_combine(do_plot=do_plot): # If being run via pytest, turn off
     msim.run(n_runs=n_runs, keep_people=True)
     sim1 = msim.combine(output=True)
     assert sim1['pop_size'] == pop_size*n_runs
+    cum_inf = sum([sim.results['cum_infections'].values for sim in msim.sims])
+    assert np.allclose(sim1.results['variant']['cum_infections_by_variant'].values.sum(axis=1), cum_inf) # The results by variant are combined too
 
     print('Running second sim, results should be similar but not identical (stochastic differences)...')
     sim2 = cv.Sim(pop_size=pop_size*n_runs, pop_infected=pop_infected*n_runs)
@@ -166,6 +173,16 @@ def test_simple_scenarios(do_plot=do_plot):
     for path in [json_path, xlsx_path]:
         print(f'Removing {path}')
         os.remove(path)
+
+    # Scenarios from an initialized sim
+    sim = cv.Sim(pop_size=pop_size, n_days=20, verbose=verbose)
+    sim.initialize()
+    scenarios = {'base': {'name':'Base', 'pars':{}}, 'nobeta': {'name':'No transmission', 'pars':{'beta':0}}}
+    scens2 = cv.Scenarios(sim=sim, scenarios=scenarios, metapars={'n_runs':1})
+    scens2.run(verbose=verbose)
+    res = scens2.results['cum_infections']
+    assert res['nobeta'].best[-1] < res['base'].best[-1] # The scenario parameters are applied even if the base sim is initialized
+    assert 'cum_infections_by_variant' in scens2.results # The results by variant are included
 
     return scens
 

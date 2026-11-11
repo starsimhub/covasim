@@ -13,3 +13,6 @@ These tutorials walk through how to use Covasim. To run locally, start a Jupyter
 - [Deployment](tut_deployment.ipynb) — Running at scale and in production
 - [Tips and tricks](tut_tips.ipynb) — Shortcuts and common patterns
 - [Advanced usage](tut_advanced.ipynb) — Lower-level APIs and extensions
+- [Wastewater](tut_wastewater.ipynb) — Geography, sewersheds, viral shedding, and wastewater sampling
+- [Sequence evolution](tut_sequence_evol.ipynb) — Mutations along the transmission tree, and variant fitness
+- [Clinical sequencing](tut_clinical_sequencing.ipynb) — Sampling sequences from cases, alongside wastewater

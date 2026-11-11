@@ -1,6 +1,6 @@
-'''
+"""
 Tests for immune waning, variants, and vaccine intervention.
-'''
+"""
 
 #%% Imports and settings
 import sciris as sc
@@ -16,14 +16,14 @@ cv.options(interactive=False) # Assume not running interactively
 # Shared parameters across simulations
 base_pars = sc.objdict(
     pop_size = 1e3,
-    verbose  = -1,
+    verbose  = 0,
 )
 
 
 #%% Define the tests
 
 def test_states():
-    ''' Test state consistency against state_diagram.xlsx '''
+    """ Test state consistency against state_diagram.xlsx """
 
     filename = 'state_diagram.xlsx'
     sheets   = ['Without waning', 'With waning']
@@ -134,7 +134,7 @@ def test_variants(do_plot=False):
     b117 = cv.variant('b117',         days=10, n_imports=20)
     p1   = cv.variant('beta',   days=20, n_imports=20)
     cust = cv.variant(label='Custom', days=40, n_imports=20, variant={'rel_beta': 2, 'rel_symp_prob': 1.6})
-    sim  = cv.Sim(base_pars, use_waning=True, variants=[b117, p1, cust], analyzers=lambda sim: nabs.append(sim.people.nab.copy()))
+    sim  = cv.Sim(base_pars, use_waning=True, variants=[b117, p1, cust], analyzers=lambda sim: nabs.append(sim.people.nab.raw.copy())) # v4: .raw includes agents who have died, so the length is constant
     sim.run()
 
     if do_plot:
@@ -153,7 +153,8 @@ def test_vaccines(do_plot=False):
     nabs = []
     p1 = cv.variant('beta',   days=20, n_imports=20)
     pfizer = cv.vaccinate(vaccine='pfizer', days=30)
-    sim  = cv.Sim(base_pars, use_waning=True, variants=p1, interventions=pfizer, analyzers=lambda sim: nabs.append(sim.people.nab.copy()))
+    analyzer = (lambda sim: nabs.append(sim.people.nab.raw.copy())) if do_plot else None # v4: .raw includes agents who have died, so the length is constant; only kept for plotting, so the shrunk sim holds no test data
+    sim  = cv.Sim(base_pars, use_waning=True, variants=p1, interventions=pfizer, analyzers=analyzer)
     sim.run()
     sim.shrink()
 
@@ -177,7 +178,7 @@ def test_vaccines_sequential(do_plot=False):
     n_doses = []
     subtarget = dict(inds=np.arange(int(base_pars.pop_size//2)), vals=0.1)
     pfizer = cv.vaccinate_num(vaccine='pfizer', sequence='age', num_doses=num_doses, subtarget=subtarget)
-    sim  = cv.Sim(base_pars, n_days=n_days, rescale=False, use_waning=True, variants=p1, interventions=pfizer, analyzers=lambda sim: n_doses.append(sim.people.doses.copy()))
+    sim  = cv.Sim(base_pars, n_days=n_days, rescale=False, use_waning=True, variants=p1, interventions=pfizer, analyzers=lambda sim: n_doses.append(sim.people.doses.raw.copy())) # v4: .raw includes agents who have died, so the length is constant
     sim.run()
 
     n_doses = np.array(n_doses)
@@ -191,7 +192,7 @@ def test_vaccines_sequential(do_plot=False):
 
         # At the end of the simulation
         df = pd.DataFrame(n_doses.T)
-        df['age_bin'] = np.digitize(sim.people.age,np.arange(0,100,10))
+        df['age_bin'] = np.digitize(sim.people.age.raw,np.arange(0,100,10))
         df['fully_vaccinated'] = df[60]==2
         df['first_dose'] = df[60]==1
         df['unvaccinated'] = df[60]==0
@@ -200,7 +201,7 @@ def test_vaccines_sequential(do_plot=False):
 
         # Part-way through the simulation
         df = pd.DataFrame(n_doses.T)
-        df['age_bin'] = np.digitize(sim.people.age,np.arange(0,100,10))
+        df['age_bin'] = np.digitize(sim.people.age.raw,np.arange(0,100,10))
         df['fully_vaccinated'] = df[40]==2
         df['first_dose'] = df[40]==1
         df['unvaccinated'] = df[40]==0
@@ -219,7 +220,7 @@ def test_two_vaccines(do_plot=False):
     vac1 = cv.vaccinate_num(vaccine='pfizer', sequence=[0], num_doses=1)
     vac2 = cv.vaccinate_num(vaccine='jj', sequence=[1], num_doses=1)
 
-    sim  = cv.Sim(base_pars, n_days=1000, pop_size=2, pop_infected=0, variants=p1, interventions=[vac1, vac2], analyzers=lambda sim: nabs.append(sim.people.nab.copy()))
+    sim  = cv.Sim(base_pars, n_days=1000, pop_size=2, pop_infected=0, variants=p1, interventions=[vac1, vac2], analyzers=lambda sim: nabs.append(sim.people.nab.raw.copy())) # v4: .raw includes agents who have died, so the length is constant
 
     # No infections, so suppress warnings
     with cv.options.context(warnings='print'):
@@ -259,66 +260,59 @@ def test_vaccine_target_eff():
             return
 
         def apply(self, sim):
-            if sim.t == self.day:
+            if sim.diseases.covid.today == self.day:
                 eligible = cv.true(~np.isfinite(sim.people.date_exposed) & ~sim.people.vaccinated)
                 self.placebo_inds = eligible[cv.choose(len(eligible), min(self.trial_size, len(eligible)))]
             return
 
     pars = dict(
-        rand_seed  = 1, # Note: results may be sensitive to the random seed
         pop_size   = 20_000,
         beta       = 0.01,
         n_days     = 90,
-        verbose    = -1,
+        verbose    = 0,
         use_waning = True,
     )
 
     # Define vaccine arm
     trial_size = 4_000
     start_trial = 20
+    n_seeds = 4
 
     def subtarget(sim):
-        ''' Select people who are susceptible '''
-        if sim.t == start_trial:
+        """ Select people who are susceptible """
+        if sim.diseases.covid.today == start_trial:
             eligible = cv.true(~np.isfinite(sim.people.date_exposed))
             inds = eligible[cv.choose(len(eligible), min(trial_size // 2, len(eligible)))]
         else:
             inds = []
         return {'vals': [1.0 for ind in inds], 'inds': inds}
 
-    # Initialize
-    vx = cv.vaccinate_prob(vaccine=vacc_pars, days=[start_trial], label='target_eff', prob=0.0, subtarget=subtarget)
-    sim = cv.Sim(
-        pars          = pars,
-        interventions = vx,
-        analyzers     = placebo_arm(day=start_trial, trial_size=trial_size // 2)
-    )
+    # Run the trial over several seeds, since a single one is highly sensitive
+    counts = sc.objdict(inf=np.zeros(2), symp=np.zeros(2), sev=np.zeros(2))
+    for rand_seed in range(n_seeds):
+        vx = cv.vaccinate_prob(vaccine=vacc_pars, days=[start_trial], label='target_eff', prob=0.0, subtarget=subtarget)
+        sim = cv.Sim(
+            pars          = sc.mergedicts(pars, dict(rand_seed=rand_seed)),
+            interventions = vx,
+            analyzers     = placebo_arm(day=start_trial, trial_size=trial_size // 2)
+        )
+        sim.run()
 
-    # Run
-    sim.run()
+        vacc_inds = cv.true(sim.people.vaccinated)  # Find trial arm indices, those who were vaccinated
+        placebo_inds = sim['analyzers'][0].placebo_inds
+        assert len(vacc_inds) > 0 and len(placebo_inds) > 0, 'Expected both arms of the trial to have people'
+        assert (len(set(vacc_inds).intersection(set(placebo_inds))) == 0)  # Check that there is no overlap
+        for key, dates in dict(inf=sim.people.date_exposed, symp=sim.people.date_symptomatic, sev=sim.people.date_severe).items():
+            counts[key] += [np.isfinite(dates[vacc_inds]).sum(), np.isfinite(dates[placebo_inds]).sum()]
 
+    # Calculate vaccine efficacy against infection, symptoms, and severe disease
     print('Vaccine efficiency:')
-    results = sc.objdict()
-    vacc_inds = cv.true(sim.people.vaccinated)  # Find trial arm indices, those who were vaccinated
-    placebo_inds = sim['analyzers'][0].placebo_inds
-    assert (len(set(vacc_inds).intersection(set(placebo_inds))) == 0)  # Check that there is no overlap
-    # Calculate vaccine efficacy against infection
-    VE_inf = 1 - (np.isfinite(sim.people.date_exposed[vacc_inds]).sum() /
-                  np.isfinite(sim.people.date_exposed[placebo_inds]).sum())
-    # Calculate vaccine efficacy against symptoms
-    VE_symp = 1 - (np.isfinite(sim.people.date_symptomatic[vacc_inds]).sum() /
-                   np.isfinite(sim.people.date_symptomatic[placebo_inds]).sum())
-    # Calculate vaccine efficacy against severe disease
-    VE_sev = 1 - (np.isfinite(sim.people.date_severe[vacc_inds]).sum() /
-                  np.isfinite(sim.people.date_severe[placebo_inds]).sum())
-    results['inf'] = VE_inf
-    results['symp'] = VE_symp
-    results['sev'] = VE_sev
-    print(f'Against: infection: {VE_inf * 100:0.2f}%, symptoms: {VE_symp * 100:0.2f}%, severity: {VE_sev * 100:0.2f}%')
+    results = sc.objdict({key: 1 - val[0]/val[1] for key, val in counts.items()})
+    print(f'Against: infection: {results.inf * 100:0.2f}%, symptoms: {results.symp * 100:0.2f}%, severity: {results.sev * 100:0.2f}%')
 
-    # Check that actual efficacy is within 6 %age points of target
-    errormsg = f'Expected VE to be about {target_eff_2}, but it is {VE_symp}. Check different random seeds; this test is highly sensitive.'
-    assert round(abs(VE_symp-target_eff_2),2)<=0.1, errormsg
+    # The trial's window includes the 21 days on the first dose, so efficacy is between the two doses' targets
+    errormsg = f'Expected VE between {target_eff_1} and {target_eff_2}, but it is {results.symp}'
+    assert target_eff_1 <= results.symp <= target_eff_2, errormsg
 
     nab_init = sim['vaccine_pars']['target_eff']['nab_init']
     boost = sim['vaccine_pars']['target_eff']['nab_boost']
@@ -399,11 +393,64 @@ def test_historical():
     wave = cv.historical_wave(120, 0.05)
     sim1 = cv.Sim(base_pars, interventions=pfizer).run()
     sim2 = cv.Sim(base_pars, interventions=wave).run()
+    for key in ['cum_infections', 'cum_recoveries', 'cum_symptomatic']: # As in v3, the historical infections are counted on day 0, at the end of the first step (index 1)
+        assert sim2.results[key][1] > 0.02*sim2['pop_size'], f'Expected a few percent of people to have {key} on day 0'
     with pytest.raises(RuntimeError):
         cv.Sim(base_pars, pop_scale=5, interventions=wave).run()
     with pytest.raises(ValueError):
         cv.Sim(base_pars, interventions=cv.historical_wave(120, 0.05, variant='invalid')).run()
+    sim3 = cv.Sim(base_pars, n_days=30, pop_infected=0, interventions=cv.historical_vaccinate_prob('pfizer', days=[-100], prob=0.5)).run()
+    covid = sim3.diseases.covid
+    assert covid.nab[covid.vaccinated.uids].min() > 0 # NAbs from historical vaccination keep waning slowly, rather than falling to zero
     return sim1, sim2
+
+
+def test_nabs():
+    sc.heading('Testing neutralizing antibodies (NAbs)')
+
+    sim = cv.Sim(base_pars, pop_infected=0)
+    sim.initialize()
+
+    # NAbs rise to their peak during the growth time, then decay
+    nab_decay = sim['nab_decay']
+    growth_time = nab_decay['growth_time']
+    daily_change = cv.immunity.precompute_waning(180, nab_decay)
+    assert np.isclose(daily_change[:growth_time].sum(), 1) # NAbs are relative to the peak
+    assert np.all(daily_change[:growth_time] > 0)
+    assert np.all(daily_change[growth_time+5:] < 0)
+
+    # More NAbs give more protection, but never complete protection
+    nabs = np.linspace(0, 20, 50)
+    for axis in ['sus', 'symp', 'sev']:
+        efficacy = cv.immunity.calc_VE(nabs, axis, sim['nab_eff'])
+        assert efficacy[0] == 0 # No NAbs, no protection
+        assert np.all(np.diff(efficacy) > 0)
+        assert efficacy[-1] < 1
+
+    # People with more severe disease have more NAbs (compared by the mean of the log, since the NAbs are lognormal, so their mean is noisy)
+    sim2 = cv.Sim(base_pars, pop_size=5000, pop_infected=0)
+    sim2.initialize()
+    ppl = sim2.people
+    ppl.infect(ppl.uid)
+    symptomatic = np.isfinite(ppl.date_symptomatic)
+    severe      = np.isfinite(ppl.date_severe)
+    log_nabs    = np.log2(ppl.peak_nab.values)
+    asymp_nabs  = log_nabs[~symptomatic].mean()
+    mild_nabs   = log_nabs[symptomatic & ~severe].mean()
+    severe_nabs = log_nabs[severe].mean()
+    assert asymp_nabs < mild_nabs < severe_nabs
+
+    # The initial NAbs can be changed when creating the sim
+    sim3 = cv.Sim(base_pars, pop_infected=100, n_days=1, nab_init=dict(dist='normal', par1=5, par2=0.1)).run()
+    covid = sim3.diseases.covid
+    assert np.log2(covid.peak_nab[covid.infected.uids]).min() > 5 # The default is par1=0
+
+    # Average NAbs in the population rise during an epidemic and then wane
+    sim2 = cv.Sim(base_pars, n_days=250).run()
+    pop_nabs = sim2.results['pop_nabs']
+    assert 0 < pop_nabs[-1] < pop_nabs[:].max()
+
+    return sim2
 
 
 #%% Run as a script
@@ -422,6 +469,7 @@ if __name__ == '__main__':
     sim6  = test_vaccine_target_eff()
     res   = test_decays(do_plot=do_plot)
     sims7 = test_historical()
+    sim8  = test_nabs()
 
     sc.toc(T)
     print('Done.')

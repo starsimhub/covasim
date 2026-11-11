@@ -1,4 +1,4 @@
-'''
+"""
 Define country age pyramids.
 
 This is the following file:
@@ -6,7 +6,7 @@ This is the following file:
 https://github.com/neherlab/covid19_scenarios/blob/master/src/assets/data/country_age_distribution.json
 
 expressed as a Python file.
-'''
+"""
 
 data = {
  'Afghanistan': {'0-9': 11088731,
