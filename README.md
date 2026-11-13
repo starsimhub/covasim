@@ -101,7 +101,6 @@ The model consists of two core classes: the `Person` class (which contains infor
 The structure of the `covasim` folder is as follows, roughly in the order in which the modules are imported, building from most fundamental to most complex:
 
 - `version.py`: Version, date, and license information.
-- `requirements.py`: A simple module to check that imports succeeded, and turn off features if they didn't.
 - `utils.py`: Functions for choosing random numbers, many based on Numba, plus other helper functions.
 - `misc.py`: Miscellaneous helper functions.
 - `settings.py`: User-customizable options for Covasim (e.g. default font size).

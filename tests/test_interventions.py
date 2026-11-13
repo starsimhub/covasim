@@ -13,7 +13,7 @@ import pylab as pl
 import covasim as cv
 import pytest
 
-verbose = -1
+verbose = 0
 do_plot = 0 # Whether to plot when run interactively
 cv.options.set(interactive=False) # Assume not running interactively
 csv_file  = sc.thispath() / 'example_data.csv'

@@ -7,6 +7,7 @@ This file describes each of the input parameters in Covasim. Note: the overall i
 - `pop_size` = Number of agents, i.e., people susceptible to SARS-CoV-2
 - `pop_infected` = Number of initial infections
 - `pop_type` = What type of population data to use -- 'random' (fastest), 'synthpops' (best), 'hybrid' (compromise)
+- `clustered` = For `hybrid`: whether schools and workplaces are random networks, as in v3 (False, the default), or clusters whose members all know each other (True)
 - `location` = What location to load data from -- default Seattle
 
 ## Simulation parameters

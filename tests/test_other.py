@@ -11,7 +11,7 @@ import sciris as sc
 import covasim as cv
 
 do_plot = 1
-verbose = -1
+verbose = 0
 debug   = 1 # This runs without parallelization; faster with pytest
 csv_file  = os.path.join(sc.thisdir(), 'example_data.csv')
 xlsx_file = os.path.join(sc.thisdir(), 'example_data.xlsx')
@@ -284,20 +284,6 @@ def test_population():
 
 
 
-def test_requirements():
-    sc.heading('Testing requirements')
-
-    orig = cv.requirements.min_versions['sciris']
-    cv.requirements.min_versions['sciris'] = '99.99.99'
-    with pytest.raises(ImportError):
-        cv.requirements.check_requirements()
-    cv.requirements.min_versions['sciris'] = orig # Restore
-
-    print('↑ Should print various requirements warnings')
-
-    return
-
-
 def test_run():
     sc.heading('Testing run')
 
@@ -364,7 +350,7 @@ def test_sim():
     cv.parameters.absolute_prognoses(sim['prognoses'])
 
     # Test intervention functions and results analyses
-    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.ti==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.ti}')))).run() # ...This is not the recommended way of defining interventions.
+    cv.Sim(pop_size=100, verbose=0, interventions=lambda sim: (sim.diseases.covid.today==20 and (sim.__setitem__('beta', 0) or print(f'Applying lambda intervention to set beta=0 on day {sim.ti}')))).run() # ...This is not the recommended way of defining interventions.
 
     # Test other outputs
     sim = cv.Sim(pop_size=100, verbose=0, n_days=30)
@@ -398,7 +384,6 @@ if __name__ == '__main__':
     test_misc()
     test_plotting()
     test_population()
-    test_requirements()
     test_run()
     test_sim()
     test_settings()

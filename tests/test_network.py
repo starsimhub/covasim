@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 import sciris as sc
 import starsim as ss
+import starsim.library as ssl
 import covasim as cv
 
 pop_size = 5000
@@ -36,6 +37,16 @@ def test_random():
     assert len(ages) == pop_size # Everyone is in the layer
     assert np.isclose(n_contacts, sim['contacts']['a'], rtol=0.05)
 
+    # The number of contacts can be a distribution instead of a number, e.g. a negative binomial for overdispersion
+    m, k = 20, 0.5
+    nbinom = ss.nbinom(mean=m, n=k) # n is the dispersion
+    overdispersed = cv.Sim(pop_size=pop_size, contacts=nbinom, verbose=0).initialize()
+    layer = overdispersed.people.contacts['a']
+    counts = np.bincount(np.concatenate([layer['p1'], layer['p2']]), minlength=pop_size) # The number of contacts each person has
+    assert np.isclose(counts.mean(), m, rtol=0.05) # The same mean as the Poisson...
+    assert counts.var() > 5*m # ...but a much larger variance (for a Poisson, it's about m)
+    assert overdispersed['contacts']['a'] is overdispersed.networks.a.pars.n_contacts # sim['contacts'] gives the distribution, since it has no single mean
+
     return sim
 
 
@@ -60,6 +71,25 @@ def test_hybrid():
     work_ages, _ = layer_stats(sim, 'w')
     assert  6 <= school_ages.min() and school_ages.max() < 22
     assert 22 <= work_ages.min()   and work_ages.max()   < 65
+
+    # By default, schools and workplaces are random networks, as in v3
+    assert isinstance(sim.networks.s, ss.RandomNet) and isinstance(sim.networks.w, ss.RandomNet)
+
+    # With clustered=True, they are clusters, with the same number of contacts
+    clustered = cv.Sim(pop_size=pop_size, pop_type='hybrid', clustered=True, verbose=0).initialize()
+    assert isinstance(clustered.networks.s, ssl.ClusterNet) and isinstance(clustered.networks.w, ssl.ClusterNet)
+    for key in ['s', 'w']:
+        ages, n_contacts = layer_stats(clustered, key)
+        assert np.isclose(n_contacts, sim['contacts'][key], rtol=0.05)
+
+    # It can also be changed before the sim is initialized, and is kept when the contacts change
+    sim2 = cv.Sim(pop_size=pop_size, pop_type='hybrid', verbose=0)
+    sim2['clustered'] = True
+    sim2['contacts'] = dict(s=5)
+    assert isinstance(sim2.initialize().networks.s, ssl.ClusterNet)
+
+    # Schools can still be turned off
+    assert len(cv.Sim(pop_size=pop_size, pop_type='hybrid', clustered=True, contacts=dict(s=0), verbose=0).initialize().networks.s) == 0
 
     return sim
 
