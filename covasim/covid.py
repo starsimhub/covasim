@@ -822,7 +822,7 @@ class COVID(ss.AgentDisease):
         if len(new_dead):
             self.sim.people.request_death(new_dead)
             self.infected[new_dead] = False # As in v3, people don't transmit on the day they die
-        # Capture this step's flows for record_flows(); reinfections are counted in set_prognoses()
+        # Capture this step's flows for record_events(); reinfections are counted in set_prognoses()
         self.flows['symptomatic']  = len(new_symp)
         self.flows['severe']       = len(new_sev)
         self.flows['critical']     = len(new_crit)
@@ -987,9 +987,9 @@ class COVID(ss.AgentDisease):
         )
         return
 
-    def record_stocks(self):
+    def record_states(self):
         """ Record the stocks, at the start of the step """
-        super().record_stocks()  # auto-counts the BoolState stocks (symptomatic, severe, ...; sim.results.n_symptomatic etc. as in v3)
+        super().record_states()  # auto-counts the BoolState stocks (symptomatic, severe, ...; sim.results.n_symptomatic etc. as in v3)
         ti = self.ti
         res = self.results
         infectious = self.infected & (self.ti_infectious < ti) # As at the end of the last step, before this step's state updates (the property infectious includes those who become infectious in this step)
@@ -1011,9 +1011,9 @@ class COVID(ss.AgentDisease):
             res.pop_symp_protection[ti] = float(self.symp_imm[auids].mean()) if len(auids) else 0.0
         return
 
-    def record_flows(self):
+    def record_events(self):
         """ Record the flows, at the end of the step """
-        super().record_flows()
+        super().record_events()
         ti = self.ti
         res = self.results
         # Flows (captured this timestep in step_state)
