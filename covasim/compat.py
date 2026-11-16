@@ -181,7 +181,7 @@ class V3Sim:
             else:
                 return self.pars.total_pop/self.pars.n_agents if self.pars.total_pop else 1.0
         elif key == 'rescale': # Whether there is dynamic rescaling (see ss.solvers.abm(rescale=))
-            return self._rescaling()
+            return self._dynamic_rescaling()
         elif key == 'verbose':
             return self.pars[key]
         elif key == 'beta': # Stored as a rate; v3 used the daily probability
@@ -247,7 +247,7 @@ class V3Sim:
         elif key in ['rescale', 'rescale_threshold', 'rescale_factor']: # Starsim's ss.solvers.abm(rescale=) is the dict of the options, or False
             if key != 'rescale':
                 self._v3_pars[key] = value
-                value = self._rescaling()
+                value = self._dynamic_rescaling()
             self.pars.solver = ss.solvers.abm(rescale=dict(threshold=self._v3_pars['rescale_threshold'], factor=self._v3_pars['rescale_factor']) if value else False)
         elif key == 'verbose':
             self.pars[key] = value
@@ -303,7 +303,7 @@ class V3Sim:
 
     # v3 properties and methods
 
-    def _rescaling(self):
+    def _dynamic_rescaling(self):
         """ Whether the sim rescales dynamically: an option of Starsim's agents, ss.solvers.abm(rescale=) """
         solver = self.__dict__.get('solver') or self.pars.solver
         return bool(getattr(solver, 'rescale', False))
@@ -313,7 +313,7 @@ class V3Sim:
         """ v3: the number of people each agent represents on each timestep, which changes over time with dynamic rescaling """
         if self._is_v3_saved():
             return self.__dict__['rescale_vec']
-        if self._rescaling():
+        if self._dynamic_rescaling():
             return self.results.pop_scale.values
         return np.full(self.t.npts, self.pop_scale)
 
