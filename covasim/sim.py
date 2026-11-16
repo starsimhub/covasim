@@ -112,7 +112,7 @@ class Sim(cvc.V3Sim, ss.Sim):
         self.timelimit     = v3.pop('timelimit', defaults['timelimit'])
         self.stopping_func = v3.pop('stopping_func', defaults['stopping_func'])
         rescale_opts = {key:v3.pop(f'rescale_{key}', defaults[f'rescale_{key}']) for key in ['threshold', 'factor']} # Dynamic rescaling, done by Starsim
-        pars['rescale'] = rescale_opts if v3.pop('rescale', defaults['rescale']) else False
+        pars['solver'] = ss.solvers.abm(rescale=rescale_opts if v3.pop('rescale', defaults['rescale']) else False) # Dynamic rescaling is an option of Starsim's agents
         if end_day is not None: # As in v3, an end_day takes precedence over n_days
             n_days = int(sc.daydiff(start_day, end_day))
         if pop_type not in ['random', 'hybrid']:
@@ -572,7 +572,7 @@ class Sim(cvc.V3Sim, ss.Sim):
         for key in ['alive', 'female']: # Likewise for the people, e.g. n_alive
             self.results[f'n_{key}'] = self.results[key]
             self._bridged_keys.append(f'n_{key}')
-        self.results['new_emigrants'] = self.results['emigrated'] # The people who left, under the name it had
+        self.results['new_emigrants'] = self.results['emigration'] # The people who left, under the name it had
         self._bridged_keys.append('new_emigrants')
         self.results['variant'] = variant
         self.results['date'] = self.results['timevec'] # v3 also had the time keys "date" and "t"

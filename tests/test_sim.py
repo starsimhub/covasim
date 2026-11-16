@@ -193,7 +193,7 @@ def test_starsim():
 
     # Starsim modules can be added to a sim, e.g. births
     pop_size = 1000
-    sim = cv.Sim(pop_size=pop_size, n_days=30, demographics=ss.Births(birth_rate=ss.peryear(200)), verbose=0)
+    sim = cv.Sim(pop_size=pop_size, n_days=30, demographics=ss.Births(birth_rate=ss.peryear(200), rate_per=1000), verbose=0)
     sim.run()
     assert sim.people.n_uids > pop_size # People have been born
 

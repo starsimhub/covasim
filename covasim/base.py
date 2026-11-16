@@ -3,6 +3,7 @@ The v3 contact layers (``cv.Layer``, now a Starsim network, and ``cv.Contacts``)
 ``cv.Result`` (now Starsim's).
 """
 
+import numpy as np
 import sciris as sc
 import starsim as ss
 
@@ -62,6 +63,7 @@ class Layer(ss.Network):
             kwargs['weight'] = kwargs.pop('beta')
         if 'beta' in edges:
             edges['weight'] = edges.pop('beta')
+        edges.update({k:kwargs.pop(k) for k in list(kwargs) if np.ndim(kwargs[k]) > 0}) # As in v3, other columns of the edges can be given by keyword, e.g. cv.Layer(**layer, index=index)
         super().__init__(pars=pars, edges=edges, **kwargs)
         return
 

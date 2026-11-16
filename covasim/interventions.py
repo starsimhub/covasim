@@ -1182,7 +1182,7 @@ class historical_wave(Intervention):
         covid = self.sim.diseases.covid
         if not covid.pars.use_waning:
             raise RuntimeError('cv.historical_wave() requires use_waning=True.')
-        if sim.pars.rescale and (sim['pop_scale'] > 1):
+        if sim['rescale'] and (sim['pop_scale'] > 1):
             errormsg = 'cv.historical_wave() requires rescale=False, since rescaling assumes non-included agents are naive. Please disable dynamic rescaling.'
             raise RuntimeError(errormsg)
         mapping = {label:ind for ind,label in covid.variant_map.items()}

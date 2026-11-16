@@ -180,8 +180,8 @@ class V3Sim:
                 return self._v3_pars['pop_scale']
             else:
                 return self.pars.total_pop/self.pars.n_agents if self.pars.total_pop else 1.0
-        elif key == 'rescale': # True, or a dict of the rescaling options (see ss.Sim)
-            return bool(self.pars.rescale)
+        elif key == 'rescale': # Whether there is dynamic rescaling (see ss.solvers.abm(rescale=))
+            return self._rescaling()
         elif key == 'verbose':
             return self.pars[key]
         elif key == 'beta': # Stored as a rate; v3 used the daily probability
@@ -244,11 +244,11 @@ class V3Sim:
             self._v3_pars['scaled_pop'] = value
         elif key == 'dur': # Converted to the COVID duration parameters (e.g. dur_exp2inf) when the sim is initialized
             self._v3_pars['dur'] = value
-        elif key in ['rescale', 'rescale_threshold', 'rescale_factor']: # Starsim's rescale= is the dict of the options, or False
+        elif key in ['rescale', 'rescale_threshold', 'rescale_factor']: # Starsim's ss.solvers.abm(rescale=) is the dict of the options, or False
             if key != 'rescale':
                 self._v3_pars[key] = value
-                value = bool(self.pars.rescale)
-            self.pars.rescale = dict(threshold=self._v3_pars['rescale_threshold'], factor=self._v3_pars['rescale_factor']) if value else False
+                value = self._rescaling()
+            self.pars.solver = ss.solvers.abm(rescale=dict(threshold=self._v3_pars['rescale_threshold'], factor=self._v3_pars['rescale_factor']) if value else False)
         elif key == 'verbose':
             self.pars[key] = value
         elif key in ['interventions', 'analyzers']:
@@ -303,12 +303,17 @@ class V3Sim:
 
     # v3 properties and methods
 
+    def _rescaling(self):
+        """ Whether the sim rescales dynamically: an option of Starsim's agents, ss.solvers.abm(rescale=) """
+        solver = self.__dict__.get('solver') or self.pars.solver
+        return bool(getattr(solver, 'rescale', False))
+
     @property
     def rescale_vec(self):
         """ v3: the number of people each agent represents on each timestep, which changes over time with dynamic rescaling """
         if self._is_v3_saved():
             return self.__dict__['rescale_vec']
-        if self.pars.rescale:
+        if self._rescaling():
             return self.results.pop_scale.values
         return np.full(self.t.npts, self.pop_scale)
 
@@ -579,7 +584,7 @@ class V3Sim:
         flat = self.results.flatten(sep='_', only_results=False, keep_case=True, columns=True)
         skip = ('covid_', 'variant_') # Skip the duplicates of the COVID results (e.g. "covid_cum_infections", the same as "cum_infections"), and the results by variant, which aren't in the v3 summary
         for key,res in flat.items():
-            if not key.startswith(skip) and key not in ['alive', 'female', 'infection', 'died', 'emigrated', 'unrepresented']: # The same as n_alive, n_female, new_infections, new_deaths, and new_emigrants, the v3 names; unrepresented is v4's own
+            if not key.startswith(skip) and key not in ['alive', 'female', 'infection', 'death', 'emigration', 'unrepresented']: # The same as n_alive, n_female, new_infections, new_deaths, and new_emigrants, the v3 names; unrepresented is v4's own
                 val = res[t]
                 if sc.isnumber(val): # Skip the dates
                     summary[key] = val
@@ -614,7 +619,7 @@ class V3Sim:
         """ v3: the results as a dataframe, including the columns "t" and "date", and the COVID results named as in v3 (e.g. "cum_infections") """
         df = super().to_df(**kwargs)
         cols = list(df.columns)
-        dups = ['timevec', 'infection', 'covid_infection', 'died', 'emigrated'] # The same as "date", "new_infections", "new_deaths", and "new_emigrants"
+        dups = ['timevec', 'infection', 'covid_infection', 'death', 'emigration'] # The same as "date", "new_infections", "new_deaths", and "new_emigrants"
         for col in cols: # Remove duplicates of the COVID results, e.g. "covid_cum_infections" (same as "cum_infections")
             if col.startswith('variant_'):
                 dups.append(col)

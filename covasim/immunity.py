@@ -49,7 +49,7 @@ class variant(sc.prettyobj):
         self.label     = None  # variant key (dict label)
         self.p         = None  # the 5 per-variant parameters
         self.choose_imports = ss.choose_n() # Who to infect on each introduction day
-        self.round_imports = ss.constant(value=0, round='stochastic') # Round the number of imports up or down, with rescaling
+        self.round_imports = ss.constant(value=0, round='random') # Round the number of imports up or down, with rescaling
         self.parse(variant=variant, label=label)
         self.initialized = False
         return
