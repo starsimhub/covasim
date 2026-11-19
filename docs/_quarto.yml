@@ -139,7 +139,6 @@ website:
         - api/people.qmd
         - api/plotting.qmd
         - api/population.qmd
-        - api/requirements.qmd
         - api/run.qmd
         - api/settings.qmd
         - api/sim.qmd
@@ -166,7 +165,6 @@ quartodoc:
       - people
       - plotting
       - population
-      - requirements
       - run
       - settings
       - sim

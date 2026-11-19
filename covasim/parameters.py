@@ -35,6 +35,7 @@ def make_pars(set_prognoses=False, prog_by_age=True, version=None, **kwargs):
     pars['pop_infected'] = 20       # Number of initial infections
     pars['pop_type']     = 'random' # What type of population data to use -- 'random' (fastest) or 'hybrid' (household, school, work, and community layers)
     pars['location']     = None     # What location to load data from -- default Seattle
+    pars['clustered']    = False    # For hybrid: whether schools and workplaces are random networks, as in v3 (False), or clusters, whose members all know each other (True)
 
     # Simulation parameters
     pars['start_day']  = '2020-03-01' # Start day of the simulation
@@ -144,6 +145,7 @@ def make_pars(set_prognoses=False, prog_by_age=True, version=None, **kwargs):
         for key in pars.keys(): # Only loop over keys that have been populated
             if (key in version_pars) and (key not in skip_keys): # Only replace keys that exist in the old version
                 pars[key] = version_pars[key]
+        pars['clustered'] = version_pars.get('clustered', False) # Schools and workplaces were random networks in earlier versions
         if version_pars.get('prognoses') is not None: # The version file stores the prognoses as lists; convert them to arrays
             pars['prognoses'] = {key:np.array(val) for key,val in version_pars['prognoses'].items()}
 
@@ -174,8 +176,10 @@ def reset_layer_pars(pars, layer_keys=None, force=False):
     commonly, however, mismatches need to be fixed explicitly.
 
     Each layer parameter (``beta_layer``, ``contacts``, ``dynam_layer``, ``iso_factor``,
-    ``quar_factor``) can be a dict by layer, or a single number for all layers
-    (e.g. ``beta_layer=0.5``).
+    ``quar_factor``) can be a dict by layer, or a single value for all layers
+    (e.g. ``beta_layer=0.5``). The number of contacts can also be a Starsim
+    distribution (e.g. ``contacts=dict(c=ss.nbinom(mean=20, n=0.5))``); a number
+    is the mean of a Poisson distribution.
 
     Args:
         pars (dict): the parameters dictionary
@@ -220,7 +224,7 @@ def reset_layer_pars(pars, layer_keys=None, force=False):
             par_dict = defaults[pkey] # Just use defaults
         else:
             user_par = pars.get(pkey, None)
-            if sc.isnumber(user_par): # A single value for all layers
+            if (user_par is not None) and not isinstance(user_par, dict): # A single value for all layers, e.g. a number or a distribution
                 user_par = {lkey:user_par for lkey in (layer_keys or default_layer_keys)}
             par_dict = sc.mergedicts(defaults[pkey], user_par) # Use user-supplied parameters if available, else default
 
