@@ -152,7 +152,6 @@ class Contacts(FlexDict):
         """
         for lkey,layer in kwargs.items():
             layer = to_layer(lkey, layer)
-            layer.validate()
             if self.sim is not None:
                 self.sim._add_network(layer)
             dict.__setitem__(self, lkey, layer) # Not self[lkey] = layer, which is only for contacts that aren't from a sim

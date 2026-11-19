@@ -76,7 +76,7 @@ class Options(sc.objdict):
 
         cv.options(dpi=150) # Larger size
         cv.options(style='simple', font='Rosario') # Change to the "simple" Covasim style with a custom font
-        cv.options.set(fontsize=18, show=False, backend='agg', precision=64) # Multiple changes
+        cv.options.set(fontsize=18, show=False, backend='agg') # Multiple changes
         cv.options(interactive=False) # Turn off interactive plots
         cv.options(jupyter=True) # Defaults for Jupyter
         cv.options('defaults') # Reset to default options
@@ -106,9 +106,6 @@ class Options(sc.objdict):
             self.set(**env_options)
             self.setattribute('orig_options', sc.dcp(self.to_dict())) # These are now the defaults
 
-        # The precision is shared with Starsim; set it directly, since set() would reload Covasim
-        if self.precision != ss.options.precision:
-            ss.options(precision=self.precision)
         ss.options(warnings=self.warnings) # Likewise the warnings, so that the two never differ
         return
 
@@ -216,9 +213,6 @@ class Options(sc.objdict):
         optdesc.sep = 'Set thousands separator for text output'
         options.sep = str(os.getenv('COVASIM_SEP', ','))
 
-        optdesc.precision = 'Set arithmetic precision (shared with Starsim) -- 32-bit by default for efficiency'
-        options.precision = int(os.getenv('COVASIM_PRECISION', ss.options.precision))
-
         optdesc.numba_cache = 'Set Numba caching -- saves on compilation time; disabling is not recommended'
         options.numba_cache = bool(int(os.getenv('COVASIM_NUMBA_CACHE', 1)))
 
@@ -242,9 +236,9 @@ class Options(sc.objdict):
 
         reload_required = False
         rename = {'font_size': 'fontsize', 'font_family':'font'} # Deprecated keys
-        numba_keys = ['precision', 'numba_cache'] # Keys that require a reload
+        numba_keys = ['numba_cache'] # Keys that require a reload
         matplotlib_keys = ['fontsize', 'font', 'dpi', 'backend'] # Keys that are set in Matplotlib directly
-        starsim_keys = ['verbose', 'warnings', 'precision'] # Keys that are shared with ss.options
+        starsim_keys = ['verbose', 'warnings'] # Keys that are shared with ss.options
 
         # Reset to defaults
         reset = key in ['default', 'defaults']
@@ -588,10 +582,7 @@ def reload_numba():
     **Example**::
 
         import covasim as cv
-        cv.options.set(precision=64) # Also sets ss.options.precision
-        sim = cv.Sim()
-        sim.run()
-        assert np.asarray(sim.people.rel_trans).dtype == np.float64
+        cv.options.set(numba_cache=False) # Reloads Covasim's Numba functions, uncached
     """
     print('Reloading Covasim so changes take effect...')
     import importlib
