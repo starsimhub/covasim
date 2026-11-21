@@ -13,6 +13,7 @@ To regenerate the v3 results, see the README.
 import sys
 import pytest
 import sciris as sc
+import covasim as cv
 
 sys.path.insert(0, str(sc.thispath().parent)) # So the migrate3to4 folder can be imported
 import migrate3to4.short_summary as mss
@@ -27,7 +28,7 @@ not_results = ['_seed', '_total_pop', 'n_alive'] # Keys in the summaries that ar
 
 #%% Define the tests
 
-def check_parity(name, anchor, summary, v3_name=None, z_threshold=5.0, skip=None):
+def check_parity(name, anchor, summary, v3_name=None, z_threshold=5.0, skip=None, v4_pars=None):
     """
     Compare v4 with v3 for the random and hybrid populations
 
@@ -38,6 +39,7 @@ def check_parity(name, anchor, summary, v3_name=None, z_threshold=5.0, skip=None
         v3_name     (str):    the name of the v3 results file, if different from the feature
         z_threshold (float):  how many standard errors v4 can differ from v3 by; 5 allows differences of a few percent, which are expected since the random numbers differ
         skip        (list):   results that are known to differ, so aren't checked
+        v4_pars     (dict):   parameters for the v4 sims, to allow for a known difference from v3
     """
     sc.heading(f'Checking v3 vs. v4: {name}')
     skip = set(sc.mergelists(skip, not_results))
@@ -48,7 +50,7 @@ def check_parity(name, anchor, summary, v3_name=None, z_threshold=5.0, skip=None
         if not filename.exists():
             pytest.skip(f'v3 results not found: {filename}')
         v3_rows = sc.loadjson(filename)
-        v4_rows = [summary(anchor.make_sim(pop_type=pop_type, rand_seed=seed).run()) for seed in range(n_seeds)]
+        v4_rows = [summary(anchor.make_sim(pop_type=pop_type, rand_seed=seed, **(v4_pars or {})).run()) for seed in range(n_seeds)]
         failures = parity_gate(v4_rows, v3_rows, z_threshold=z_threshold, skip_keys=skip)
         assert not failures, f'{name} ({pop_type}) differs from v3 by more than {z_threshold} standard errors for (result, z-score): {failures}'
 
@@ -62,7 +64,12 @@ def test_transmission():
 
 @pytest.mark.slow
 def test_natural_history():
-    return check_parity('natural_history', anchor_natural_history, mss.build_summary_natural_history)
+    # v4 corrects a rounding error in v3's viral load, which gave some people an extra day of high viral load,
+    # so its transmission is 1-2% lower for the same beta (see docs/migrate3to4.md); with the full disease course
+    # this lowers the peak by about 4% (over 5 standard errors). A 2% higher beta, as the docs advise for models
+    # calibrated with v3, brings every result within about 1.5 standard errors
+    v4_pars = dict(beta=1.02*cv.make_pars()['beta'])
+    return check_parity('natural_history', anchor_natural_history, mss.build_summary_natural_history, v4_pars=v4_pars)
 
 
 @pytest.mark.slow

@@ -3,6 +3,7 @@ The v3 contact layers (``cv.Layer``, now a Starsim network, and ``cv.Contacts``)
 ``cv.Result`` (now Starsim's).
 """
 
+import numpy as np
 import sciris as sc
 import starsim as ss
 
@@ -51,20 +52,32 @@ class Layer(ss.Network):
         n_people = 1000
         p1 = np.random.randint(n_people, size=n)
         p2 = np.random.randint(n_people, size=n)
-        beta = np.ones(n)
-        layer = cv.Layer(p1=p1, p2=p2, beta=beta, label='rand')
+        weight = np.ones(n)
+        layer = cv.Layer(p1=p1, p2=p2, weight=weight, label='rand')
+
+    As in v3, the weight of each edge can also be given as ``beta``.
     """
+    def __init__(self, pars=None, edges=None, **kwargs):
+        edges = dict(edges) if edges is not None else {} # dict() also handles dataframes
+        if 'beta' in kwargs: # v3's name for the weight of each edge
+            kwargs['weight'] = kwargs.pop('beta')
+        if 'beta' in edges:
+            edges['weight'] = edges.pop('beta')
+        edges.update({k:kwargs.pop(k) for k in list(kwargs) if np.ndim(kwargs[k]) > 0}) # As in v3, other columns of the edges can be given by keyword, e.g. cv.Layer(**layer, index=index)
+        super().__init__(pars=pars, edges=edges, **kwargs)
+        return
+
     def step(self):
         """ The edges are static """
         pass
 
     def keys(self):
-        """ v3: a layer was a dict of its edge arrays (p1, p2, beta, and any others), so e.g. cv.Layer(**layer) copies it """
+        """ v3: a layer was a dict of its edge arrays (p1, p2, weight, and any others), so e.g. cv.Layer(**layer) copies it """
         return list(self.edges.keys())
 
 
 def to_layer(lkey, layer):
-    """ Return the layer as a network named lkey: a network is used as it is, and a dict of edges (p1, p2, beta) becomes a cv.Layer """
+    """ Return the layer as a network named lkey: a network is used as it is, and a dict of edges (p1, p2, and weight, or v3's beta) becomes a cv.Layer """
     if isinstance(layer, ss.Network):
         if layer.name != lkey:
             layer.name = lkey
@@ -81,7 +94,7 @@ class Contacts(FlexDict):
     can't be removed from or replaced in a sim this way, so pass ``networks`` to ``cv.Sim()`` instead.
 
     Args:
-        data (dict): a dictionary of layers (or of dicts of p1, p2, and beta arrays)
+        data (dict): a dictionary of layers (or of dicts of p1, p2, and weight arrays)
         layer_keys (list): if provided, create an empty Contacts object with these layers
         sim (Sim): if provided, the sim whose networks these are
         kwargs (dict): additional layer(s), merged with data
@@ -139,7 +152,6 @@ class Contacts(FlexDict):
         """
         for lkey,layer in kwargs.items():
             layer = to_layer(lkey, layer)
-            layer.validate()
             if self.sim is not None:
                 self.sim._add_network(layer)
             dict.__setitem__(self, lkey, layer) # Not self[lkey] = layer, which is only for contacts that aren't from a sim
@@ -152,7 +164,7 @@ class Contacts(FlexDict):
 
         **Example**::
 
-            contacts = cv.Contacts(a=dict(p1=[0,1], p2=[1,2], beta=[1,1]), b=dict(p1=[2], p2=[3], beta=[1]))
+            contacts = cv.Contacts(a=dict(p1=[0,1], p2=[1,2], weight=[1,1]), b=dict(p1=[2], p2=[3], weight=[1]))
             contacts.pop_layer('b')
         """
         if self.sim is not None:

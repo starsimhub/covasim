@@ -71,7 +71,7 @@ def test_isolation():
 
     # Quarantine some people who are susceptible
     period = 7
-    susceptible = cv.true(ppl.susceptible)[:50]
+    susceptible = cv.true(ppl.susceptible & ~ppl.recovered)[:50] # Not people who have recovered and are susceptible again, since they aren't quarantined
     ppl.schedule_quarantine(susceptible, start_date=day+delay, period=period)
 
     # Once the results are back, people who are diagnosed and still infected are isolated

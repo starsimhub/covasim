@@ -40,7 +40,7 @@ def test_snapshot():
     assert people1 == people2, 'Snapshot options should match but do not'
     assert people3 != people4, 'Snapshot options should not match but do'
     assert len(people4) == pars['pop_size'], 'Snapshots should include everyone, including people who have died'
-    assert people4.count('exposed') == sim.results['n_exposed'][34], 'Snapshot should match the results on that day'
+    assert people4.count('exposed') == sim.results['n_exposed'][35], 'Snapshot should match the results at the start of the next day' # As in v3, the snapshot is at the end of the day; a stock in the results is at the start of the day
     return people5
 
 
@@ -194,7 +194,25 @@ def test_calibration():
     calib.plot_sims(to_plot=['cum_deaths', 'cum_diagnoses'], **fname('Calibration sims'))
     calib.plot_trend()
 
-    assert calib.after.fit.mismatch < calib.before.fit.mismatch
+    assert calib.after_fit.mismatch < calib.before_fit.mismatch
+
+    return calib
+
+
+def test_calibration_pop_size():
+    sc.heading('Testing calibration of the population size')
+
+    # Data from a sim with known values, long enough for the epidemic to end, so its size depends on the population
+    true = cv.Sim(pop_size=1000, beta=0.016, n_days=100, verbose=0).run()
+    data = sc.dataframe(date=true.datevec, new_infections=true.results['new_infections'][:], cum_infections=true.results['cum_infections'][:])
+    sim = cv.Sim(pop_size=500, beta=0.01, n_days=100, verbose=0, datafile=data)
+    calib = sim.calibrate(calib_pars=dict(pop_size=[500, 250, 4000], beta=[0.01, 0.005, 0.03]), n_trials=30, n_workers=1, verbose=0)
+
+    # Named as in v3, and recovered roughly (over 6 seeds, 770-1000 and 0.017-0.027)
+    assert 'pop_size' in calib.df.columns
+    assert 700 < calib.best_pars.pop_size < 1300
+    assert 0.008 < calib.best_pars.beta < 0.032
+    assert calib.after['pop_size'] == round(calib.best_pars.pop_size)
 
     return calib
 
@@ -238,6 +256,7 @@ if __name__ == '__main__':
     nab_hist  = test_nab_hist()
     fit       = test_fit()
     calib     = test_calibration()
+    calib2    = test_calibration_pop_size()
     transtree = test_transtree()
 
     print('\n'*2)

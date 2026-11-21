@@ -127,7 +127,7 @@ s2 = cv.Sim(n_days=120, pop_size=20e3,  pop_infected=50, pop_scale=10, rescale=T
 s3 = cv.Sim(n_days=120, pop_size=20e3,  pop_infected=5,  pop_scale=10, rescale=False, label='Static rescaling')
 
 msim = cv.MultiSim([s1, s2, s3])
-msim.run(verbose=-1)
+msim.run(verbose=0)
 msim.plot()
 ```
 

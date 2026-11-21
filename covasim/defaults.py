@@ -1,17 +1,11 @@
 """
 Set the defaults across each of the different files.
-
-The precision (32 bit by default, or 64 bit) is shared with Starsim; to change
-it, use::
-
-    cv.options.set(precision=64)
 """
 
 import numpy as np
 import numba as nb
 import sciris as sc
 import starsim as ss
-from .settings import options as cvo # To set options
 
 # Specify all externally visible functions this file defines
 __all__ = ['default_float', 'default_int', 'get_default_colors', 'get_default_plots']
@@ -19,19 +13,13 @@ __all__ = ['default_float', 'default_int', 'get_default_colors', 'get_default_pl
 
 #%% Specify what data types to use
 
-# Floats are the same as Starsim's, which follow ss.options.precision (set by cv.options.set(precision=...))
+# Floats are the same as Starsim's (float32)
 default_float = ss.dtypes.float
 nbfloat       = ss.dtypes.nbfloat
 
-# Integers for the contact arrays (population.py) and the Numba functions (utils.py); Starsim always uses int64
-if cvo.precision == 32:
-    default_int = np.int32
-    nbint       = nb.int32
-elif cvo.precision == 64: # pragma: no cover
-    default_int = np.int64
-    nbint       = nb.int64
-else:
-    raise NotImplementedError(f'Precision must be either 32 bit or 64 bit, not {cvo.precision}')
+# Integers for the contact arrays (population.py) and the Numba functions (utils.py)
+default_int = np.int32
+nbint       = nb.int32
 
 
 #%% Define other defaults

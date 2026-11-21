@@ -18,7 +18,7 @@ authors = [
     {name = "Daniel Klein"},
 ]
 keywords = ["COVID", "COVID-19", "coronavirus", "SARS-CoV-2", "stochastic", "agent-based model", "interventions", "epidemiology"]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 classifiers = [
     "Environment :: Console",
     "Intended Audience :: Science/Research",
@@ -36,7 +36,7 @@ dependencies = [
     "statsmodels",
     "matplotlib",
     "sciris>=3.4.0",
-    "starsim>=3.7.2,<4",
+    "starsim>=4.0.0rc2",
 ]
 dynamic = ["version"]
 
